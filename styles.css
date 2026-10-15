@@ -247,3 +247,8 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line);
   .ticker__track { animation: none; }
   .art__frame img, .art__frame canvas { transition: none; }
 }
+
+/* ---------- 404 ---------- */
+.lost { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; }
+.dot--down { background: var(--down); box-shadow: 0 0 0 4px color-mix(in srgb, var(--down) 18%, transparent); }
+.lost .proj__link { margin-top: 0; }

@@ -16,4 +16,6 @@ Open it through a local server rather than `file://`, or the canvas can't read t
 
 ## Deploy
 
-Netlify: import this repo, leave the build command empty, publish directory `.`. Then add `ethantam.dev` under Domain management.
+Cloudflare (the domain's DNS is already there): Workers & Pages → Create → Pages → Connect to Git → this repo. Framework preset: None, build command empty, output directory `/`. Then Custom domains → `ethantam.dev`.
+
+`_headers` sets security and cache headers; `404.html` is served for unknown paths. `assets/og.png` is the link-preview card.

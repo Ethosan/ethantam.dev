@@ -217,6 +217,14 @@
   form.addEventListener("submit", (e) => { e.preventDefault(); run(input.value); input.value = ""; });
   input.addEventListener("keydown", (e) => {
     if (e.key === "ArrowUp" && hIdx > 0) { input.value = history[--hIdx]; e.preventDefault(); }
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const [cmd, arg] = input.value.trimStart().split(/\s+/, 2);
+      const pool = arg !== undefined ? Object.keys(LINKS).map((k) => `${cmd} ${k}`) : Object.keys(COMMANDS);
+      const hits = pool.filter((c) => c.startsWith(input.value.trimStart().toLowerCase()));
+      if (hits.length === 1) input.value = hits[0] + (hits[0] === "open" ? " " : "");
+      else if (hits.length > 1) print(input.value, hits.join("  "));
+    }
     if (e.key === "ArrowDown") { hIdx = Math.min(history.length, hIdx + 1); input.value = history[hIdx] ?? ""; e.preventDefault(); }
   });
   document.querySelectorAll("[data-open-term]").forEach((b) => b.addEventListener("click", openTerm));

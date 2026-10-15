@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ethantam.dev/sitemap.xml
