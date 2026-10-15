@@ -186,7 +186,10 @@ h2 { margin: 0; font-weight: 400; color: var(--muted); text-transform: uppercase
 .proj p { margin: 0 0 22px; color: var(--muted); font-size: 0.9375rem; }
 .stack { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0 0 22px; font-size: 0.6875rem; }
 .stack li { padding: 4px 9px; border: 1px solid var(--line); border-radius: 3px; color: var(--muted); }
-.proj__link { margin-top: auto; text-decoration: none; color: var(--accent); align-self: flex-start; }
+.proj__links { margin-top: auto; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+.proj__link { text-decoration: none; color: var(--accent); }
+.proj__src { text-decoration: none; color: var(--muted); }
+.proj__src:hover { color: var(--fg); }
 .proj__link:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 .log { list-style: none; margin: 0; padding: 0; }
@@ -264,7 +267,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line);
   .block__head { margin-bottom: 20px; }
   .proj { padding: 18px; }
   .proj__top { margin-bottom: 24px; }
-  .proj__link, .links a, .foot .link { display: inline-block; padding-block: 8px; }
+  .proj__link, .proj__src, .links a, .foot .link { display: inline-block; padding-block: 8px; }
   .log li { grid-template-columns: 64px minmax(0, 1fr); gap: 2px 12px; }
   .log__o { grid-column: 2; text-align: left; }
   .contact { font-size: 1.3rem; }

@@ -151,8 +151,8 @@
   const LINKS = {
     github: "https://github.com/Ethosan",
     linkedin: "https://linkedin.com/in/ethantam-",
-    "20bucks": "https://github.com/Ethosan/moneytracker",
-    list: "https://github.com/Ethosan/Makan-bot",
+    "20bucks": "https://20bucks.ethantam.dev",
+    list: "https://list.ethantam.dev",
   };
   const a = (href, text = href) => `<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
 
@@ -171,8 +171,8 @@
     ].join("\n"),
     about: () => "Ethan Tam. Singapore.\nI build web apps and bots that fix problems in my own life, then polish them\nuntil other people can use them. Economics and finance by training, code by habit.",
     projects: () => [
-      `20bucks     personal finance PWA: splits, PayLater, P&L, AI review   ${a(LINKS["20bucks"], "src")}`,
-      `The List    restaurant ratings + auto-researched want list + bot     ${a(LINKS.list, "src")}`,
+      `20bucks     personal finance PWA: splits, PayLater, P&L, AI review   ${a(LINKS["20bucks"], "app")} ${a("https://github.com/Ethosan/moneytracker", "src")}`,
+      `The List    restaurant ratings + auto-researched want list + bot     ${a(LINKS.list, "app")} ${a("https://github.com/Ethosan/Makan-bot", "src")}`,
     ].join("\n"),
     record: () => [
       "2023–24  Founder & President, ACSians Investment Society",
