@@ -270,7 +270,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line);
   .contact { font-size: 1.3rem; }
   .foot { flex-direction: column; align-items: flex-start; gap: 4px; }
 
-  .ticker__label { padding-right: 10px; font-size: 0.625rem; }
+  .ticker__label { padding-right: 10px; font-size: 0.6875rem; }
   .ticker__track { gap: 1.5rem; padding-left: 1.25rem; }
 
   /* terminal: sit at the top so the on-screen keyboard doesn't cover it */
