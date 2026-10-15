@@ -1,0 +1,35 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "buried-raster",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-15T17:41:39.553Z",
+        "reason": "Claude: the painting img sits at opacity 0 under the dithered canvas by design and fades in on hover/tap"
+      },
+      {
+        "rule": "clipped-overflow-container",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-15T17:41:39.774Z",
+        "reason": "Claude: art frame clips its own absolutely positioned img/canvas fill; no popovers inside"
+      },
+      {
+        "rule": "italic-serif-display",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-15T17:41:40.002Z",
+        "reason": "Claude: only a two-word italic accent inside a roman sans headline, echoing the painting; not a full serif hero"
+      }
+    ]
+  }
+}
