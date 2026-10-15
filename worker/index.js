@@ -29,21 +29,36 @@ async function quote([label, yahoo = label]) {
   }
 }
 
+const STALE_TTL = 60 * 60 * 24;
+const json = (body, cacheControl) => new Response(JSON.stringify(body), {
+  headers: { "content-type": "application/json; charset=utf-8", "cache-control": cacheControl },
+});
+
 async function quotes(request, ctx) {
   const cache = caches.default;
-  const key = new Request(new URL("/api/quotes", request.url).toString());
-  const hit = await cache.match(key);
-  if (hit) return hit;
+  const base = new URL(request.url).origin;
+  const freshKey = new Request(`${base}/api/quotes`);
+  const staleKey = new Request(`${base}/api/quotes?stale`);
+
+  const hit = await cache.match(freshKey);
+  if (hit) return new Response(hit.body, { headers: { ...Object.fromEntries(hit.headers), "cache-control": "no-store" } });
 
   const list = await Promise.all(WATCHLIST.map(quote));
-  const res = new Response(JSON.stringify({ t: Date.now(), quotes: list }), {
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      "cache-control": `public, max-age=${TTL}`,
-    },
-  });
-  ctx.waitUntil(cache.put(key, res.clone()));
-  return res;
+  const body = { t: Date.now(), quotes: list };
+
+  if (!list.some((q) => typeof q.p === "number")) {
+    // Yahoo is down or blocking us: serve the last good result rather than caching a blank one
+    const stale = await cache.match(staleKey);
+    if (stale) return new Response(stale.body, { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "x-quotes-stale": "1" } });
+    return json(body, "no-store");
+  }
+
+  ctx.waitUntil(Promise.all([
+    cache.put(freshKey, json(body, `public, max-age=${TTL}`)),
+    cache.put(staleKey, json(body, `public, max-age=${STALE_TTL}`)),
+  ]));
+  // the edge does the caching; browsers always ask again
+  return json(body, "no-store");
 }
 
 export default {

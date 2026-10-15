@@ -24,14 +24,15 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <noscript><link rel="stylesheet" href="noscript.css"></noscript>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
-  <div class="ticker" aria-label="Watchlist">
-    <span class="ticker__label mono">Watchlist</span>
+  <div class="ticker" aria-hidden="true">
+    <span class="ticker__label mono"><span class="ticker__long">Prices I check too often</span><span class="ticker__short">Watching</span></span>
     <div class="ticker__viewport">
       <div class="ticker__track" id="ticker">
         <!-- filled by main.js; this is the no-JS fallback -->
@@ -61,17 +62,16 @@
         <h1>Hi, I'm Ethan. I like <em>markets</em>, economics, and building small things.</h1>
         <p class="lede">I'm doing National Service in Singapore right now, and I'll be studying Economics at Cambridge from 2027. In between, I read about markets and make apps for myself and my friends.</p>
 
-        <dl class="stats mono">
-          <div><dt>Now</dt><dd>National Service</dd></div>
-          <div><dt>On the side</dt><dd>Advisory SG</dd></div>
-          <div><dt>Next</dt><dd>Economics '27</dd></div>
-          <div><dt>Into</dt><dd>Markets</dd></div>
-        </dl>
+        <p class="status mono">
+          <span><span class="dim">Now</span> National Service</span>
+          <span><span class="dim">On the side</span> finance at Advisory SG</span>
+          <span><span class="dim">Next</span> Economics, 2027</span>
+        </p>
       </div>
 
       <figure class="art" id="art">
         <button type="button" class="art__frame" aria-label="Toggle between dithered and original painting" aria-pressed="false">
-          <img src="assets/tulips.jpg" alt="Vase of Flowers in a Window by Ambrosius Bosschaert the Elder: tulips, roses and irises in a glass vase set in a stone arch, a river landscape behind." width="900" height="1250" decoding="async" fetchpriority="high">
+          <img src="assets/tulips.webp" alt="Vase of Flowers in a Window by Ambrosius Bosschaert the Elder: tulips, roses and irises in a glass vase set in a stone arch, a river landscape behind." width="800" height="1111" decoding="async" fetchpriority="high">
           <canvas aria-hidden="true"></canvas>
         </button>
         <figcaption class="mono">
@@ -100,30 +100,32 @@
 
       <div class="projects">
         <article class="proj">
-          <header class="proj__top mono">
-            <span class="tag tag--live">LIVE</span>
-            <span class="dim">PWA</span>
-          </header>
-          <h3>20bucks</h3>
-          <p>Personal finance app you can install on your phone or use on a laptop. Spending, bill splits, PayLater instalments, trading and poker P&amp;L, statement imports, offline sync, and an AI assistant that reviews your entries.</p>
-          <ul class="stack mono"><li>JavaScript</li><li>Supabase</li><li>Edge Functions</li></ul>
-          <div class="proj__links mono">
-            <a class="proj__link" href="https://20bucks.ethantam.dev">20bucks.ethantam.dev ↗</a>
-            <a class="proj__src" href="https://github.com/Ethosan/moneytracker">Source</a>
+          <div class="proj__meta mono">
+            <h3>20bucks</h3>
+            <span class="dim">Since Sep 2026 · 167 commits</span>
+          </div>
+          <div class="proj__body">
+            <p class="proj__why">I wanted one place to see where my money actually goes, including PayLater instalments and the "I'll pay you back" bills that never show up in a banking app.</p>
+            <p>It grew into a proper finance app: bill splits, trading P&amp;L, statement imports, and it works offline. Plain JavaScript and Supabase, plus a small AI check that flags entries that look off.</p>
+            <div class="proj__links mono">
+              <a class="proj__link" href="https://20bucks.ethantam.dev">20bucks.ethantam.dev ↗</a>
+              <a class="proj__src" href="https://github.com/Ethosan/moneytracker">Source</a>
+            </div>
           </div>
         </article>
 
         <article class="proj">
-          <header class="proj__top mono">
-            <span class="tag tag--live">LIVE</span>
-            <span class="dim">WEB + TELEGRAM</span>
-          </header>
-          <h3>The List</h3>
-          <p>Shared restaurant journal for friends. Tier-weighted ratings, a live leaderboard, and a want list that finds the right TikTok and details for each place by itself. Booking reminders and goals, on the web and as a Telegram bot.</p>
-          <ul class="stack mono"><li>TypeScript</li><li>Cloudflare Workers</li><li>Supabase</li><li>grammY</li></ul>
-          <div class="proj__links mono">
-            <a class="proj__link" href="https://list.ethantam.dev">list.ethantam.dev ↗</a>
-            <a class="proj__src" href="https://github.com/Ethosan/Makan-bot">Source</a>
+          <div class="proj__meta mono">
+            <h3>The List</h3>
+            <span class="dim">Since Aug 2026 · 143 commits</span>
+          </div>
+          <div class="proj__body">
+            <p class="proj__why">My friends and I kept forgetting where we'd eaten and where we still wanted to go.</p>
+            <p>So now there's a shared list. We rate places, there's a leaderboard, and when someone adds a place to the want list it goes and finds a good TikTok and the details by itself. It also lives in our Telegram group as a bot. TypeScript on Cloudflare Workers, with Supabase.</p>
+            <div class="proj__links mono">
+              <a class="proj__link" href="https://list.ethantam.dev">list.ethantam.dev ↗</a>
+              <a class="proj__src" href="https://github.com/Ethosan/Makan-bot">Source</a>
+            </div>
           </div>
         </article>
       </div>
@@ -158,7 +160,7 @@
   </main>
 
   <footer class="foot wrap mono">
-    <span class="dim">© <span id="year">2026</span> Ethan Tam</span>
+    <p class="colophon dim">Plain HTML, CSS and a bit of JavaScript, no framework. Set in Geist and Instrument Serif. The painting is Bosschaert's <i>Vase of Flowers in a Window</i>, from the Mauritshuis (public domain). Last updated 16 Oct 2026.</p>
     <button type="button" class="link" data-open-term>Press <kbd>~</kbd> for a terminal</button>
   </footer>
 

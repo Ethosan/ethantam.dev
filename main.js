@@ -2,13 +2,12 @@
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (s, el = document) => el.querySelector(s);
 
-  /* ---------- clock + year ---------- */
+  /* ---------- clock ---------- */
   const clock = $("#clock");
   const sgt = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Singapore", hour: "2-digit", minute: "2-digit" });
   const tickClock = () => { clock.textContent = sgt.format(new Date()); };
   tickClock();
   setInterval(tickClock, 15_000);
-  $("#year").textContent = new Date().getFullYear();
 
   /* ---------- ticker ---------- */
   const WATCHLIST = ["BTC", "ETH", "SOL", "AXTI", "MU", "NBIS", "CRWV", "LLY", "GS", "IBKR", "NVDA", "CRWD", "NET", "CAT", "TWLO"];
@@ -41,10 +40,10 @@
     }
   };
 
-  // Primary: our own /api/quotes (Cloudflare Pages Function, stocks + crypto).
+  // Primary: our own /api/quotes (the Worker in worker/index.js, stocks + crypto, edge-cached 60s).
   // Fallback for local preview or if Yahoo is down: CoinGecko for the crypto only.
   const fromApi = async () => {
-    const r = await fetch("/api/quotes");
+    const r = await fetch("/api/quotes", { cache: "no-store" });
     if (!r.ok) throw new Error(r.status);
     const { quotes: q } = await r.json();
     if (!q?.some((x) => typeof x.p === "number")) throw new Error("empty");
@@ -155,20 +154,34 @@
     list: "https://list.ethantam.dev",
   };
   const a = (href, text = href) => `<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
+  const esc = (t) => String(t).replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
+
+  const MOTD = String.raw`
+    _ _
+   ( V )     ethantam.dev
+    \ /      type help
+  \  |  /
+   \ | /
+     |`.slice(1);
 
   const COMMANDS = {
     help: () => [
       "help        this list",
       "about       who I am",
+      "now         what I'm up to",
       "projects    what I've built",
       "record      background, briefly",
-      "watchlist   what I'm watching, live",
+      "watchlist   prices I check too often, live",
       "contact     how to reach me",
       "open &lt;x&gt;    open github | linkedin | 20bucks | list",
       "tulip       a cautionary tale",
       "clear       clear the screen",
       "exit        close (or press esc)",
     ].join("\n"),
+    now: () => "National Service until Feb 2027.\nOn the side: finance at Advisory Singapore, and whatever I'm fixing in 20bucks this week.\nThen Economics, from Oct 2027.",
+    ns: () => "still serving. back in Feb 2027.",
+    makan: () => `hungry? ${a(LINKS.list, "list.ethantam.dev")} has opinions.`,
+    hire: () => COMMANDS.contact(),
     about: () => "Ethan Tam, Singapore.\nDoing National Service now, Economics at Cambridge from 2027.\nI like markets, economics, and building small apps for myself and my friends.",
     projects: () => [
       `20bucks     personal finance PWA: splits, PayLater, P&L, AI review   ${a(LINKS["20bucks"], "app")} ${a("https://github.com/Ethosan/moneytracker", "src")}`,
@@ -184,7 +197,7 @@
     contact: () => `email     ${a("mailto:eatentam@gmail.com", "eatentam@gmail.com")}\ngithub    ${a(LINKS.github, "Ethosan")}\nlinkedin  ${a(LINKS.linkedin, "ethantam-")}`,
     open: (arg) => {
       const url = LINKS[arg];
-      if (!url) return `open: unknown target "${arg || ""}". try: ${Object.keys(LINKS).join(", ")}`;
+      if (!url) return `open: unknown target "${esc(arg || "")}". try: ${Object.keys(LINKS).join(", ")}`;
       window.open(url, "_blank", "noopener");
       return `opening ${arg}…`;
     },
@@ -194,7 +207,7 @@
       return `${q.s.padEnd(6)}${px.padStart(10)}   ${chg}`;
     }).join("\n") + "\n\nnot financial advice. see also: tulip",
     tulip: () => "Feb 1637: a single Semper Augustus bulb was quoted at more than a house on an\nAmsterdam canal. A few weeks later, buyers stopped showing up.\nThe painting on the front page is from about 20 years before the peak.",
-    ls: () => "about  projects  record  watchlist  contact  tulip",
+    ls: () => "about  now  projects  record  watchlist  contact  tulip",
     whoami: () => "guest. but you could be a friend: try `contact`",
     sudo: () => "nice try.",
     clear: () => { out.innerHTML = ""; return null; },
@@ -219,28 +232,46 @@
     history.push(line); hIdx = history.length;
     const [name, ...args] = line.split(/\s+/);
     const fn = COMMANDS[name.toLowerCase()];
-    const res = fn ? fn(args.join(" ").toLowerCase()) : `command not found: ${name.replace(/[<>&]/g, "")}. type \`help\``;
+    const res = fn ? fn(args.join(" ").toLowerCase()) : `command not found: ${esc(name)}. type \`help\``;
     if (name.toLowerCase() !== "clear") print(line, res);
   };
+
+  // everything except the terminal goes inert while it's open, so focus and screen readers stay inside
+  const background = [...document.body.children].filter((el) => el !== term && el.tagName !== "SCRIPT");
+  const setInert = (on) => background.forEach((el) => { el.inert = on; });
 
   const openTerm = () => {
     if (!term.hidden) return;
     opener = document.activeElement;
     term.hidden = false;
+    setInert(true);
     document.body.style.overflow = "hidden";
-    if (!out.childElementCount) print("help", COMMANDS.help());
+    if (!out.childElementCount) {
+      const m = document.createElement("div");
+      m.className = "res motd"; m.textContent = MOTD;
+      out.append(m);
+    }
     input.focus();
   };
   const closeTerm = () => {
     term.hidden = true;
+    setInert(false);
     document.body.style.overflow = "";
     opener?.focus?.();
   };
 
+  // focus trap: the only focusables are the input and the close button
+  const closeBtn = $(".term__x", term);
+  term.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab") return;
+    if (e.shiftKey && document.activeElement === input) { e.preventDefault(); closeBtn.focus(); }
+    else if (!e.shiftKey && document.activeElement === closeBtn) { e.preventDefault(); input.focus(); }
+  });
+
   form.addEventListener("submit", (e) => { e.preventDefault(); run(input.value); input.value = ""; });
   input.addEventListener("keydown", (e) => {
     if (e.key === "ArrowUp" && hIdx > 0) { input.value = history[--hIdx]; e.preventDefault(); }
-    if (e.key === "Tab") {
+    if (e.key === "Tab" && !e.shiftKey) {
       e.preventDefault();
       const [cmd, arg] = input.value.trimStart().split(/\s+/, 2);
       const pool = arg !== undefined ? Object.keys(LINKS).map((k) => `${cmd} ${k}`) : Object.keys(COMMANDS);
