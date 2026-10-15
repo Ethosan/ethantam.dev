@@ -11,43 +11,60 @@
   $("#year").textContent = new Date().getFullYear();
 
   /* ---------- ticker ---------- */
-  const STATIC = [
-    ["IB", "44/45"],
-    ["UKMT", "GOLD ×3"],
-    ["CS50", "COMPLETE"],
-    ["SHIPPED", "2 APPS"],
-    ["TULIP", "1637", -99.0],
-  ];
-  const COINS = { bitcoin: "BTC", ethereum: "ETH", solana: "SOL" };
-  let quotes = [];
+  const WATCHLIST = ["BTC", "ETH", "SOL", "AXTI", "MU", "NBIS", "CRWV", "LLY", "GS", "IBKR", "NVDA", "CRWD", "NET", "CAT", "TWLO"];
+  const COINS = { BTC: "bitcoin", ETH: "ethereum", SOL: "solana" };
+  const PX_PER_SEC = 45;
+  let quotes = WATCHLIST.map((s) => ({ s }));
 
-  const fmtUsd = (n) => n >= 1000 ? n.toLocaleString("en-US", { maximumFractionDigits: 0 }) : n.toFixed(2);
-  const item = ([sym, val, chg]) => {
-    const change = typeof chg === "number"
-      ? ` <i class="${chg >= 0 ? "up" : "dn"}">${chg >= 0 ? "▲" : "▼"} ${Math.abs(chg).toFixed(1)}%</i>`
+  const fmtPx = (n) => n >= 1000
+    ? n.toLocaleString("en-US", { maximumFractionDigits: 0 })
+    : n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const itemInner = ({ s, p, c }) => {
+    const val = typeof p === "number" ? fmtPx(p) : "—";
+    const chg = typeof c === "number"
+      ? ` <i class="${c >= 0 ? "up" : "dn"}">${c >= 0 ? "▲" : "▼"} ${Math.abs(c).toFixed(1)}%</i>`
       : "";
-    return `<span class="tk"><b>${sym}</b>${val}${change}</span>`;
+    return `<b>${s}</b>${val}${chg}`;
   };
+  const track = $("#ticker");
+  // Build the strip once (two copies so the CSS loop can translate -50% seamlessly),
+  // then only swap the numbers inside it, so the scroll never restarts.
+  track.innerHTML = [0, 1].map(() => WATCHLIST.map((s) => `<span class="tk" data-s="${s}"></span>`).join("")).join("");
+  let speedSet = false;
   const renderTicker = () => {
-    const html = [...quotes, ...STATIC].map(item).join("");
-    // doubled so the CSS loop can translate -50% seamlessly
-    $("#ticker").innerHTML = html + html;
+    for (const q of quotes) {
+      track.querySelectorAll(`[data-s="${q.s}"]`).forEach((el) => { el.innerHTML = itemInner(q); });
+    }
+    if (!speedSet && quotes.some((q) => typeof q.p === "number")) {
+      track.style.animationDuration = `${Math.round(track.scrollWidth / 2 / PX_PER_SEC)}s`;
+      speedSet = true;
+    }
+  };
+
+  // Primary: our own /api/quotes (Cloudflare Pages Function, stocks + crypto).
+  // Fallback for local preview or if Yahoo is down: CoinGecko for the crypto only.
+  const fromApi = async () => {
+    const r = await fetch("/api/quotes");
+    if (!r.ok) throw new Error(r.status);
+    const { quotes: q } = await r.json();
+    if (!q?.some((x) => typeof x.p === "number")) throw new Error("empty");
+    return q;
+  };
+  const fromCoinGecko = async () => {
+    const ids = Object.values(COINS).join(",");
+    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+    if (!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    return WATCHLIST.map((s) => COINS[s] && d[COINS[s]] ? { s, p: d[COINS[s]].usd, c: d[COINS[s]].usd_24h_change } : { s });
   };
   const loadQuotes = async () => {
-    try {
-      const ids = Object.keys(COINS).join(",");
-      const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
-      if (!r.ok) throw new Error(r.status);
-      const data = await r.json();
-      quotes = Object.entries(COINS)
-        .filter(([id]) => data[id])
-        .map(([id, sym]) => [sym, fmtUsd(data[id].usd), data[id].usd_24h_change]);
-    } catch { /* keep whatever we had; static items still show */ }
+    try { quotes = await fromApi(); }
+    catch { try { quotes = await fromCoinGecko(); } catch { /* keep last */ } }
     renderTicker();
   };
   renderTicker();
   loadQuotes();
-  setInterval(loadQuotes, 90_000);
+  setInterval(loadQuotes, 60_000);
 
   /* ---------- dithered painting ---------- */
   const art = $("#art");
@@ -145,6 +162,7 @@
       "about       who I am",
       "projects    what I've built",
       "record      the short CV",
+      "watchlist   what I'm watching, live",
       "contact     how to reach me",
       "open &lt;x&gt;    open github | linkedin | 20bucks | list",
       "tulip       a cautionary tale",
@@ -170,8 +188,13 @@
       window.open(url, "_blank", "noopener");
       return `opening ${arg}…`;
     },
+    watchlist: () => quotes.map((q) => {
+      const px = typeof q.p === "number" ? fmtPx(q.p) : "—";
+      const chg = typeof q.c === "number" ? `<span class="${q.c >= 0 ? "up" : "dn"}">${q.c >= 0 ? "+" : ""}${q.c.toFixed(2)}%</span>` : "";
+      return `${q.s.padEnd(6)}${px.padStart(10)}   ${chg}`;
+    }).join("\n") + "\n\nnot financial advice. see also: tulip",
     tulip: () => "Feb 1637: a single Semper Augustus bulb was quoted at more than a house on an\nAmsterdam canal. A few weeks later, buyers stopped showing up.\nThe painting on the front page is from about 20 years before the peak.",
-    ls: () => "about  projects  record  contact  tulip",
+    ls: () => "about  projects  record  watchlist  contact  tulip",
     whoami: () => "guest. but you could be a friend: try `contact`",
     sudo: () => "nice try.",
     clear: () => { out.innerHTML = ""; return null; },
