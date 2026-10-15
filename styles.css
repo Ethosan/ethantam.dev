@@ -160,6 +160,9 @@ h1 em { font-family: var(--serif); font-weight: 400; font-style: italic; letter-
 .art figcaption i { font-style: italic; }
 
 /* ---------- sections ---------- */
+.about { display: grid; gap: 1.1em; max-width: 64ch; }
+.about p { margin: 0; font-size: 1.0625rem; color: color-mix(in srgb, var(--fg) 82%, var(--muted)); }
+
 .block { padding-block: clamp(40px, 6vw, 72px); }
 .block__head {
   display: flex; justify-content: space-between; align-items: baseline;
@@ -254,6 +257,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line);
   .top { padding-block: 16px; }
   .nav { gap: 16px; font-size: 0.75rem; }
   .nav__term { width: 36px; height: 36px; }
+  .nav a[href="#about"] { display: none; }
   .hero { gap: 40px; padding-block: 28px 48px; }
   .label { margin-bottom: 20px; }
   h1 { font-size: clamp(2rem, 9.4vw, 2.5rem); }
@@ -281,7 +285,10 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line);
   .term__win { height: min(420px, 62dvh); }
   .term__in input { font-size: 16px; } /* stops iOS zooming on focus */
 }
-@media (max-width: 359px) {
+@media (max-width: 400px) {
+  .nav a[href="#record"] { display: none; }
+}
+@media (max-width: 319px) {
   .nav a { display: none; }
 }
 
