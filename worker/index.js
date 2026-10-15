@@ -1,5 +1,5 @@
-// Cloudflare Pages Function: GET /api/quotes
-// Pulls the watchlist from Yahoo's chart endpoint server-side (browsers are blocked by CORS)
+// Cloudflare Worker for ethantam.dev. Static files are served from the assets binding;
+// this script only handles GET /api/quotes, which pulls the watchlist from Yahoo's chart endpoint server-side (browsers are blocked by CORS)
 // and caches the combined result at the edge for 60 seconds.
 
 const WATCHLIST = [
@@ -29,19 +29,27 @@ async function quote([label, yahoo = label]) {
   }
 }
 
-export async function onRequestGet({ request, waitUntil }) {
+async function quotes(request, ctx) {
   const cache = caches.default;
   const key = new Request(new URL("/api/quotes", request.url).toString());
   const hit = await cache.match(key);
   if (hit) return hit;
 
-  const quotes = await Promise.all(WATCHLIST.map(quote));
-  const res = new Response(JSON.stringify({ t: Date.now(), quotes }), {
+  const list = await Promise.all(WATCHLIST.map(quote));
+  const res = new Response(JSON.stringify({ t: Date.now(), quotes: list }), {
     headers: {
       "content-type": "application/json; charset=utf-8",
       "cache-control": `public, max-age=${TTL}`,
     },
   });
-  waitUntil(cache.put(key, res.clone()));
+  ctx.waitUntil(cache.put(key, res.clone()));
   return res;
 }
+
+export default {
+  async fetch(request, env, ctx) {
+    const { pathname } = new URL(request.url);
+    if (pathname === "/api/quotes" && request.method === "GET") return quotes(request, ctx);
+    return env.ASSETS.fetch(request);
+  },
+};

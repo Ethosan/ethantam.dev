@@ -9,13 +9,16 @@ Personal site of Ethan Tam. Plain HTML, CSS and JS: no build step, no dependenci
 ## Run locally
 
 ```sh
-npx serve .
+npx wrangler dev
 ```
 
-Open it through a local server rather than `file://`, or the canvas can't read the image and the painting falls back to the plain version.
+That serves the static files and the `/api/quotes` endpoint together. (A plain static server works too, but the stock prices will show "—" and only crypto loads.)
 
 ## Deploy
 
-Cloudflare (the domain's DNS is already there): Workers & Pages → Create → Pages → Connect to Git → this repo. Framework preset: None, build command empty, output directory `/`. Then Custom domains → `ethantam.dev`.
+Hosted as a Cloudflare Worker (`ethantam-dev`) with static assets, connected to this repo through Workers Builds: every push to `main` deploys.
 
-`_headers` sets security and cache headers; `404.html` is served for unknown paths. `assets/og.png` is the link-preview card.
+- `wrangler.jsonc`: Worker config; serves `404.html` for unknown paths
+- `worker/index.js`: handles `GET /api/quotes` (Yahoo, cached 60s at the edge); everything else is a static file
+- `.assetsignore`: keeps the README, config and worker source from being served
+- `_headers`: security and cache headers
