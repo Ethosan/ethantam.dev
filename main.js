@@ -277,9 +277,9 @@
     about: () => "Ethan Tam, Singapore.\nDoing National Service now, Economics at Cambridge from 2027.\nI like markets, economics, and building small apps for myself and my friends.",
     projects: () => [
       `20bucks     personal finance PWA: splits, PayLater, P&L, AI review   ${a(LINKS["20bucks"], "app")} ${a("https://github.com/Ethosan/moneytracker", "src")}`,
-      `The List    restaurant ratings + auto-researched want list + bot     ${a(LINKS.list, "app")} ${a("https://github.com/Ethosan/Makan-bot", "src")}`,
-      `Markets     macro dashboard: risk appetite, recession odds, vol      ${a(LINKS.markets, "app")} ${a("https://github.com/Ethosan/eqmarkets", "src")}`,
-      `Oracular    research terminal: memo, scorecard, seasonality          ${a(LINKS.oracular, "app")} ${a("https://github.com/Ethosan/oracular", "src")}`,
+      `The List    ratings, leaderboard, auto want list, Telegram bot       ${a(LINKS.list, "app")} ${a("https://github.com/Ethosan/Makan-bot", "src")}`,
+      `Markets     macro dashboard: risk, regime, absorption, recession     ${a(LINKS.markets, "app")} ${a("https://github.com/Ethosan/eqmarkets", "src")}`,
+      `Oracular    research terminal: memo, scorecard, seasonality, chat     ${a(LINKS.oracular, "app")} ${a("https://github.com/Ethosan/oracular", "src")}`,
     ].join("\n"),
     record: () => [
       "2027     Economics (BA), University of Cambridge",
