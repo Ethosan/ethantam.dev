@@ -1,0 +1,27 @@
+{
+  "name": "Ethan Tam",
+  "short_name": "ethantam",
+  "description": "Personal site of Ethan Tam: markets, economics, and small apps.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c0b0a",
+  "theme_color": "#0c0b0a",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/assets/mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["finance", "education", "productivity"],
+  "lang": "en",
+  "dir": "ltr"
+}

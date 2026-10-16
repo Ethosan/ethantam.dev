@@ -7,6 +7,9 @@ Personal site of Ethan Tam. Plain HTML, CSS and JS: no build step, no dependenci
 - **Layout:** on desktop the name and section nav stay pinned on the left while the rest scrolls on the right, and the nav marks the section you're reading (the layout follows Brittany Chiang's site). Phones and tablets get one column with sticky section titles.
 - **Project screenshots:** taken from the demo-data screenshots in each project's repo, cropped and saved as WebP in `assets/`.
 - **Terminal:** press `~` anywhere (or the `~` button) and type `help`
+- **Copy email:** one-click copy button next to the email address, with clipboard API and execCommand fallback.
+- **PWA:** installable as a standalone app (`manifest.json`) with offline support via a service worker (`sw.js`). The site works without a network connection once cached.
+- **Print styles:** clean black-on-white output when printing; hides the ticker, terminal, and decorative elements.
 
 ## Run locally
 
@@ -24,5 +27,7 @@ Hosted as a Cloudflare Worker (`ethantam-dev`) with static assets, connected to 
 - `wrangler.jsonc`: Worker config; serves `404.html` for unknown paths
 - `worker/index.js`: handles `GET /api/quotes` (Yahoo, cached 60s at the edge); everything else is a static file
 - `.assetsignore`: keeps the README, config and worker source from being served
-- `_headers`: security headers (including a CSP) and asset caching
+- `_headers`: security headers (CSP, HSTS, COOP, CORP, Permissions-Policy) and cache-control rules
+- `manifest.json`: PWA manifest for installability
+- `sw.js`: service worker for offline support (network-first for HTML, cache-first for assets)
 - `noscript.css`: shows the plain painting when JavaScript is off

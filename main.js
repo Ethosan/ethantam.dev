@@ -383,4 +383,35 @@
     const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName);
     if ((e.key === "~" || e.key === "`") && !typing) { e.preventDefault(); openTerm(); }
   });
+
+  /* ---------- copy email button ---------- */
+  document.querySelectorAll("[data-copy]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const text = btn.dataset.copy;
+      try {
+        await navigator.clipboard.writeText(text);
+        const original = btn.textContent;
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        setTimeout(() => { btn.textContent = original; btn.classList.remove("copied"); }, 2000);
+      } catch {
+        // clipboard API unavailable (e.g. non-secure context): fall back to execCommand
+        const ta = document.createElement("textarea");
+        ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.append(ta); ta.select();
+        try { document.execCommand("copy"); btn.textContent = "Copied!"; btn.classList.add("copied");
+          setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+        } catch { btn.textContent = text; }
+        ta.remove();
+      }
+    });
+  });
+
+  /* ---------- service worker (offline support) ---------- */
+  if ("serviceWorker" in navigator) {
+    addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js").catch(() => { /* fail silently */ });
+    });
+  }
+
 })();

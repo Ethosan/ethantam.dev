@@ -6,7 +6,7 @@
   --line-2: rgba(235, 231, 223, .18);
   --fg: #ebe7df;
   --fg-2: #cdc8be;
-  --muted: #8f8a80;
+  --muted: #9a958a;
   --accent: #f2a93b;
   --up: #7bc48a;
   --down: #e5715f;
@@ -100,6 +100,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   gap: 2rem;
   padding-left: 2rem;
   animation: tick 120s linear infinite;
+  will-change: transform;
 }
 .tk { color: var(--muted); font-variant-numeric: tabular-nums; }
 .tk b { color: var(--fg); font-weight: 500; margin-right: .5em; }
@@ -188,7 +189,7 @@ h1 em, .tagline em {
 .art figcaption { display: grid; gap: 2px; margin-top: 12px; font-size: 0.75rem; line-height: 1.5; }
 .art figcaption i { font-style: italic; }
 
-.sec { padding-bottom: 60px; }
+.sec { padding-bottom: 60px; scroll-margin-top: 48px; }
 /* phones and tablets: section titles stick to the top while you scroll through them */
 .sec__h {
   position: sticky; top: var(--pad-t); z-index: 5;
@@ -317,6 +318,20 @@ h1 em, .tagline em {
   text-decoration-thickness: 1px;
   text-underline-offset: 6px;
 }
+
+/* contact row: email + copy button */
+.contact__row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.copy-btn {
+  padding: 4px 12px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  color: var(--muted);
+  font-size: 0.75rem;
+  transition: color .15s, border-color .15s, background-color .15s;
+}
+.copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+.copy-btn.copied { color: var(--up); border-color: var(--up); background: color-mix(in srgb, var(--up) 10%, transparent); }
+
 
 /* footer */
 .foot { display: grid; gap: 10px; padding-block: 28px calc(44px + var(--pad-b)); border-top: 1px solid var(--line); color: var(--muted); }
@@ -489,3 +504,13 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 .dot--down { background: var(--down); box-shadow: 0 0 0 4px color-mix(in srgb, var(--down) 18%, transparent); }
 .accent-link { padding-block: 10px; color: var(--accent); text-decoration: none; }
 .accent-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- print ---------- */
+@media print {
+  .ticker, .spotlight, .term, .term-btn, .hint, .skip, .copy-btn { display: none !important; }
+  body { background: #fff; color: #000; }
+  .side, .content { display: block; }
+  .card__media img { box-shadow: none; }
+  a { color: #000; text-decoration: underline; }
+  .contact__mail { color: #000; }
+}

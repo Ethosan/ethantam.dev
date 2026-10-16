@@ -3,29 +3,48 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Ethan Tam</title>
-  <meta name="description" content="Ethan Tam: Singapore, into markets and economics, builds small apps on the side.">
+  <title>Ethan Tam — Markets, Economics &amp; Small Apps</title>
+  <meta name="description" content="Ethan Tam: Singapore, into markets and economics, builds small apps on the side. National Service now, Economics at Cambridge from 2027.">
+  <meta name="author" content="Ethan Tam">
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="theme-color" content="#0c0b0a">
-  <meta property="og:title" content="Ethan Tam">
-  <meta property="og:description" content="Into markets and economics. Builds small apps on the side. Singapore.">
+  <meta property="og:title" content="Ethan Tam — Markets, Economics &amp; Small Apps">
+  <meta property="og:description" content="Into markets and economics. Builds small apps on the side. Singapore. National Service now, Economics at Cambridge from 2027.">
   <meta property="og:url" content="https://ethantam.dev">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Ethan Tam">
+  <meta property="og:locale" content="en_SG">
   <meta property="og:image" content="https://ethantam.dev/assets/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Ethan Tam — personal site. Dark background with amber accents, a dithered tulip painting, and a live markets ticker.">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Ethan Tam — Markets, Economics &amp; Small Apps">
+  <meta name="twitter:description" content="Into markets and economics. Builds small apps on the side. Singapore.">
+  <meta name="twitter:image" content="https://ethantam.dev/assets/og.png">
+  <meta name="twitter:image:alt" content="Ethan Tam — personal site. Dark background with amber accents, a dithered tulip painting, and a live markets ticker.">
   <link rel="canonical" href="https://ethantam.dev/">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preload" as="image" href="assets/tulips.webp" fetchpriority="high">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Person","name":"Ethan Tam","url":"https://ethantam.dev",
+   "jobTitle":"Finance & Content","worksFor":{"@type":"Organization","name":"Advisory Singapore"},
    "sameAs":["https://github.com/Ethosan","https://linkedin.com/in/ethantam-"],
-   "alumniOf":"Anglo-Chinese School (Independent)","homeLocation":"Singapore"}
+   "alumniOf":{"@type":"Organization","name":"Anglo-Chinese School (Independent)"},
+   "homeLocation":{"@type":"Place","name":"Singapore"},
+   "knowsAbout":["Economics","Financial markets","Personal finance","Web development"]}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"Ethan Tam","url":"https://ethantam.dev",
+   "description":"Personal site of Ethan Tam: markets, economics, and small apps.",
+   "inLanguage":"en"}
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" fetchpriority="high">
   <noscript><link rel="stylesheet" href="noscript.css"></noscript>
 </head>
 <body>
@@ -66,9 +85,9 @@
         <p class="label">Singapore <span><span data-tz="Asia/Singapore">--:--</span> SGT</span></p>
         <p class="label">United Kingdom <span><span data-tz="Europe/London">--:--</span> <span data-tz-name="Europe/London">UK</span></span></p>
         <ul class="social">
-          <li><a href="https://github.com/Ethosan">GitHub ↗</a></li>
-          <li><a href="https://linkedin.com/in/ethantam-">LinkedIn ↗</a></li>
-          <li><a href="mailto:eatentam@gmail.com">Email</a></li>
+          <li><a href="https://github.com/Ethosan" target="_blank" rel="noopener noreferrer" aria-label="Ethan Tam on GitHub (opens in new tab)">GitHub ↗</a></li>
+          <li><a href="https://linkedin.com/in/ethantam-" target="_blank" rel="noopener noreferrer" aria-label="Ethan Tam on LinkedIn (opens in new tab)">LinkedIn ↗</a></li>
+          <li><a href="mailto:eatentam@gmail.com" aria-label="Send email to Ethan Tam">Email</a></li>
           <li><button type="button" class="term-btn" data-open-term aria-label="Open terminal">~</button></li>
         </ul>
       </div>
@@ -90,7 +109,7 @@
         <h2 id="about-h" class="sec__h mono">About</h2>
         <dl class="now mono">
           <div><dt>Now</dt><dd>National Service</dd></div>
-          <div><dt>On the side</dt><dd>Finance &amp; Content at <a href="https://www.advisory.sg">Advisory SG</a></dd></div>
+          <div><dt>On the side</dt><dd>Finance &amp; Content at <a href="https://www.advisory.sg" target="_blank" rel="noopener noreferrer">Advisory SG</a></dd></div>
           <div><dt>Next</dt><dd>Economics, 2027</dd></div>
         </dl>
         <div class="prose">
@@ -107,14 +126,14 @@
 
           <article class="card">
             <div class="card__body">
-              <h3><a class="card__title" href="https://futuretracker.ethantam.dev/?demo">Trade Journal <span class="arrow" aria-hidden="true">↗</span></a></h3>
+              <h3><a class="card__title" href="https://futuretracker.ethantam.dev/?demo" target="_blank" rel="noopener noreferrer">Trade Journal <span class="arrow" aria-hidden="true">↗</span></a></h3>
               <p class="card__meta mono"><span>Built Mar 2026</span> · <span>on GitHub since Oct 2026</span></p>
               <p class="card__why">My futures account kept going down, and I wanted to know why.</p>
               <p>So I log every trade with its setup and any rule I broke, and it works out the R multiple as I type. The stats gave me the answer: the trades where I broke a rule lost more than the clean ones made. Trades save to my own Google Sheet, and it still works offline. The link opens it with sample trades.</p>
               <ul class="tags mono" aria-label="Built with">
                 <li>JavaScript</li><li>Vite</li><li>Google Sheets</li><li>PWA</li>
               </ul>
-              <a class="card__src mono" href="https://github.com/Ethosan/futuretracker">Source</a>
+              <a class="card__src mono" href="https://github.com/Ethosan/futuretracker" target="_blank" rel="noopener noreferrer">Source</a>
             </div>
             <div class="card__media">
               <img src="assets/journal-charts.webp" alt="Trade Journal charts: cumulative P&amp;L from May to October rising to about $1,200 then falling below zero, and win rate by strategy. Demo data." width="390" height="720" loading="lazy" decoding="async">
@@ -124,14 +143,14 @@
 
           <article class="card">
             <div class="card__body">
-              <h3><a class="card__title" href="https://20bucks.ethantam.dev">20bucks <span class="arrow" aria-hidden="true">↗</span></a></h3>
+              <h3><a class="card__title" href="https://20bucks.ethantam.dev" target="_blank" rel="noopener noreferrer">20bucks <span class="arrow" aria-hidden="true">↗</span></a></h3>
               <p class="card__meta mono"><span>Built Jun 2026</span> · <span>on GitHub since Sep 2026</span></p>
               <p class="card__why">I wanted one place to see where my money actually goes, including PayLater instalments and the "I'll pay you back" bills that never show up in a banking app.</p>
               <p>It grew into a proper finance app: bill splits, trading P&amp;L, statement imports, offline sync. There's also a small AI check that flags entries that look off.</p>
               <ul class="tags mono" aria-label="Built with">
                 <li>JavaScript</li><li>Supabase</li><li>PWA</li>
               </ul>
-              <a class="card__src mono" href="https://github.com/Ethosan/moneytracker">Source</a>
+              <a class="card__src mono" href="https://github.com/Ethosan/moneytracker" target="_blank" rel="noopener noreferrer">Source</a>
             </div>
             <div class="card__media">
               <img src="assets/20bucks-month.webp" alt="20bucks month view: spending so far this month, the pace against a usual month, and spending by category. Demo data." width="390" height="720" loading="lazy" decoding="async">
@@ -142,14 +161,14 @@
 
           <article class="card">
             <div class="card__body">
-              <h3><a class="card__title" href="https://markets.ethantam.dev">Equarian Markets <span class="arrow" aria-hidden="true">↗</span></a></h3>
+              <h3><a class="card__title" href="https://markets.ethantam.dev" target="_blank" rel="noopener noreferrer">Equarian Markets <span class="arrow" aria-hidden="true">↗</span></a></h3>
               <p class="card__meta mono"><span>Built Jul 2026</span> · <span>on GitHub since Oct 2026</span> · <span>36 indicators</span> · <span>4 models</span></p>
               <p class="card__why">Before I trade micro futures I want rates, credit, vol and yen carry on one screen, read the way a desk would read them.</p>
               <p>It pulls free data from FRED, Yahoo, the CFTC and the BOJ. In the browser it runs four models: a risk appetite index, a growth and inflation regime map, the absorption ratio for how fragile markets are, and the NY Fed's recession model. A daily read spells out what stands out, like oil and grains rising while stocks fall, with the numbers behind it.</p>
               <ul class="tags mono" aria-label="Built with">
                 <li>JavaScript</li><li>Vite</li><li>Netlify</li><li>PWA</li>
               </ul>
-              <a class="card__src mono" href="https://github.com/Ethosan/eqmarkets">Source</a>
+              <a class="card__src mono" href="https://github.com/Ethosan/eqmarkets" target="_blank" rel="noopener noreferrer">Source</a>
             </div>
             <div class="card__media">
               <img src="assets/eqmarkets-models.webp" alt="Equarian Markets home screen: the Risk Appetite Index leaning risk-off, its one-year history against the neutral band, and today's score for each of its eight inputs." width="390" height="720" loading="lazy" decoding="async">
@@ -160,14 +179,14 @@
 
           <article class="card">
             <div class="card__body">
-              <h3><a class="card__title" href="https://list.ethantam.dev">The List <span class="arrow" aria-hidden="true">↗</span></a></h3>
+              <h3><a class="card__title" href="https://list.ethantam.dev" target="_blank" rel="noopener noreferrer">The List <span class="arrow" aria-hidden="true">↗</span></a></h3>
               <p class="card__meta mono"><span>Built Aug 2026</span></p>
               <p class="card__why">My friends and I kept forgetting where we'd eaten and where we still wanted to go.</p>
               <p>So now there's a shared list. We rate places and keep a leaderboard. When someone adds a place to the want list, it goes and finds a good TikTok and the details by itself. It also lives in our Telegram group as a bot.</p>
               <ul class="tags mono" aria-label="Built with">
                 <li>TypeScript</li><li>Cloudflare Workers</li><li>Supabase</li><li>Telegram</li>
               </ul>
-              <a class="card__src mono" href="https://github.com/Ethosan/Makan-bot">Source</a>
+              <a class="card__src mono" href="https://github.com/Ethosan/Makan-bot" target="_blank" rel="noopener noreferrer">Source</a>
             </div>
             <div class="card__media">
               <img src="assets/list-leaderboard.webp" alt="The List leaderboard: restaurants ranked by combined score, each with its price tier and when it was visited. Demo data." width="390" height="720" loading="lazy" decoding="async">
@@ -176,7 +195,7 @@
           </article>
         </div>
 
-        <a class="more mono" href="https://github.com/Ethosan">More on GitHub <span class="arrow" aria-hidden="true">↗</span></a>
+        <a class="more mono" href="https://github.com/Ethosan" target="_blank" rel="noopener noreferrer">More on GitHub <span class="arrow" aria-hidden="true">↗</span></a>
       </section>
 
       <section class="sec" id="record" aria-labelledby="record-h">
@@ -184,7 +203,7 @@
 
         <ol class="log">
           <li><span class="log__t mono">2027</span><span class="log__w">Economics (BA)</span><span class="log__o">University of Cambridge</span></li>
-          <li><span class="log__t mono">2026–</span><span class="log__w">Finance &amp; Content</span><span class="log__o"><a href="https://www.advisory.sg">Advisory Singapore</a></span></li>
+          <li><span class="log__t mono">2026–</span><span class="log__w">Finance &amp; Content</span><span class="log__o"><a href="https://www.advisory.sg" target="_blank" rel="noopener noreferrer">Advisory Singapore</a></span></li>
           <li><span class="log__t mono">2025–27</span><span class="log__w">National Service · Transport Operator</span><span class="log__o">Singapore Armed Forces</span></li>
           <li><span class="log__t mono">2024–25</span><span class="log__w">Maths tutor</span><span class="log__o">IB, IP &amp; IGCSE</span></li>
           <li><span class="log__t mono">2023–24</span><span class="log__w">Co-founder</span><span class="log__o">ACSians Investment Club</span></li>
@@ -192,23 +211,26 @@
           <li><span class="log__t mono">2019–24</span><span class="log__w">IP &amp; IB Diploma</span><span class="log__o">Anglo-Chinese School (Independent)</span></li>
         </ol>
 
-        <a class="more mono" href="https://linkedin.com/in/ethantam-">More on LinkedIn <span class="arrow" aria-hidden="true">↗</span></a>
+        <a class="more mono" href="https://linkedin.com/in/ethantam-" target="_blank" rel="noopener noreferrer">More on LinkedIn <span class="arrow" aria-hidden="true">↗</span></a>
       </section>
 
       <section class="sec" id="contact" aria-labelledby="contact-h">
         <h2 id="contact-h" class="sec__h mono">Contact</h2>
         <p class="contact">Always happy to chat about markets, economics, or something you're building.</p>
-        <a class="contact__mail" href="mailto:eatentam@gmail.com">eatentam@gmail.com</a>
+        <div class="contact__row">
+          <a class="contact__mail" href="mailto:eatentam@gmail.com">eatentam@gmail.com</a>
+          <button type="button" class="copy-btn mono" data-copy="eatentam@gmail.com" aria-label="Copy email address to clipboard">Copy</button>
+        </div>
       </section>
 
       <footer class="foot mono">
-        <p class="colophon">Plain HTML, CSS and a bit of JavaScript, no framework. Set in Geist and Instrument Serif. Layout borrows from Brittany Chiang's site. The painting is Bosschaert's <i>Vase of Flowers in a Window</i>, from the Mauritshuis (public domain). Last updated 16 Oct 2026.</p>
+        <p class="colophon">Plain HTML, CSS and a bit of JavaScript, no framework. Set in Geist and Instrument Serif. Layout borrows from Brittany Chiang's site. The painting is Bosschaert's <i>Vase of Flowers in a Window</i>, from the Mauritshuis (public domain). Last updated 17 Oct 2026.</p>
         <button type="button" class="hint" data-open-term><span class="hint__key">Press <kbd>~</kbd> for a terminal</span><span class="hint__tap">Open the terminal</span></button>
       </footer>
     </main>
   </div>
 
-  <div class="term" id="term" role="dialog" aria-modal="true" aria-label="Terminal" hidden>
+  <div class="term" id="term" role="dialog" aria-modal="true" aria-label="Terminal" aria-describedby="term-out" hidden>
     <div class="term__win mono">
       <div class="term__bar">
         <span>ethan@ethantam.dev: ~</span>
