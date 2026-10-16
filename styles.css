@@ -18,6 +18,8 @@
   --gutter: clamp(20px, 5vw, 48px);
   --pad-l: max(var(--gutter), env(safe-area-inset-left));
   --pad-r: max(var(--gutter), env(safe-area-inset-right));
+  --pad-t: env(safe-area-inset-top);
+  --pad-b: env(safe-area-inset-bottom);
   --max: 1200px;
   --tick-h: 40px;
   --ease: cubic-bezier(.16, 1, .3, 1);
@@ -69,7 +71,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .ticker {
   display: flex;
   align-items: stretch;
-  height: var(--tick-h);
+  height: calc(var(--tick-h) + var(--pad-t));
+  padding-top: var(--pad-t);
   border-bottom: 1px solid var(--line);
   font-family: var(--mono);
   font-size: 0.75rem;
@@ -188,11 +191,12 @@ h1 em, .tagline em {
 .sec { padding-bottom: 60px; }
 /* phones and tablets: section titles stick to the top while you scroll through them */
 .sec__h {
-  position: sticky; top: 0; z-index: 5;
+  position: sticky; top: var(--pad-t); z-index: 5;
   margin: 0 0 24px;
   width: 100vw;
-  margin-left: calc(50% - 50vw);
-  padding: 14px calc(50vw - 50%);
+  /* full-bleed, but honour asymmetric landscape insets so the bar covers the notch side */
+  margin-left: calc(50% - 50vw + (var(--pad-r) - var(--pad-l)) / 2);
+  padding: 14px calc(50vw - 50% + (var(--pad-r) - var(--pad-l)) / 2) 14px calc(50vw - 50% + (var(--pad-l) - var(--pad-r)) / 2);
   background: color-mix(in srgb, var(--bg) 84%, transparent);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
@@ -261,6 +265,12 @@ h1 em, .tagline em {
   transition: transform .45s var(--ease), filter .45s var(--ease);
 }
 
+/* narrow: one screenshot at a time, swipe for the second (media sits above the card-wide link so it can scroll) */
+@container (max-width: 459px) {
+  .card__media { position: relative; z-index: 2; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; max-width: none; }
+  .card__media img { flex: 0 0 74%; scroll-snap-align: start; }
+}
+
 /* wide enough: screenshots move to the left as an overlapping pair */
 @container (min-width: 520px) {
   .card { grid-template-columns: 9.5rem minmax(0, 1fr); gap: 32px; align-items: start; }
@@ -305,7 +315,7 @@ h1 em, .tagline em {
 }
 
 /* footer */
-.foot { display: grid; gap: 10px; padding-block: 28px 44px; border-top: 1px solid var(--line); color: var(--muted); }
+.foot { display: grid; gap: 10px; padding-block: 28px calc(44px + var(--pad-b)); border-top: 1px solid var(--line); color: var(--muted); }
 .colophon { margin: 0; max-width: 62ch; font-size: 0.75rem; line-height: 1.7; }
 .colophon i { font-style: italic; }
 .hint { justify-self: start; padding-block: 10px; color: var(--muted); font-size: 0.75rem; transition: color .15s; }
@@ -438,9 +448,11 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .ticker__short { display: inline; }
 
   /* terminal: sit at the top so the on-screen keyboard doesn't cover it */
-  .term { place-items: start center; padding: 12px; }
-  .term__win { height: min(420px, 62dvh); }
-  .term__in input { font-size: 16px; } /* stops iOS zooming on focus */
+  .term { place-items: start center; padding: max(12px, var(--pad-t)) 12px max(12px, var(--pad-b)); }
+  .term__win { height: min(420px, 62vh); height: min(420px, 62dvh); }
+}
+@media (max-width: 400px) {
+  .ticker__label { display: none; }
 }
 @media (max-width: 359px) {
   .social { font-size: 0.75rem; }
@@ -448,6 +460,8 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 @media (pointer: coarse) {
   .term-btn { width: 44px; height: 44px; }
   .card__src, .more, .hint { padding-block: 12px; }
+  .contact__mail, .term__x { padding-block: 10px; }
+  .term__in input { font-size: 16px; } /* stops iOS zooming on focus */
 }
 /* the footer hint talks about a key; on touch screens it's just a button */
 .hint__tap { display: none; }

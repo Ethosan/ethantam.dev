@@ -196,8 +196,21 @@
       art.classList.add("no-dither");
     }
   };
-  if (img.complete && img.naturalWidth) dither();
-  else { img.addEventListener("load", dither); img.addEventListener("error", () => art.classList.add("no-dither")); }
+  // pay for the dither pass only once the painting is near the viewport (on phones it starts below the fold)
+  const startDither = () => {
+    if (img.complete && img.naturalWidth) dither();
+    else if (img.complete) art.classList.add("no-dither"); // failed before this script ran
+    else img.addEventListener("load", dither, { once: true });
+  };
+  img.addEventListener("error", () => art.classList.add("no-dither"));
+  if ("IntersectionObserver" in window) {
+    const seen = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) { seen.disconnect(); startDither(); }
+    }, { rootMargin: "25% 0px" });
+    seen.observe(art);
+  } else {
+    startDither();
+  }
 
   frame.addEventListener("click", () => {
     const plain = art.classList.toggle("is-plain");
