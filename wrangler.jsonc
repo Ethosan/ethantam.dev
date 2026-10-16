@@ -8,5 +8,7 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "run_worker_first": ["/api/*"]
-  }
+  },
+  // PR builds run `wrangler preview`, which needs this block (it can stay empty)
+  "previews": {}
 }
