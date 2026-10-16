@@ -1,4 +1,4 @@
 /* Loaded only when JavaScript is off: show the original painting instead of the empty dither canvas. */
 .art__frame img { opacity: 1 !important; }
 .art__frame canvas { display: none !important; }
-.term-btn, [data-open-term] { display: none !important; }
+.term-btn, .theme-btn, [data-open-term] { display: none !important; }

@@ -61,11 +61,18 @@
   // A clicked item stays lit while the page scrolls to it, even when the page is too short to bring
   // that section to the top. Any scrolling of your own hands control back to the reading line.
   const release = () => { lock = null; clearTimeout(lockTimer); };
-  navLinks.forEach((a) => a.addEventListener("click", () => {
+  navLinks.forEach((a) => a.addEventListener("click", (e) => {
+    // same-page anchor: use view transition for a smooth cross-fade
+    if (a.hash && document.querySelector(a.hash) && "startViewTransition" in document) {
+      e.preventDefault();
+      document.startViewTransition(() => {
+        document.querySelector(a.hash).scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+      });
+    }
     release();
     lock = a.hash.slice(1);
     setActive(lock);
-    lockTimer = setTimeout(release, 1200); // fallback where scrollend isn't supported
+    lockTimer = setTimeout(release, 1200);
   }));
   document.addEventListener("scrollend", release);
   for (const type of ["wheel", "touchstart", "keydown"]) addEventListener(type, release, { passive: true });
@@ -180,8 +187,13 @@
       }
 
       const out = ctx.createImageData(W, H);
-      const [ar, ag, ab] = [242, 169, 59];   // --accent
-      const [br, bg, bb] = [12, 11, 10];     // --bg
+      // read theme-aware colors from CSS custom properties
+      const cs = getComputedStyle(root);
+      const accentHex = cs.getPropertyValue("--accent").trim() || "#f2a93b";
+      const bgHex = cs.getPropertyValue("--bg").trim() || "#0c0b0a";
+      const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+      const [ar, ag, ab] = hex(accentHex);
+      const [br, bg, bb] = hex(bgHex);
       for (let i = 0; i < W * H; i++) {
         const p = i * 4, on = lum[i] > 0.5;
         out.data[p] = on ? ar : br;
@@ -193,7 +205,7 @@
       if (reduceMotion) { ctx.putImageData(out, 0, 0); return; }
 
       // scan the dithered image in from top to bottom
-      ctx.fillStyle = `rgb(${br},${bg},${bb})`;
+      ctx.fillStyle = bgHex;
       ctx.fillRect(0, 0, W, H);
       let row = 0;
       const step = () => {
@@ -382,6 +394,35 @@
     if (e.key === "Escape" && !term.hidden) { closeTerm(); return; }
     const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName);
     if ((e.key === "~" || e.key === "`") && !typing) { e.preventDefault(); openTerm(); }
+  });
+
+
+  /* ---------- theme toggle ---------- */
+  const root = document.documentElement;
+  const themeBtns = document.querySelectorAll("[data-toggle-theme]");
+  const isLight = () => root.dataset.theme === "light" ||
+    (!root.dataset.theme && matchMedia("(prefers-color-scheme: light)").matches);
+  const updateThemeBtns = () => {
+    const light = isLight();
+    themeBtns.forEach((b) => b.setAttribute("aria-pressed", String(light)));
+  };
+  const toggleTheme = () => {
+    const light = isLight();
+    const next = light ? "dark" : "light";
+    root.dataset.theme = next;
+    try { localStorage.setItem("theme", next); } catch {}
+    updateThemeBtns();
+    // re-dither the painting in the new theme colors
+    if (typeof dither === "function" && img.complete && img.naturalWidth) dither();
+  };
+  themeBtns.forEach((b) => b.addEventListener("click", toggleTheme));
+  updateThemeBtns();
+  // listen for system theme changes when no explicit preference is set
+  matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => {
+    if (!root.dataset.theme) {
+      updateThemeBtns();
+      if (typeof dither === "function" && img.complete && img.naturalWidth) dither();
+    }
   });
 
   /* ---------- copy email button ---------- */

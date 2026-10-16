@@ -7,6 +7,10 @@ Personal site of Ethan Tam. Plain HTML, CSS and JS: no build step, no dependenci
 - **Layout:** on desktop the name and section nav stay pinned on the left while the rest scrolls on the right, and the nav marks the section you're reading (the layout follows Brittany Chiang's site). Phones and tablets get one column with sticky section titles.
 - **Project screenshots:** taken from the demo-data screenshots in each project's repo, cropped and saved as WebP in `assets/`.
 - **Terminal:** press `~` anywhere (or the `~` button) and type `help`
+- **Themes:** dark and light mode with a toggle button. Respects `prefers-color-scheme` by default, persists choice in `localStorage`. The dithered painting re-renders in theme colors.
+- **Self-hosted fonts:** Geist, Geist Mono, and Instrument Serif served as woff2 from `assets/fonts/` (latin subset only, ~80 KB total). No Google Fonts dependency.
+- **View transitions:** smooth cross-fade when navigating between sections via the nav (uses the View Transitions API where supported).
+- **"Now" page:** a snapshot of what Ethan is currently focused on, at `/now.html`.
 - **Copy email:** one-click copy button next to the email address, with clipboard API and execCommand fallback.
 - **PWA:** installable as a standalone app (`manifest.json`) with offline support via a service worker (`sw.js`). The site works without a network connection once cached.
 - **Print styles:** clean black-on-white output when printing; hides the ticker, terminal, and decorative elements.
@@ -31,3 +35,6 @@ Hosted as a Cloudflare Worker (`ethantam-dev`) with static assets, connected to 
 - `manifest.json`: PWA manifest for installability
 - `sw.js`: service worker for offline support (network-first for HTML, cache-first for assets)
 - `noscript.css`: shows the plain painting when JavaScript is off
+- `fonts.css`: self-hosted @font-face declarations (latin subset woff2)
+- `assets/fonts/`: Geist, Geist Mono, Instrument Serif woff2 files
+- `now.html`: "Now" page — current focus snapshot

@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <script>try{const t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t;else if(matchMedia("(prefers-color-scheme: light)").matches)document.documentElement.dataset.theme="light"}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Ethan Tam — Markets, Economics &amp; Small Apps</title>
   <meta name="description" content="Ethan Tam: Singapore, into markets and economics, builds small apps on the side. National Service now, Economics at Cambridge from 2027.">
   <meta name="author" content="Ethan Tam">
   <meta name="robots" content="index, follow, max-image-preview:large">
-  <meta name="theme-color" content="#0c0b0a">
+  <meta name="theme-color" content="#0c0b0a" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)">
   <meta property="og:title" content="Ethan Tam — Markets, Economics &amp; Small Apps">
   <meta property="og:description" content="Into markets and economics. Builds small apps on the side. Singapore. National Service now, Economics at Cambridge from 2027.">
   <meta property="og:url" content="https://ethantam.dev">
@@ -41,9 +43,7 @@
    "description":"Personal site of Ethan Tam: markets, economics, and small apps.",
    "inLanguage":"en"}
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="fonts.css" fetchpriority="high">
   <link rel="stylesheet" href="styles.css" fetchpriority="high">
   <noscript><link rel="stylesheet" href="noscript.css"></noscript>
 </head>
@@ -74,6 +74,7 @@
         <p class="lede">I'm doing National Service in Singapore right now, and I'll be studying Economics at Cambridge from 2027. In between, I read about markets and make apps for myself and my friends.</p>
 
         <nav class="nav mono" aria-label="Sections">
+          <a href="/now.html"><span class="nav__line" aria-hidden="true"></span>Now</a>
           <a href="#about"><span class="nav__line" aria-hidden="true"></span>About</a>
           <a href="#work"><span class="nav__line" aria-hidden="true"></span>Projects</a>
           <a href="#record"><span class="nav__line" aria-hidden="true"></span>Background</a>
@@ -88,6 +89,7 @@
           <li><a href="https://github.com/Ethosan" target="_blank" rel="noopener noreferrer" aria-label="Ethan Tam on GitHub (opens in new tab)">GitHub ↗</a></li>
           <li><a href="https://linkedin.com/in/ethantam-" target="_blank" rel="noopener noreferrer" aria-label="Ethan Tam on LinkedIn (opens in new tab)">LinkedIn ↗</a></li>
           <li><a href="mailto:eatentam@gmail.com" aria-label="Send email to Ethan Tam">Email</a></li>
+          <li><button type="button" class="theme-btn" data-toggle-theme aria-label="Toggle dark/light mode" aria-pressed="false"><span class="theme-btn__dark" aria-hidden="true">☾</span><span class="theme-btn__light" aria-hidden="true">☀</span></button></li>
           <li><button type="button" class="term-btn" data-open-term aria-label="Open terminal">~</button></li>
         </ul>
       </div>
