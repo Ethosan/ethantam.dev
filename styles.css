@@ -234,6 +234,7 @@ h1 em, .tagline em {
 /* the whole card opens the app; the Source link sits above this layer */
 .card__title::after { content: ""; position: absolute; inset: 0; z-index: 1; }
 .card__meta { margin: 4px 0 0; color: var(--muted); font-size: 0.75rem; }
+.card__meta span { white-space: nowrap; }
 .card p:not(.card__meta) { margin: 12px 0 0; color: var(--muted); font-size: 0.9375rem; line-height: 1.65; }
 .card p.card__why { margin-top: 14px; color: var(--fg-2); font-size: 1rem; }
 .tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 18px 0 0; padding: 0; }
