@@ -5,7 +5,7 @@ Personal site of Ethan Tam. Plain HTML, CSS and JS: no build step, no dependenci
 - **Ticker:** live prices for a watchlist of stocks and crypto, fetched from Yahoo by the Worker (`/api/quotes`, edge-cached 60s, falls back to the last good result). If that endpoint isn't there, the page falls back to CoinGecko for crypto only.
 - **Painting:** Ambrosius Bosschaert the Elder, *Vase of Flowers in a Window* (c.1618, Mauritshuis, public domain), dithered in the browser on a canvas. Hover or tap to see the original.
 - **Layout:** on desktop the name and section nav stay pinned on the left while the rest scrolls on the right, and the nav marks the section you're reading (the layout follows Brittany Chiang's site). Phones and tablets get one column with sticky section titles.
-- **Project screenshots:** taken from the demo-data screenshots in each project's repo, cropped and saved as WebP in `assets/`.
+- **Project screenshots:** 780×1440 captures saved as WebP in `assets/`. Live for Equarian Markets; demo data for 20bucks, The List and Trade Journal; test data for Tally.
 - **Terminal:** press `~` anywhere (or the `~` button) and type `help`
 - **Themes:** dark and light mode with a toggle button. Respects `prefers-color-scheme` by default, persists choice in `localStorage`. The dithered painting re-renders in theme colors.
 - **Self-hosted fonts:** Geist, Geist Mono, and Instrument Serif served as woff2 from `assets/fonts/` (latin subset only, ~80 KB total). No Google Fonts dependency.
@@ -26,7 +26,7 @@ That serves the static files and the `/api/quotes` endpoint together. (A plain s
 
 ## Deploy
 
-Hosted as a Cloudflare Worker (`ethantam-dev`) with static assets, connected to this repo through Workers Builds: every push to `main` deploys.
+Hosted as a Cloudflare Worker (`ethantam-dev`) with static assets. Deploys are manual: `npm run deploy` (runs `wrangler deploy`).
 
 - `wrangler.jsonc`: Worker config; serves `404.html` for unknown paths
 - `worker/index.js`: handles `GET /api/quotes` (Yahoo, cached 60s at the edge); everything else is a static file
