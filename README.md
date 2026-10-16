@@ -4,6 +4,8 @@ Personal site of Ethan Tam. Plain HTML, CSS and JS: no build step, no dependenci
 
 - **Ticker:** live prices for a watchlist of stocks and crypto, fetched from Yahoo by the Worker (`/api/quotes`, edge-cached 60s, falls back to the last good result). If that endpoint isn't there, the page falls back to CoinGecko for crypto only.
 - **Painting:** Ambrosius Bosschaert the Elder, *Vase of Flowers in a Window* (c.1618, Mauritshuis, public domain), dithered in the browser on a canvas. Hover or tap to see the original.
+- **Layout:** on desktop the name and section nav stay pinned on the left while the rest scrolls on the right, and the nav marks the section you're reading (the layout follows Brittany Chiang's site). Phones and tablets get one column with sticky section titles.
+- **Project screenshots:** taken from the demo-data screenshots in each project's repo, cropped and saved as WebP in `assets/`.
 - **Terminal:** press `~` anywhere (or the `~` button) and type `help`
 
 ## Run locally

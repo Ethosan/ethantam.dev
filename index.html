@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Ethan Tam</title>
   <meta name="description" content="Ethan Tam: Singapore, into markets and economics, builds small apps on the side.">
   <meta name="theme-color" content="#0c0b0a">
@@ -24,12 +24,13 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <noscript><link rel="stylesheet" href="noscript.css"></noscript>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
+  <div class="spotlight" aria-hidden="true"></div>
 
   <div class="ticker" aria-hidden="true">
     <span class="ticker__label mono"><span class="ticker__long">Prices I check too often</span><span class="ticker__short">Watching</span></span>
@@ -41,128 +42,133 @@
     </div>
   </div>
 
-  <header class="top wrap">
-    <a href="/" class="brand" aria-label="Ethan Tam, home">
-      <img src="assets/mark.svg" alt="" width="22" height="22">
-      <span>ethantam<span class="dim">.dev</span></span>
-    </a>
-    <nav class="nav mono">
-      <a href="#about">About</a>
-      <a href="#work">Projects</a>
-      <a href="#record">Background</a>
-      <a href="#contact">Contact</a>
-      <button type="button" class="nav__term" data-open-term aria-label="Open terminal">~</button>
-    </nav>
-  </header>
-
-  <main id="main">
-    <section class="hero wrap">
-      <div class="hero__text">
-        <p class="label mono"><span class="dot" aria-hidden="true"></span>Singapore · SGT <span id="clock">--:--</span></p>
-        <h1>Hi, I'm Ethan. I like <em>markets</em>, economics, and building small things.</h1>
+  <div class="shell wrap">
+    <!-- Left column: pinned on desktop while the right column scrolls -->
+    <header class="side">
+      <div class="side__top">
+        <a href="/" class="brand mono" aria-label="Ethan Tam, home">
+          <img src="assets/mark.svg" alt="" width="22" height="22">
+          <span>ethantam<span class="dim">.dev</span></span>
+        </a>
+        <h1>Ethan Tam</h1>
+        <p class="tagline">I like <em>markets</em>, economics, and building small things.</p>
         <p class="lede">I'm doing National Service in Singapore right now, and I'll be studying Economics at Cambridge from 2027. In between, I read about markets and make apps for myself and my friends.</p>
 
-        <p class="status mono">
-          <span><span class="dim">Now</span> National Service</span>
-          <span><span class="dim">On the side</span> finance at Advisory SG</span>
-          <span><span class="dim">Next</span> Economics, 2027</span>
-        </p>
+        <nav class="nav mono" aria-label="Sections">
+          <a href="#about"><span class="nav__line" aria-hidden="true"></span>About</a>
+          <a href="#work"><span class="nav__line" aria-hidden="true"></span>Projects</a>
+          <a href="#record"><span class="nav__line" aria-hidden="true"></span>Background</a>
+          <a href="#contact"><span class="nav__line" aria-hidden="true"></span>Contact</a>
+        </nav>
       </div>
 
+      <div class="side__foot mono">
+        <p class="label"><span class="dot" aria-hidden="true"></span>Singapore, <span id="clock">--:--</span> SGT</p>
+        <ul class="social">
+          <li><a href="https://github.com/Ethosan">GitHub ↗</a></li>
+          <li><a href="https://linkedin.com/in/ethantam-">LinkedIn ↗</a></li>
+          <li><a href="mailto:eatentam@gmail.com">Email</a></li>
+          <li><button type="button" class="term-btn" data-open-term aria-label="Open terminal">~</button></li>
+        </ul>
+      </div>
+    </header>
+
+    <main id="main" class="content">
       <figure class="art" id="art">
         <button type="button" class="art__frame" aria-label="Toggle between dithered and original painting" aria-pressed="false">
           <img src="assets/tulips.webp" alt="Vase of Flowers in a Window by Ambrosius Bosschaert the Elder: tulips, roses and irises in a glass vase set in a stone arch, a river landscape behind." width="800" height="1111" decoding="async" fetchpriority="high">
           <canvas aria-hidden="true"></canvas>
         </button>
         <figcaption class="mono">
-          <span>FIG. 1 — Bosschaert, <i>Vase of Flowers in a Window</i>, c.1618.</span>
+          <span>Fig. 1: Bosschaert, <i>Vase of Flowers in a Window</i>, c.1618.</span>
           <span class="dim">Tulip prices peaked Feb 1637. Don't buy the top.</span>
         </figcaption>
       </figure>
-    </section>
 
-    <section class="block wrap" id="about" aria-labelledby="about-h">
-      <div class="block__head">
-        <h2 id="about-h" class="mono">01 / About</h2>
-      </div>
-      <div class="about">
-        <p>The first stock I ever bought was a gold ETF, at 14, in the middle of COVID. I mostly wanted to understand why everyone was suddenly piling into gold. That question turned into a habit of reading about how fear, incentives and institutions move markets, which is roughly how I ended up choosing Economics.</p>
-        <p>At school I co-founded the ACSians Investment Club with some friends: workshops for beginners, stock pitches, and talks from people working in the industry. For my Extended Essay I tried predicting bitcoin prices with machine learning, which taught me a lot about messy data and about how humbling prediction is.</p>
-        <p>I started building apps because I wanted tools that didn't exist yet, like a money tracker that understands PayLater and splitting bills with friends. A couple of them are below.</p>
-      </div>
-    </section>
+      <section class="sec" id="about" aria-labelledby="about-h">
+        <h2 id="about-h" class="sec__h mono">About</h2>
+        <dl class="now mono">
+          <div><dt>Now</dt><dd>National Service</dd></div>
+          <div><dt>On the side</dt><dd>Finance at Advisory SG</dd></div>
+          <div><dt>Next</dt><dd>Economics, 2027</dd></div>
+        </dl>
+        <div class="prose">
+          <p>The first stock I ever bought was a gold ETF, at 14, in the middle of COVID. I mostly wanted to understand why everyone was suddenly piling into gold. That question turned into a habit of reading about how fear, incentives and institutions move markets, which is roughly how I ended up choosing Economics.</p>
+          <p>At school I co-founded the ACSians Investment Club with some friends: workshops for beginners, stock pitches, and talks from people working in the industry. For my Extended Essay I tried predicting bitcoin prices with machine learning, which taught me a lot about messy data and about how humbling prediction is.</p>
+          <p>I started building apps because I wanted tools that didn't exist yet, like a money tracker that understands PayLater and splitting bills with friends. A couple of them are below.</p>
+        </div>
+      </section>
 
-    <section class="block wrap" id="work" aria-labelledby="work-h">
-      <div class="block__head">
-        <h2 id="work-h" class="mono">02 / Projects</h2>
-        <a class="mono link" href="https://github.com/Ethosan">github.com/Ethosan ↗</a>
-      </div>
+      <section class="sec" id="work" aria-labelledby="work-h">
+        <h2 id="work-h" class="sec__h mono">Projects</h2>
 
-      <div class="projects">
-        <article class="proj">
-          <div class="proj__meta mono">
-            <h3>20bucks</h3>
-            <span class="dim">Since Sep 2026 · 167 commits</span>
-          </div>
-          <div class="proj__body">
-            <p class="proj__why">I wanted one place to see where my money actually goes, including PayLater instalments and the "I'll pay you back" bills that never show up in a banking app.</p>
-            <p>It grew into a proper finance app: bill splits, trading P&amp;L, statement imports, and it works offline. Plain JavaScript and Supabase, plus a small AI check that flags entries that look off.</p>
-            <div class="proj__links mono">
-              <a class="proj__link" href="https://20bucks.ethantam.dev">20bucks.ethantam.dev ↗</a>
-              <a class="proj__src" href="https://github.com/Ethosan/moneytracker">Source</a>
+        <div class="cards">
+          <article class="card">
+            <div class="card__body">
+              <h3><a class="card__title" href="https://20bucks.ethantam.dev">20bucks <span class="arrow" aria-hidden="true">↗</span></a></h3>
+              <p class="card__meta mono">Since Sep 2026 · 167 commits</p>
+              <p class="card__why">I wanted one place to see where my money actually goes, including PayLater instalments and the "I'll pay you back" bills that never show up in a banking app.</p>
+              <p>It grew into a proper finance app: bill splits, trading P&amp;L, statement imports, and it works offline. There's also a small AI check that flags entries that look off.</p>
+              <ul class="tags mono" aria-label="Built with">
+                <li>JavaScript</li><li>Supabase</li><li>PWA</li>
+              </ul>
+              <a class="card__src mono" href="https://github.com/Ethosan/moneytracker">Source</a>
             </div>
-          </div>
-        </article>
-
-        <article class="proj">
-          <div class="proj__meta mono">
-            <h3>The List</h3>
-            <span class="dim">Since Aug 2026 · 143 commits</span>
-          </div>
-          <div class="proj__body">
-            <p class="proj__why">My friends and I kept forgetting where we'd eaten and where we still wanted to go.</p>
-            <p>So now there's a shared list. We rate places, there's a leaderboard, and when someone adds a place to the want list it goes and finds a good TikTok and the details by itself. It also lives in our Telegram group as a bot. TypeScript on Cloudflare Workers, with Supabase.</p>
-            <div class="proj__links mono">
-              <a class="proj__link" href="https://list.ethantam.dev">list.ethantam.dev ↗</a>
-              <a class="proj__src" href="https://github.com/Ethosan/Makan-bot">Source</a>
+            <div class="card__media">
+              <img src="assets/20bucks-month.webp" alt="20bucks month view: spending so far this month, the pace against a usual month, and spending by category. Demo data." width="390" height="720" loading="lazy" decoding="async">
+              <img src="assets/20bucks-insights.webp" alt="20bucks insights screen: a bar chart of monthly food spending against the average. Demo data." width="390" height="720" loading="lazy" decoding="async">
             </div>
-          </div>
-        </article>
-      </div>
-    </section>
+          </article>
 
-    <section class="block wrap" id="record" aria-labelledby="record-h">
-      <div class="block__head">
-        <h2 id="record-h" class="mono">03 / Background</h2>
-      </div>
+          <article class="card">
+            <div class="card__body">
+              <h3><a class="card__title" href="https://list.ethantam.dev">The List <span class="arrow" aria-hidden="true">↗</span></a></h3>
+              <p class="card__meta mono">Since Aug 2026 · 143 commits</p>
+              <p class="card__why">My friends and I kept forgetting where we'd eaten and where we still wanted to go.</p>
+              <p>So now there's a shared list. We rate places, there's a leaderboard, and when someone adds a place to the want list it goes and finds a good TikTok and the details by itself. It also lives in our Telegram group as a bot.</p>
+              <ul class="tags mono" aria-label="Built with">
+                <li>TypeScript</li><li>Cloudflare Workers</li><li>Supabase</li><li>Telegram</li>
+              </ul>
+              <a class="card__src mono" href="https://github.com/Ethosan/Makan-bot">Source</a>
+            </div>
+            <div class="card__media">
+              <img src="assets/list-leaderboard.webp" alt="The List leaderboard: restaurants ranked by combined score, each with its price tier and when it was visited. Demo data." width="390" height="720" loading="lazy" decoding="async">
+              <img src="assets/list-place.webp" alt="The List place page: one restaurant's scores for food, ambiance, aesthetics and service from each person. Demo data." width="390" height="720" loading="lazy" decoding="async">
+            </div>
+          </article>
+        </div>
 
-      <ol class="log">
-        <li><span class="log__t mono">2027</span><span class="log__w">Economics (BA)</span><span class="log__o dim">University of Cambridge</span></li>
-        <li><span class="log__t mono">2026–</span><span class="log__w">Finance Officer</span><span class="log__o dim">Advisory Singapore</span></li>
-        <li><span class="log__t mono">2025–27</span><span class="log__w">National Service</span><span class="log__o dim">Singapore Armed Forces</span></li>
-        <li><span class="log__t mono">2024–25</span><span class="log__w">Maths tutor</span><span class="log__o dim">IB, IP &amp; IGCSE</span></li>
-        <li><span class="log__t mono">2023–24</span><span class="log__w">Co-founder</span><span class="log__o dim">ACSians Investment Club</span></li>
-        <li><span class="log__t mono">2023–24</span><span class="log__w">Co-founder</span><span class="log__o dim">Project Lumos, fundraising for migrant workers</span></li>
-        <li><span class="log__t mono">2019–24</span><span class="log__w">IP &amp; IB Diploma</span><span class="log__o dim">Anglo-Chinese School (Independent)</span></li>
-      </ol>
-    </section>
+        <a class="more mono" href="https://github.com/Ethosan">More on GitHub <span class="arrow" aria-hidden="true">↗</span></a>
+      </section>
 
-    <section class="block wrap" id="contact" aria-labelledby="contact-h">
-      <div class="block__head">
-        <h2 id="contact-h" class="mono">04 / Contact</h2>
-      </div>
-      <p class="contact">Always happy to chat about markets, economics, or something you're building. <a href="mailto:eatentam@gmail.com">eatentam@gmail.com</a></p>
-      <ul class="links mono">
-        <li><a href="https://github.com/Ethosan">GitHub ↗</a></li>
-        <li><a href="https://linkedin.com/in/ethantam-">LinkedIn ↗</a></li>
-      </ul>
-    </section>
-  </main>
+      <section class="sec" id="record" aria-labelledby="record-h">
+        <h2 id="record-h" class="sec__h mono">Background</h2>
 
-  <footer class="foot wrap mono">
-    <p class="colophon dim">Plain HTML, CSS and a bit of JavaScript, no framework. Set in Geist and Instrument Serif. The painting is Bosschaert's <i>Vase of Flowers in a Window</i>, from the Mauritshuis (public domain). Last updated 16 Oct 2026.</p>
-    <button type="button" class="link" data-open-term>Press <kbd>~</kbd> for a terminal</button>
-  </footer>
+        <ol class="log">
+          <li><span class="log__t mono">2027</span><span class="log__w">Economics (BA)</span><span class="log__o">University of Cambridge</span></li>
+          <li><span class="log__t mono">2026–</span><span class="log__w">Finance Officer</span><span class="log__o">Advisory Singapore</span></li>
+          <li><span class="log__t mono">2025–27</span><span class="log__w">National Service</span><span class="log__o">Singapore Armed Forces</span></li>
+          <li><span class="log__t mono">2024–25</span><span class="log__w">Maths tutor</span><span class="log__o">IB, IP &amp; IGCSE</span></li>
+          <li><span class="log__t mono">2023–24</span><span class="log__w">Co-founder</span><span class="log__o">ACSians Investment Club</span></li>
+          <li><span class="log__t mono">2023–24</span><span class="log__w">Co-founder</span><span class="log__o">Project Lumos, fundraising for migrant workers</span></li>
+          <li><span class="log__t mono">2019–24</span><span class="log__w">IP &amp; IB Diploma</span><span class="log__o">Anglo-Chinese School (Independent)</span></li>
+        </ol>
+
+        <a class="more mono" href="https://linkedin.com/in/ethantam-">More on LinkedIn <span class="arrow" aria-hidden="true">↗</span></a>
+      </section>
+
+      <section class="sec" id="contact" aria-labelledby="contact-h">
+        <h2 id="contact-h" class="sec__h mono">Contact</h2>
+        <p class="contact">Always happy to chat about markets, economics, or something you're building.</p>
+        <a class="contact__mail" href="mailto:eatentam@gmail.com">eatentam@gmail.com</a>
+      </section>
+
+      <footer class="foot mono">
+        <p class="colophon">Plain HTML, CSS and a bit of JavaScript, no framework. Set in Geist and Instrument Serif. Layout borrows from Brittany Chiang's site. The painting is Bosschaert's <i>Vase of Flowers in a Window</i>, from the Mauritshuis (public domain). Last updated 16 Oct 2026.</p>
+        <button type="button" class="hint" data-open-term><span class="hint__key">Press <kbd>~</kbd> for a terminal</span><span class="hint__tap">Open the terminal</span></button>
+      </footer>
+    </main>
+  </div>
 
   <div class="term" id="term" role="dialog" aria-modal="true" aria-label="Terminal" hidden>
     <div class="term__win mono">
