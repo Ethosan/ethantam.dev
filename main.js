@@ -22,7 +22,7 @@
 
   /* ---------- section nav (desktop): mark the section you're reading ---------- */
   const navLinks = [...document.querySelectorAll(".nav a")];
-  const sections = navLinks.map((a) => $(a.hash)).filter(Boolean);
+  const sections = navLinks.map((a) => a.hash && $(a.hash)).filter(Boolean);
   let current = null;
   const setActive = (id) => {
     if (id === current) return;
@@ -256,7 +256,6 @@
     list: "https://list.ethantam.dev",
     markets: "https://markets.ethantam.dev",
     journal: "https://futuretracker.ethantam.dev/?demo",
-    tally: "https://main.d23gra1a9ugqjs.amplifyapp.com",
   };
   const a = (href, text = href) => `<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
   const esc = (t) => String(t).replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
@@ -278,7 +277,7 @@
       "record      background, briefly",
       "watchlist   prices I check too often, live",
       "contact     how to reach me",
-      "open &lt;x&gt;    open github | linkedin | 20bucks | list | markets | journal | tally",
+      "open &lt;x&gt;    open github | linkedin | 20bucks | list | markets | journal",
       "tulip       a cautionary tale",
       "clear       clear the screen",
       "exit        close (or press esc)",
@@ -293,7 +292,7 @@
       `20bucks     personal finance PWA: splits, PayLater, P&L, AI review   ${a(LINKS["20bucks"], "app")} ${a("https://github.com/Ethosan/moneytracker", "src")}`,
       `Markets     macro dashboard: risk, regime, absorption, recession     ${a(LINKS.markets, "app")} ${a("https://github.com/Ethosan/eqmarkets", "src")}`,
       `The List    ratings, leaderboard, auto want list, Telegram bot       ${a(LINKS.list, "app")} ${a("https://github.com/Ethosan/Makan-bot", "src")}`,
-      `Tally       escrow trust layer: Cardano, evidence, reliability       ${a(LINKS.tally, "demo")} ${a("https://github.com/xiaoyang4c/actual-token2049-hackathon-repo", "src")}`,
+      `Tally       escrow trust layer: Cardano, evidence, reliability       ${a("https://github.com/xiaoyang4c/actual-token2049-hackathon-repo", "src")}`,
     ].join("\n"),
     record: () => [
       "2027     Economics (BA), University of Cambridge",
