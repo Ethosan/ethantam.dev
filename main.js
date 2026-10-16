@@ -9,6 +9,51 @@
   tickClock();
   setInterval(tickClock, 15_000);
 
+  /* ---------- section nav (desktop): mark the section you're reading ---------- */
+  const navLinks = [...document.querySelectorAll(".nav a")];
+  const sections = navLinks.map((a) => $(a.hash)).filter(Boolean);
+  const setActive = (id) => navLinks.forEach((a) => {
+    const on = a.hash === `#${id}`;
+    a.classList.toggle("is-active", on);
+    if (on) a.setAttribute("aria-current", "location");
+    else a.removeAttribute("aria-current");
+  });
+  if ("IntersectionObserver" in window && sections.length) {
+    // whichever section crosses a thin band ~40% down the viewport is current
+    const inBand = new Set();
+    let atEnd = false;
+    const update = () => {
+      if (atEnd) return setActive(sections.at(-1).id);
+      const hit = sections.find((s) => inBand.has(s));
+      if (hit) setActive(hit.id);
+      else if (sections[0].getBoundingClientRect().top > 0) setActive(sections[0].id); // still up by the painting
+    };
+    const band = new IntersectionObserver((entries) => {
+      for (const e of entries) e.isIntersecting ? inBand.add(e.target) : inBand.delete(e.target);
+      update();
+    }, { rootMargin: "-40% 0px -59% 0px" });
+    sections.forEach((s) => band.observe(s));
+    // Contact is short and may never reach the band, so the page bottom counts as Contact
+    const end = new IntersectionObserver(([e]) => { atEnd = e.isIntersecting; update(); }, { threshold: 1 });
+    end.observe($(".foot"));
+    setActive(sections[0].id);
+  }
+
+  /* ---------- spotlight: a soft glow under the pointer (desktop only) ---------- */
+  const spot = $(".spotlight");
+  if (spot && !reduceMotion && matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    let raf = 0, px = 0, py = 0;
+    addEventListener("pointermove", (e) => {
+      px = e.clientX; py = e.clientY;
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        spot.style.setProperty("--x", `${px}px`);
+        spot.style.setProperty("--y", `${py}px`);
+        raf = 0;
+      });
+    }, { passive: true });
+  }
+
   /* ---------- ticker ---------- */
   const WATCHLIST = ["BTC", "ETH", "SOL", "AXTI", "MU", "NBIS", "CRWV", "LLY", "GS", "IBKR", "NVDA", "CRWD", "NET", "CAT", "TWLO"];
   const COINS = { BTC: "bitcoin", ETH: "ethereum", SOL: "solana" };
