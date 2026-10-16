@@ -12,32 +12,53 @@
   /* ---------- section nav (desktop): mark the section you're reading ---------- */
   const navLinks = [...document.querySelectorAll(".nav a")];
   const sections = navLinks.map((a) => $(a.hash)).filter(Boolean);
-  const setActive = (id) => navLinks.forEach((a) => {
-    const on = a.hash === `#${id}`;
-    a.classList.toggle("is-active", on);
-    if (on) a.setAttribute("aria-current", "location");
-    else a.removeAttribute("aria-current");
-  });
-  if ("IntersectionObserver" in window && sections.length) {
-    // whichever section crosses a thin band ~40% down the viewport is current
-    const inBand = new Set();
-    let atEnd = false;
-    const update = () => {
-      if (atEnd) return setActive(sections.at(-1).id);
-      const hit = sections.find((s) => inBand.has(s));
-      if (hit) setActive(hit.id);
-      else if (sections[0].getBoundingClientRect().top > 0) setActive(sections[0].id); // still up by the painting
-    };
-    const band = new IntersectionObserver((entries) => {
-      for (const e of entries) e.isIntersecting ? inBand.add(e.target) : inBand.delete(e.target);
-      update();
-    }, { rootMargin: "-40% 0px -59% 0px" });
-    sections.forEach((s) => band.observe(s));
-    // Contact is short and may never reach the band, so the page bottom counts as Contact
-    const end = new IntersectionObserver(([e]) => { atEnd = e.isIntersecting; update(); }, { threshold: 1 });
-    end.observe($(".foot"));
-    setActive(sections[0].id);
-  }
+  let current = null;
+  const setActive = (id) => {
+    if (id === current) return;
+    current = id;
+    navLinks.forEach((a) => {
+      const on = a.hash === `#${id}`;
+      a.classList.toggle("is-active", on);
+      if (on) a.setAttribute("aria-current", "location");
+      else a.removeAttribute("aria-current");
+    });
+  };
+
+  // The current section is the last one whose top has passed a reading line 40% down the window.
+  // Background and Contact are short and sit at the end, so they can't all reach that line; over the
+  // last 60% of a window's worth of scrolling the line slides to the bottom edge, giving each its turn
+  // and lighting Contact at the bottom on any screen height.
+  let lock = null, lockTimer = 0;
+  const spy = () => {
+    if (lock || !sections.length || !navLinks[0].offsetParent) return; // clicked item wins; nav hidden on phones
+    const h = innerHeight;
+    const left = Math.max(0, document.documentElement.scrollHeight - h - scrollY);
+    const line = Math.max(h * 0.4, h - left);
+    let id = sections[0].id;
+    for (const s of sections) if (s.getBoundingClientRect().top <= line) id = s.id;
+    setActive(id);
+  };
+  let queued = false;
+  const queueSpy = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; spy(); });
+  };
+  addEventListener("scroll", queueSpy, { passive: true });
+  addEventListener("resize", queueSpy, { passive: true });
+
+  // A clicked item stays lit while the page scrolls to it, even when the page is too short to bring
+  // that section to the top. Any scrolling of your own hands control back to the reading line.
+  const release = () => { lock = null; clearTimeout(lockTimer); };
+  navLinks.forEach((a) => a.addEventListener("click", () => {
+    release();
+    lock = a.hash.slice(1);
+    setActive(lock);
+    lockTimer = setTimeout(release, 1200); // fallback where scrollend isn't supported
+  }));
+  document.addEventListener("scrollend", release);
+  for (const type of ["wheel", "touchstart", "keydown"]) addEventListener(type, release, { passive: true });
+  spy();
 
   /* ---------- spotlight: a soft glow under the pointer (desktop only) ---------- */
   const spot = $(".spotlight");
