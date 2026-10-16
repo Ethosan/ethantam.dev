@@ -2,10 +2,21 @@
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (s, el = document) => el.querySelector(s);
 
-  /* ---------- clock ---------- */
-  const clock = $("#clock");
-  const sgt = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Singapore", hour: "2-digit", minute: "2-digit" });
-  const tickClock = () => { clock.textContent = sgt.format(new Date()); };
+  /* ---------- clocks: Singapore and the UK ---------- */
+  const clocks = [...document.querySelectorAll("[data-tz]")].map((el) => [
+    el, new Intl.DateTimeFormat("en-GB", { timeZone: el.dataset.tz, hour: "2-digit", minute: "2-digit" }),
+  ]);
+  // GMT in winter, BST in summer
+  const zoneNames = [...document.querySelectorAll("[data-tz-name]")].map((el) => [
+    el, new Intl.DateTimeFormat("en-GB", { timeZone: el.dataset.tzName, timeZoneName: "short" }),
+  ]);
+  const tickClock = () => {
+    const now = new Date();
+    clocks.forEach(([el, fmt]) => { el.textContent = fmt.format(now); });
+    zoneNames.forEach(([el, fmt]) => {
+      el.textContent = fmt.formatToParts(now).find((p) => p.type === "timeZoneName")?.value ?? el.textContent;
+    });
+  };
   tickClock();
   setInterval(tickClock, 15_000);
 
