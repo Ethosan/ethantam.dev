@@ -243,6 +243,7 @@
     "20bucks": "https://20bucks.ethantam.dev",
     list: "https://list.ethantam.dev",
     markets: "https://markets.ethantam.dev",
+    journal: "https://futuretracker.netlify.app/?demo",
   };
   const a = (href, text = href) => `<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
   const esc = (t) => String(t).replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
@@ -264,7 +265,7 @@
       "record      background, briefly",
       "watchlist   prices I check too often, live",
       "contact     how to reach me",
-      "open &lt;x&gt;    open github | linkedin | 20bucks | list | markets",
+      "open &lt;x&gt;    open github | linkedin | 20bucks | list | markets | journal",
       "tulip       a cautionary tale",
       "clear       clear the screen",
       "exit        close (or press esc)",
@@ -278,6 +279,7 @@
       `20bucks     personal finance PWA: splits, PayLater, P&L, AI review   ${a(LINKS["20bucks"], "app")} ${a("https://github.com/Ethosan/moneytracker", "src")}`,
       `The List    ratings, leaderboard, auto want list, Telegram bot       ${a(LINKS.list, "app")} ${a("https://github.com/Ethosan/Makan-bot", "src")}`,
       `Markets     macro dashboard: risk, regime, absorption, recession     ${a(LINKS.markets, "app")} ${a("https://github.com/Ethosan/eqmarkets", "src")}`,
+      `Journal     futures trade journal: R multiples, what mistakes cost    ${a(LINKS.journal, "demo")} ${a("https://github.com/Ethosan/futuretracker", "src")}`,
     ].join("\n"),
     record: () => [
       "2027     Economics (BA), University of Cambridge",
