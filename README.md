@@ -33,7 +33,7 @@ Hosted as a Cloudflare Worker (`ethantam-dev`) with static assets. Deploys are m
 - `.assetsignore`: keeps the README, config and worker source from being served
 - `_headers`: security headers (CSP, HSTS, COOP, CORP, Permissions-Policy) and cache-control rules
 - `manifest.json`: PWA manifest for installability
-- `sw.js`: service worker for offline support (network-first for HTML, cache-first for assets)
+- `sw.js`: service worker for offline support (network-first for HTML, CSS and JS, cache-first for images and fonts)
 - `noscript.css`: shows the plain painting when JavaScript is off
 - `fonts.css`: self-hosted @font-face declarations (latin subset woff2)
 - `assets/fonts/`: Geist, Geist Mono, Instrument Serif woff2 files

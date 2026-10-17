@@ -42,8 +42,8 @@ self.addEventListener("fetch", (e) => {
   // Never cache API calls or external requests
   if (url.pathname.startsWith("/api/") || url.origin !== self.location.origin) return;
 
-  // Network-first for HTML, cache-first for assets
-  if (request.destination === "document" || url.pathname.endsWith(".html")) {
+  // Network-first for HTML, CSS and JS so deploys show up on the next load; cache-first for images and fonts
+  if (request.destination === "document" || /\.(html|css|js)$/.test(url.pathname)) {
     e.respondWith(
       fetch(request)
         .then((res) => {
