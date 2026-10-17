@@ -81,7 +81,7 @@
     --sec-bg: rgba(250, 249, 246, .88);
     color-scheme: light;
   }
-}}
+}
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; }
