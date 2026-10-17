@@ -51,7 +51,7 @@
   --up: #3a8f52;
   --down: #c44a38;
   --accent-soft: rgba(196, 127, 23, .1);
-  --spotlight: rgba(196, 127, 23, .04);
+  --spotlight: rgba(196, 127, 23, .14);
   --card-shadow: rgba(28, 25, 20, .12);
   --term-bg: #1c1914;
   --term-overlay: rgba(250, 249, 246, .85);
@@ -74,7 +74,7 @@
     --up: #3a8f52;
     --down: #c44a38;
     --accent-soft: rgba(196, 127, 23, .1);
-    --spotlight: rgba(196, 127, 23, .04);
+    --spotlight: rgba(196, 127, 23, .14);
     --card-shadow: rgba(28, 25, 20, .12);
     --term-bg: #1c1914;
     --term-overlay: rgba(250, 249, 246, .85);
