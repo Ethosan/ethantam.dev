@@ -632,6 +632,23 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .tabbar a.is-active { color: var(--accent); }
   body { padding-bottom: calc(48px + var(--pad-b)); }
 
+
+  /* tulip and now share one row: the painting keeps the left, the list takes the right;
+     the timeline needs full width and stays below */
+  .content { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: 18px; align-items: start; }
+  #tulip { grid-column: 1; grid-row: 1; }
+  #now { grid-column: 2; grid-row: 1; }
+  #record, #work, #contact, .foot { grid-column: 1 / -1; }
+  #tulip .sec__h, #now .sec__h {
+    position: static; width: auto; margin-left: 0; margin-bottom: 12px;
+    padding: 0;
+    background: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+    border-bottom: 0;
+  }
+  #tulip .art { margin: 0; }
+  #now .now { margin-bottom: 0; }
+  #now .now div { grid-template-columns: 1fr; gap: 2px; }
+
   /* project details sit behind one tap; the hook stays visible */
   .card__more {
     display: inline-flex; align-items: center; gap: 6px;
