@@ -1,0 +1,17 @@
+# Auto-deploy: every push to the default branch goes live on Cloudflare.
+#
+# One-time setup: Settings > CI/CD > Variables > add a variable named
+#   CLOUDFLARE_API_TOKEN  (check Masked + Protected)
+# Create the token at dashboard.cloudflare.com/profile/api-tokens using the
+# "Edit Cloudflare Workers" template. Then retry this pipeline once.
+
+deploy:
+  stage: deploy
+  image: node:22
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  variables:
+    CLOUDFLARE_ACCOUNT_ID: "f4cf66898198033a983bcbc15b6f3900"
+  script:
+    - npm ci --no-audit --no-fund
+    - npx wrangler deploy
