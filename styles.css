@@ -376,14 +376,17 @@ html.theme-wipe::view-transition-new(root) {
   transition: transform .45s var(--ease), filter .45s var(--ease);
 }
 
-/* narrow: one screenshot at a time, swipe for the second (media sits above the card-wide link so it can scroll) */
+/* narrow: the overlapping pair sits small on the left, words on the right, like the wide layout */
 @container (max-width: 459px) {
-  .card__media { position: relative; z-index: 2; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; max-width: none; }
-  .card__media img { flex: 0 0 66%; scroll-snap-align: start; }
+  .card { grid-template-columns: 7rem minmax(0, 1fr); gap: 20px 18px; align-items: start; }
+  .card__media { order: -1; position: relative; z-index: 2; display: block; max-width: none; padding-bottom: 12px; }
+  .card__media img { width: 78%; box-shadow: 0 8px 20px var(--card-shadow); }
+  .card__media img:first-child { position: relative; z-index: 1; transform: rotate(-2deg); }
+  .card__media img:last-child { position: absolute; top: 10px; left: 22%; transform: rotate(4deg); filter: brightness(.6); }
 }
 
-/* wide enough: screenshots move to the left as an overlapping pair */
-@container (min-width: 520px) {
+/* wide enough: the pair grows one step wider */
+@container (min-width: 460px) {
   .card { grid-template-columns: 9.5rem minmax(0, 1fr); gap: 32px; align-items: start; }
   .card__media { order: -1; position: relative; display: block; padding-bottom: 14px; }
   .card__media img { width: 78%; box-shadow: 0 12px 32px var(--card-shadow); }
