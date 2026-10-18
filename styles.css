@@ -676,7 +676,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 
   /* terminal: sit at the top so the on-screen keyboard doesn't cover it */
   .term { place-items: start center; padding: max(12px, var(--pad-t)) 12px max(12px, var(--pad-b)); }
-  .term__win { height: min(420px, 62vh); height: min(420px, 62dvh); }
+  .term__win { height: min(420px, 85vh); height: min(420px, 85dvh); }
 }
 @media (max-width: 400px) {
   .ticker__label { display: none; }
