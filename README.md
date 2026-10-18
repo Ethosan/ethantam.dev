@@ -15,6 +15,16 @@ Personal site of Ethan Tam. Plain HTML, CSS and JS: no build step, no dependenci
 - **PWA:** installable as a standalone app (`manifest.json`) with offline support via a service worker (`sw.js`). The site works without a network connection once cached.
 - **Print styles:** clean black-on-white output when printing; hides the ticker, terminal, and decorative elements.
 
+## At a glance
+
+| | |
+| --- | --- |
+| **Live** | https://ethantam.dev |
+| **Hosting** | Cloudflare Worker `ethantam-dev` with static assets |
+| **Run locally** | `npm install && npm run dev` |
+| **Settings** | None. No secrets or environment variables. |
+| **Source** | [gitlab.com/eatentam/ethantam.dev](https://gitlab.com/eatentam/ethantam.dev) (moved from GitHub on 17 Oct 2026) |
+
 ## Run locally
 
 ```sh
