@@ -377,7 +377,7 @@ html.theme-wipe::view-transition-new(root) {
 /* narrow: one screenshot at a time, swipe for the second (media sits above the card-wide link so it can scroll) */
 @container (max-width: 459px) {
   .card__media { position: relative; z-index: 2; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; max-width: none; }
-  .card__media img { flex: 0 0 74%; scroll-snap-align: start; }
+  .card__media img { flex: 0 0 66%; scroll-snap-align: start; }
 }
 
 /* wide enough: screenshots move to the left as an overlapping pair */
@@ -598,6 +598,14 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 @media (max-width: 560px) {
   .ticker__label { padding-right: 10px; }
   .ticker__track { gap: 1.5rem; padding-left: 1.5rem; } /* padding must equal gap or the loop seams */
+
+  /* phones: one step smaller than the tablet scale — h1 clamp floor never shrank below 42px here */
+  h1 { margin-top: 28px; font-size: 2.125rem; }
+  .tagline { margin-top: 10px; font-size: 1.125rem; }
+  .art { max-width: 280px; margin: 24px 0 40px; }
+  .sec { padding-bottom: 44px; }
+  .cards { gap: 40px; }
+  .card h3 { font-size: 1.0625rem; }
   .ticker__long { display: none; }
   .ticker__short { display: inline; }
 
