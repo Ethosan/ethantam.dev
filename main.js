@@ -66,7 +66,7 @@
     if (a.hash && document.querySelector(a.hash) && "startViewTransition" in document) {
       e.preventDefault();
       document.startViewTransition(() => {
-        document.querySelector(a.hash).scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+        document.querySelector(a.hash).scrollIntoView({ behavior: "instant" });
       });
     }
     release();
@@ -110,6 +110,7 @@
     return `<b>${s}</b>${val}${chg}`;
   };
   const track = $("#ticker");
+  const srList = $("#ticker-sr");
   // Build the strip once (two copies so the CSS loop can translate -50% seamlessly),
   // then only swap the numbers inside it, so the scroll never restarts.
   track.innerHTML = [0, 1].map(() => WATCHLIST.map((s) => `<span class="tk" data-s="${s}"></span>`).join("")).join("");
@@ -118,6 +119,11 @@
     for (const q of quotes) {
       track.querySelectorAll(`[data-s="${q.s}"]`).forEach((el) => { el.innerHTML = itemInner(q); });
     }
+    if (srList) srList.innerHTML = quotes.map(({ s, p, c }) => {
+      const val = typeof p === "number" ? fmtPx(p) : "—";
+      const chg = typeof c === "number" ? `, ${c >= 0 ? "up" : "down"} ${Math.abs(c).toFixed(1)}%` : "";
+      return `<li>${s}: ${val}${chg}</li>`;
+    }).join("");
     if (!speedSet && quotes.some((q) => typeof q.p === "number")) {
       track.style.animationDuration = `${Math.round(track.scrollWidth / 2 / PX_PER_SEC)}s`;
       speedSet = true;
@@ -243,7 +249,6 @@
   /* ---------- terminal ---------- */
   const term = $("#term");
   const out = $("#term-out");
-  const form = $("#term-form");
   const input = $("#term-input");
   const history = [];
   let hIdx = 0;
@@ -375,8 +380,8 @@
     else if (!e.shiftKey && document.activeElement === closeBtn) { e.preventDefault(); input.focus(); }
   });
 
-  form.addEventListener("submit", (e) => { e.preventDefault(); run(input.value); input.value = ""; });
   input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); run(input.value); input.value = ""; }
     if (e.key === "ArrowUp" && hIdx > 0) { input.value = history[--hIdx]; e.preventDefault(); }
     if (e.key === "Tab" && !e.shiftKey) {
       e.preventDefault();

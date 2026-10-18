@@ -60,6 +60,10 @@
       </div>
     </div>
   </div>
+  <!-- the animated ticker above is aria-hidden decoration; this carries the same prices for screen readers -->
+  <ul class="ticker__sr" id="ticker-sr">
+    <li>BTC</li><li>ETH</li><li>NVDA</li><li>NET</li>
+  </ul>
 
   <div class="shell wrap">
     <!-- Left column: pinned on desktop while the right column scrolls -->
@@ -125,7 +129,7 @@
         <h2 id="record-h" class="sec__h mono">About</h2>
 
         <ol class="log">
-          <li><span class="log__t mono">2027</span><span class="log__w">Economics (BA)</span><span class="log__o">University of Cambridge</span></li>
+          <li><span class="log__t mono">2027&ndash;</span><span class="log__w">Economics (BA)</span><span class="log__o">University of Cambridge</span></li>
           <li><span class="log__t mono">2026–</span><span class="log__w">Finance &amp; Content</span><span class="log__o"><a href="https://www.advisory.sg" target="_blank" rel="noopener noreferrer">Advisory Singapore</a></span></li>
           <li><span class="log__t mono">2025–27</span><span class="log__w">National Service · Transport Operator</span><span class="log__o">Singapore Armed Forces</span></li>
           <li><span class="log__t mono">2024–25</span><span class="log__w">Maths tutor</span><span class="log__o">IB, IP &amp; IGCSE</span></li>
@@ -263,10 +267,10 @@
         <button type="button" class="term__x" data-close-term aria-label="Close terminal">esc</button>
       </div>
       <div class="term__out" id="term-out" aria-live="polite"></div>
-      <form class="term__in" id="term-form" autocomplete="off">
+      <div class="term__in">
         <label for="term-input" class="acc">$</label>
         <input id="term-input" type="text" name="command" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="off" enterkeyhint="go" inputmode="text" aria-label="Command">
-      </form>
+      </div>
     </div>
   </div>
 
