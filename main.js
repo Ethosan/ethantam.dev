@@ -407,14 +407,32 @@
     const light = isLight();
     themeBtns.forEach((b) => b.setAttribute("aria-pressed", String(light)));
   };
-  const toggleTheme = () => {
+  const toggleTheme = (e) => {
     const light = isLight();
     const next = light ? "dark" : "light";
-    root.dataset.theme = next;
-    try { localStorage.setItem("theme", next); } catch {}
-    updateThemeBtns();
-    // re-dither the painting in the new theme colors
-    if (typeof dither === "function" && img.complete && img.naturalWidth) dither();
+    const apply = () => {
+      root.dataset.theme = next;
+      try { localStorage.setItem("theme", next); } catch {}
+      updateThemeBtns();
+      // re-dither the painting in the new theme colors
+      if (typeof dither === "function" && img.complete && img.naturalWidth) dither();
+    };
+    // circular wipe from the clicked button when the browser and the user allow motion
+    const btn = e && e.currentTarget;
+    const rect = btn && btn.getBoundingClientRect();
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!document.startViewTransition || !rect || reduce) { apply(); return; }
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const reach = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    root.classList.add("theme-wipe");
+    const vt = document.startViewTransition(apply);
+    vt.ready.then(() => {
+      document.documentElement.animate(
+        { clipPath: ["circle(0px at " + x + "px " + y + "px)", "circle(" + reach + "px at " + x + "px " + y + "px)"] },
+        { duration: 480, easing: "cubic-bezier(.16, 1, .3, 1)", pseudoElement: "::view-transition-new(root)" }
+      );
+    }).finally(() => root.classList.remove("theme-wipe"));
   };
   themeBtns.forEach((b) => b.addEventListener("click", toggleTheme));
   updateThemeBtns();

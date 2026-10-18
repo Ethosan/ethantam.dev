@@ -243,6 +243,12 @@ h1 em, .tagline em {
 
 /* ---------- view transitions ---------- */
 @view-transition { navigation: auto; }
+/* theme switch: a circle wipes outward from the toggle button */
+html.theme-wipe::view-transition-old(root),
+html.theme-wipe::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 0.25s;
