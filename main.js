@@ -103,7 +103,7 @@
     ? n.toLocaleString("en-US", { maximumFractionDigits: 0 })
     : n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const itemInner = ({ s, p, c }) => {
-    const val = typeof p === "number" ? fmtPx(p) : "—";
+    const val = typeof p === "number" ? fmtPx(p) : "…";
     const chg = typeof c === "number"
       ? ` <i class="${c >= 0 ? "up" : "dn"}">${c >= 0 ? "▲" : "▼"} ${Math.abs(c).toFixed(1)}%</i>`
       : "";
@@ -120,7 +120,7 @@
       track.querySelectorAll(`[data-s="${q.s}"]`).forEach((el) => { el.innerHTML = itemInner(q); });
     }
     if (srList) srList.innerHTML = quotes.map(({ s, p, c }) => {
-      const val = typeof p === "number" ? fmtPx(p) : "—";
+      const val = typeof p === "number" ? fmtPx(p) : "…";
       const chg = typeof c === "number" ? `, ${c >= 0 ? "up" : "down"} ${Math.abs(c).toFixed(1)}%` : "";
       return `<li>${s}: ${val}${chg}</li>`;
     }).join("");
@@ -314,7 +314,7 @@
       return `opening ${arg}…`;
     },
     watchlist: () => quotes.map((q) => {
-      const px = typeof q.p === "number" ? fmtPx(q.p) : "—";
+      const px = typeof q.p === "number" ? fmtPx(q.p) : "…";
       const chg = typeof q.c === "number" ? `<span class="${q.c >= 0 ? "up" : "dn"}">${q.c >= 0 ? "+" : ""}${q.c.toFixed(2)}%</span>` : "";
       return `${q.s.padEnd(6)}${px.padStart(10)}   ${chg}`;
     }).join("\n") + "\n\nnot financial advice. see also: tulip",
