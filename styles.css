@@ -255,7 +255,7 @@ html.theme-wipe::view-transition-new(root) {
   animation-timing-function: var(--ease);
 }
 .sec { view-transition-name: none; }
-#about { view-transition-name: vt-about; }
+#now { view-transition-name: vt-now; }
 #work { view-transition-name: vt-work; }
 #record { view-transition-name: vt-record; }
 #contact { view-transition-name: vt-contact; }
@@ -264,6 +264,8 @@ html.theme-wipe::view-transition-new(root) {
 .content { container-type: inline-size; }
 
 .art { width: 100%; max-width: 380px; margin: 40px 0 44px; }
+/* the tulip section's own padding owns the space after the painting */
+#tulip .art { margin-bottom: 0; }
 .art__frame {
   position: relative;
   display: block;
