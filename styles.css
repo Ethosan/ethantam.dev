@@ -174,7 +174,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 @keyframes tick { to { transform: translateX(-50%); } }
 
 /* ---------- left column ---------- */
-.side { padding-top: 28px; }
+.side { padding-top: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--line); } /* the intro ends here; content starts below the line, not under the socials */
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--fg); }
 h1 {
   margin: 40px 0 0;
@@ -266,7 +266,7 @@ html.theme-wipe::view-transition-new(root) {
 }
 
 /* ---------- right column ---------- */
-.content { container-type: inline-size; }
+.content { container-type: inline-size; padding-top: clamp(32px, 6vh, 48px); }
 
 .art { width: 100%; max-width: 380px; margin: 40px 0 44px; }
 /* the tulip section's own padding owns the space after the painting */
@@ -513,6 +513,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   }
   .side {
     position: sticky; top: var(--tick-h);
+    border-bottom: 0; /* pinned column: no divider on its bottom edge */
     align-self: start;
     height: calc(100vh - var(--tick-h));
     height: calc(100dvh - var(--tick-h));
