@@ -417,22 +417,32 @@
       // re-dither the painting in the new theme colors
       if (typeof dither === "function" && img.complete && img.naturalWidth) dither();
     };
-    // circular wipe from the clicked button when the browser and the user allow motion
-    const btn = e && e.currentTarget;
-    const rect = btn && btn.getBoundingClientRect();
+    // dawn rises from the bottom, dusk settles from the top; without the API the theme just flips
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!document.startViewTransition || !rect || reduce) { apply(); return; }
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-    const reach = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    if (!document.startViewTransition || reduce) { apply(); return; }
+    const toLight = next === "light";
     root.classList.add("theme-wipe");
+    const band = document.createElement("div");
+    band.className = "theme-band " + (toLight ? "theme-band--dawn" : "theme-band--dusk");
+    band.setAttribute("aria-hidden", "true");
+    document.body.append(band);
+    band.animate(
+      [
+        { transform: toLight ? "translateY(100vh)" : "translateY(-100%)", opacity: 1 },
+        { transform: toLight ? "translateY(-100%)" : "translateY(100vh)", opacity: 0 },
+      ],
+      { duration: 560, easing: "cubic-bezier(.16, 1, .3, 1)" }
+    );
     const vt = document.startViewTransition(apply);
     vt.ready.then(() => {
       document.documentElement.animate(
-        { clipPath: ["circle(0px at " + x + "px " + y + "px)", "circle(" + reach + "px at " + x + "px " + y + "px)"] },
+        { clipPath: [toLight ? "inset(100% 0 0 0)" : "inset(0 0 100% 0)", "inset(0 0 0 0)"] },
         { duration: 480, easing: "cubic-bezier(.16, 1, .3, 1)", pseudoElement: "::view-transition-new(root)" }
       );
-    }).finally(() => root.classList.remove("theme-wipe"));
+    }).finally(() => {
+      root.classList.remove("theme-wipe");
+      band.remove();
+    });
   };
   themeBtns.forEach((b) => b.addEventListener("click", toggleTheme));
   updateThemeBtns();

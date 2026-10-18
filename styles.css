@@ -247,12 +247,16 @@ h1 em, .tagline em {
 
 /* ---------- view transitions ---------- */
 @view-transition { navigation: auto; }
-/* theme switch: a circle wipes outward from the toggle button */
+/* theme switch: light rises like dawn, dark settles like dusk */
 html.theme-wipe::view-transition-old(root),
 html.theme-wipe::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
+/* the horizon band that rides the leading edge of the wipe */
+.theme-band { position: fixed; left: 0; right: 0; top: 0; height: 34vh; pointer-events: none; z-index: 30; }
+.theme-band--dawn { background: linear-gradient(to top, rgba(242, 169, 59, .5), rgba(242, 169, 59, .14) 45%, transparent); }
+.theme-band--dusk { background: linear-gradient(to bottom, rgba(12, 11, 10, .85), rgba(12, 11, 10, .3) 45%, transparent); }
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 0.25s;
