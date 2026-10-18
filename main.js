@@ -250,7 +250,7 @@
   let opener = null;
 
   const LINKS = {
-    github: "https://github.com/Ethosan",
+    gitlab: "https://gitlab.com/eatentam",
     linkedin: "https://linkedin.com/in/ethantam-",
     "20bucks": "https://20bucks.ethantam.dev",
     list: "https://list.ethantam.dev",
@@ -277,7 +277,7 @@
       "record      background, briefly",
       "watchlist   prices I check too often, live",
       "contact     how to reach me",
-      "open &lt;x&gt;    open github | linkedin | 20bucks | list | markets | journal",
+      "open &lt;x&gt;    open gitlab | linkedin | 20bucks | list | markets | journal",
       "tulip       a cautionary tale",
       "clear       clear the screen",
       "exit        close (or press esc)",
@@ -288,10 +288,10 @@
     hire: () => COMMANDS.contact(),
     about: () => "Ethan Tam, Singapore.\nDoing National Service now, Economics at Cambridge from 2027.\nI like markets, economics, and building small apps for myself and my friends.",
     projects: () => [
-      `Journal     futures trade journal: R multiples, what mistakes cost    ${a(LINKS.journal, "demo")} ${a("https://github.com/Ethosan/futuretracker", "src")}`,
-      `20bucks     personal finance PWA: splits, PayLater, P&L, AI review   ${a(LINKS["20bucks"], "app")} ${a("https://github.com/Ethosan/moneytracker", "src")}`,
-      `Markets     macro dashboard: risk, regime, absorption, recession     ${a(LINKS.markets, "app")} ${a("https://github.com/Ethosan/eqmarkets", "src")}`,
-      `The List    ratings, leaderboard, auto want list, Telegram bot       ${a(LINKS.list, "app")} ${a("https://github.com/Ethosan/Makan-bot", "src")}`,
+      `Journal     futures trade journal: R multiples, what mistakes cost    ${a(LINKS.journal, "demo")} ${a("https://gitlab.com/eatentam/futuretracker", "src")}`,
+      `20bucks     personal finance PWA: splits, PayLater, P&L, AI review   ${a(LINKS["20bucks"], "app")} ${a("https://gitlab.com/eatentam/moneytracker", "src")}`,
+      `Markets     macro dashboard: risk, regime, absorption, recession     ${a(LINKS.markets, "app")} ${a("https://gitlab.com/eatentam/eqmarkets", "src")}`,
+      `The List    ratings, leaderboard, auto want list, Telegram bot       ${a(LINKS.list, "app")} ${a("https://gitlab.com/eatentam/thelist", "src")}`,
       `Tally       escrow trust layer: Cardano, evidence, reliability       ${a("https://github.com/xiaoyang4c/actual-token2049-hackathon-repo", "src")}`,
     ].join("\n"),
     record: () => [
@@ -301,7 +301,7 @@
       "2023–24  Co-founder, ACSians Investment Club",
       "2023–24  Co-founder, Project Lumos",
     ].join("\n"),
-    contact: () => `email     ${a("mailto:eatentam@gmail.com", "eatentam@gmail.com")}\ngithub    ${a(LINKS.github, "Ethosan")}\nlinkedin  ${a(LINKS.linkedin, "ethantam-")}`,
+    contact: () => `email     ${a("mailto:eatentam@gmail.com", "eatentam@gmail.com")}\ngitlab    ${a(LINKS.gitlab, "eatentam")}\nlinkedin  ${a(LINKS.linkedin, "ethantam-")}`,
     open: (arg) => {
       const url = LINKS[arg];
       if (!url) return `open: unknown target "${esc(arg || "")}". try: ${Object.keys(LINKS).join(", ")}`;
