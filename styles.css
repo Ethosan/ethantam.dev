@@ -632,6 +632,14 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .tabbar a.is-active { color: var(--accent); }
   body { padding-bottom: calc(48px + var(--pad-b)); }
 
+  /* theme and terminal buttons ride beside Email instead of wrapping */
+  .social { gap: 0 12px; }
+  .social .term-btn, .social .theme-btn { width: 32px; height: 32px; font-size: 0.75rem; }
+
+  /* the colophon sits closer at the bottom: tighter leading, less air */
+  .foot { padding-block: 18px 12px; }
+  .colophon { line-height: 1.55; }
+
 
   /* tulip and now share one row: the painting keeps the left, the list takes the right;
      the timeline needs full width and stays below */
