@@ -1,5 +1,5 @@
 // Service worker for ethantam.dev: offline-first, cache static assets.
-const CACHE = "ethantam-v3";
+const CACHE = "ethantam-v4";
 const PRECACHE = [
   "/",
   "/index.html",
@@ -7,7 +7,6 @@ const PRECACHE = [
   "/main.js",
   "/noscript.css",
   "/fonts.css",
-  "/now.html",
   "/assets/mark.svg",
   "/assets/tulips.webp",
   "/assets/og.png",
