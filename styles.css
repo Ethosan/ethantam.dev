@@ -121,12 +121,16 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
     background: radial-gradient(560px circle at var(--x, 70%) var(--y, -10%), var(--spotlight), transparent 75%);
   }
 }
-.ticker, .shell { position: relative; z-index: 1; }
+.shell { position: relative; z-index: 1; }
 
 /* ---------- ticker ---------- */
 .ticker {
   display: flex;
   align-items: stretch;
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: var(--bg);
   height: calc(var(--tick-h) + var(--pad-t));
   padding-top: var(--pad-t);
   border-bottom: 1px solid var(--line);
@@ -195,9 +199,7 @@ h1 em, .tagline em {
 }
 .lede { margin: 18px 0 0; max-width: 42ch; color: var(--muted); }
 
-/* social proof strip + kinship line + small-ask CTA under the lede */
-.proof { margin: 16px 0 0; max-width: 40ch; }
-.proof b { color: var(--fg); font-weight: 500; }
+/* kinship line + small-ask CTA under the lede */
 .kin { margin: 10px 0 0; max-width: 34ch; font-family: var(--serif); font-style: italic; font-size: 1.0625rem; line-height: 1.5; color: var(--fg-2); }
 .ask { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; padding-block: 8px; color: var(--accent); text-decoration: none; transition: color .15s; }
 .ask:hover { color: var(--fg); }
@@ -285,7 +287,7 @@ h1 em, .tagline em {
 .art figcaption { display: grid; gap: 2px; margin-top: 12px; font-size: 0.75rem; line-height: 1.5; }
 .art figcaption i { font-style: italic; }
 
-.sec { padding-bottom: 60px; scroll-margin-top: 48px; }
+.sec { padding-bottom: 60px; scroll-margin-top: calc(var(--tick-h) + var(--pad-t) + 16px); }
 /* phones and tablets: section titles stick to the top while you scroll through them */
 .sec__h {
   position: sticky; top: var(--pad-t); z-index: 5;
@@ -304,6 +306,9 @@ h1 em, .tagline em {
   text-transform: uppercase;
   letter-spacing: .12em;
 }
+
+/* on pages with the ticker, section titles stick below it */
+.with-ticker .sec__h { top: calc(var(--pad-t) + var(--tick-h)); }
 
 /* about */
 .now {
@@ -491,7 +496,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
     gap: clamp(48px, 6vw, 96px);
   }
   .side {
-    position: sticky; top: 0;
+    position: sticky; top: var(--tick-h);
     align-self: start;
     height: calc(100vh - var(--tick-h));
     height: calc(100dvh - var(--tick-h));
@@ -547,7 +552,6 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .nav { margin-top: clamp(16px, 4.5vh, 64px); }
   .nav a { padding-block: 6px; }
   .lede { margin-top: 12px; }
-  .proof { margin-top: 10px; }
   .kin { margin-top: 6px; }
   .ask { margin-top: 12px; padding-block: 6px; }
   .side__foot { margin-top: 16px; }
@@ -558,7 +562,6 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   h1 { margin-top: 12px; font-size: clamp(2.25rem, 1.9rem + 2.4vw, 2.375rem); }
   .tagline { margin-top: 8px; font-size: 1.25rem; }
   .lede { margin-top: 8px; font-size: .9375rem; line-height: 1.55; }
-  .proof { margin-top: 8px; font-size: 0.75rem; }
   .kin { display: none; }
   .ask { margin-top: 8px; padding-block: 4px; }
   .nav { margin-top: 14px; }
