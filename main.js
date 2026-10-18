@@ -21,8 +21,8 @@
   setInterval(tickClock, 15_000);
 
   /* ---------- section nav (desktop): mark the section you're reading ---------- */
-  const navLinks = [...document.querySelectorAll(".nav a")];
-  const sections = navLinks.map((a) => a.hash && $(a.hash)).filter(Boolean);
+  const navLinks = [...document.querySelectorAll(".nav a, .tabbar a")];
+  const sections = navLinks.map((a) => a.hash && $(a.hash)).filter((el, i, arr) => el && arr.indexOf(el) === i);
   let current = null;
   const setActive = (id) => {
     if (id === current) return;
@@ -41,7 +41,7 @@
   // and lighting Contact at the bottom on any screen height.
   let lock = null, lockTimer = 0;
   const spy = () => {
-    if (lock || !sections.length || !navLinks[0].offsetParent) return; // clicked item wins; nav hidden on phones
+    if (lock || !sections.length || !navLinks.some((a) => a.offsetParent)) return; // clicked item wins; runs wherever a nav surface is visible
     const h = innerHeight;
     const left = Math.max(0, document.documentElement.scrollHeight - h - scrollY);
     const line = Math.max(h * 0.4, h - left);
@@ -442,6 +442,21 @@
       updateThemeBtns();
       if (typeof dither === "function" && img.complete && img.naturalWidth) dither();
     }
+  });
+
+  /* ---------- phones: project details expand inline, the hook stays visible ---------- */
+  document.querySelectorAll(".card").forEach((card) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "card__more mono";
+    btn.setAttribute("aria-expanded", "false");
+    btn.textContent = "details";
+    btn.addEventListener("click", () => {
+      const open = card.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", String(open));
+      btn.textContent = open ? "close" : "details";
+    });
+    card.querySelector(".card__body").append(btn);
   });
 
   /* ---------- copy email button ---------- */

@@ -206,6 +206,8 @@ h1 em, .tagline em {
 .ask:hover .arrow { transform: translate(2px, -2px); }
 
 .nav { display: none; }
+.tabbar { display: none; } /* phones only, styled in the max-width: 560px block */
+.card__more { display: none; } /* phones only, same block */
 
 .side__foot { display: grid; gap: 6px; margin-top: 24px; }
 .label { display: inline-flex; align-items: center; gap: 10px; margin: 0; color: var(--muted); }
@@ -611,6 +613,37 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .sec { padding-bottom: 44px; }
   .cards { gap: 40px; }
   .card h3 { font-size: 1.0625rem; }
+
+  /* bottom tab bar: the three jumps that matter, a thumb away */
+  .tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    display: flex; justify-content: space-around;
+    padding: 10px 0 max(10px, env(safe-area-inset-bottom));
+    background: var(--sec-bg);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line);
+  }
+  .tabbar a {
+    padding: 8px 16px;
+    color: var(--muted);
+    text-transform: uppercase; letter-spacing: .12em;
+    text-decoration: none;
+  }
+  .tabbar a.is-active { color: var(--accent); }
+  body { padding-bottom: calc(48px + var(--pad-b)); }
+
+  /* project details sit behind one tap; the hook stays visible */
+  .card__more {
+    display: inline-flex; align-items: center; gap: 6px;
+    position: relative; z-index: 2;
+    margin-top: 10px;
+    color: var(--accent);
+  }
+  .card:not(.is-open) .card__body > p:not(.card__why):not(.card__meta),
+  .card:not(.is-open) .tags,
+  .card:not(.is-open) .card__src { display: none; }
+  /* while a card is open, only the title and Source open the app; text stays tappable */
+  .card.is-open .card__title::after { content: none; }
   .ticker__long { display: none; }
   .ticker__short { display: inline; }
 
@@ -626,7 +659,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 }
 @media (pointer: coarse) {
   .term-btn, .theme-btn { width: 44px; height: 44px; }
-  .card__src, .more, .hint { padding-block: 12px; }
+  .card__more, .card__src, .more, .hint { padding-block: 12px; }
   .contact__mail, .term__x { padding-block: 10px; }
   .term__in input { font-size: 16px; } /* stops iOS zooming on focus */
 }
@@ -655,7 +688,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 
 /* ---------- print ---------- */
 @media print {
-  .ticker, .spotlight, .term, .term-btn, .theme-btn, .hint, .skip, .copy-btn { display: none !important; }
+  .ticker, .spotlight, .term, .term-btn, .theme-btn, .hint, .skip, .copy-btn, .tabbar { display: none !important; }
   body { background: #fff; color: #000; }
   .side, .content { display: block; }
   .card__media img { box-shadow: none; }
