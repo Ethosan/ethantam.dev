@@ -195,6 +195,14 @@ h1 em, .tagline em {
 }
 .lede { margin: 18px 0 0; max-width: 42ch; color: var(--muted); }
 
+/* social proof strip + kinship line + small-ask CTA under the lede */
+.proof { margin: 16px 0 0; max-width: 40ch; }
+.proof b { color: var(--fg); font-weight: 500; }
+.kin { margin: 10px 0 0; max-width: 34ch; font-family: var(--serif); font-style: italic; font-size: 1.0625rem; line-height: 1.5; color: var(--fg-2); }
+.ask { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; padding-block: 8px; color: var(--accent); text-decoration: none; transition: color .15s; }
+.ask:hover { color: var(--fg); }
+.ask:hover .arrow { transform: translate(2px, -2px); }
+
 .nav { display: none; }
 
 .side__foot { display: grid; gap: 6px; margin-top: 24px; }
@@ -407,6 +415,8 @@ h1 em, .tagline em {
   text-underline-offset: 6px;
 }
 
+.contact__sub { margin: 14px 0 0; max-width: 46ch; color: var(--muted); font-size: 0.9375rem; line-height: 1.65; }
+
 /* contact row: email + copy button */
 .contact__row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .copy-btn {
@@ -537,6 +547,9 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .nav { margin-top: clamp(16px, 4.5vh, 64px); }
   .nav a { padding-block: 6px; }
   .lede { margin-top: 12px; }
+  .proof { margin-top: 10px; }
+  .kin { margin-top: 6px; }
+  .ask { margin-top: 12px; padding-block: 6px; }
   .side__foot { margin-top: 16px; }
   .social a { padding-block: 8px; }
 }
@@ -545,6 +558,9 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   h1 { margin-top: 12px; font-size: clamp(2.25rem, 1.9rem + 2.4vw, 2.375rem); }
   .tagline { margin-top: 8px; font-size: 1.25rem; }
   .lede { margin-top: 8px; font-size: .9375rem; line-height: 1.55; }
+  .proof { margin-top: 8px; font-size: 0.75rem; }
+  .kin { display: none; }
+  .ask { margin-top: 8px; padding-block: 4px; }
   .nav { margin-top: 14px; }
   .nav a { padding-block: 3px; }
   .side__foot { margin-top: 12px; grid-template-columns: 1fr 1fr; gap: 4px 12px; }

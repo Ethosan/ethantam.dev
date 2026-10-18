@@ -286,7 +286,7 @@
     ns: () => "still serving as a transport operator. back in Feb 2027.",
     makan: () => `hungry? ${a(LINKS.list, "list.ethantam.dev")} has opinions.`,
     hire: () => COMMANDS.contact(),
-    about: () => "Ethan Tam, Singapore.\nDoing National Service now, Economics at Cambridge from 2027.\nI like markets, economics, and building small apps for myself and my friends.",
+    about: () => "Ethan Tam, Singapore.\nDoing National Service now, Economics at Cambridge from 2027.\nI build small tools that make markets legible.",
     projects: () => [
       `Journal     futures trade journal: R multiples, what mistakes cost    ${a(LINKS.journal, "demo")} ${a("https://gitlab.com/eatentam/futuretracker", "src")}`,
       `20bucks     personal finance PWA: splits, PayLater, P&L, AI review   ${a(LINKS["20bucks"], "app")} ${a("https://gitlab.com/eatentam/moneytracker", "src")}`,
