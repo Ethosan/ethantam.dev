@@ -650,7 +650,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
      the timeline needs full width and stays below */
   .content { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: 18px; align-items: start; }
   #tulip { grid-column: 1; grid-row: 1; }
-  #now { grid-column: 2; grid-row: 1; }
+  #now { grid-column: 2; grid-row: 1; padding-left: 16px; border-left: 1px solid var(--line); } /* the painting ends, the list begins */
   #record, #work, #contact, .foot { grid-column: 1 / -1; }
   #tulip .sec__h, #now .sec__h {
     position: static; width: auto; margin-left: 0; margin-bottom: 12px;
@@ -659,7 +659,8 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
     border-bottom: 0;
   }
   #tulip .art { margin: 0; }
-  #now .now { margin-bottom: 0; }
+  #now .now { margin-bottom: 0; grid-template-columns: 1fr; gap: 10px; } /* three columns cannot fit beside the painting; stack them */
+  #now .now { border-bottom: 0; padding-bottom: 0; } /* the left hairline divides here; a bottom rule would float under the short list */
   #now .now div { grid-template-columns: 1fr; gap: 2px; }
 
   /* project details sit behind one tap; the hook stays visible */
