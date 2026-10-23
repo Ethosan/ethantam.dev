@@ -7,8 +7,11 @@
     "directory": ".",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
-    "run_worker_first": ["/api/*"]
+    // "/" too, so the Worker can stamp the deploy into the page
+    "run_worker_first": ["/api/*", "/"]
   },
+  // the deploy's id, time and tag (CI tags it with the commit) for "Last updated"
+  "version_metadata": { "binding": "VERSION" },
   // the ticker's hub: one Durable Object streams the watchlist to every visitor (worker/index.js)
   "durable_objects": {
     "bindings": [{ "name": "TICKER", "class_name": "Ticker" }]

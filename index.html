@@ -44,15 +44,15 @@
    "inLanguage":"en"}
   </script>
   <link rel="stylesheet" href="fonts.css?v=2026.10.18" fetchpriority="high">
-  <link rel="stylesheet" href="styles.css?v=2026.10.23" fetchpriority="high">
+  <link rel="stylesheet" href="styles.css?v=2026.10.24" fetchpriority="high">
   <noscript><link rel="stylesheet" href="noscript.css?v=2026.10.18"></noscript>
 </head>
 <body class="with-ticker">
   <a class="skip" href="#main">Skip to content</a>
   <div class="spotlight" aria-hidden="true"></div>
 
-  <div class="ticker" aria-hidden="true">
-    <span class="ticker__label mono"><span class="ticker__dot"></span><span class="ticker__long">Prices I check too often</span><span class="ticker__short">Watching</span></span>
+  <div class="ticker" role="region" aria-label="Prices I check too often">
+    <span class="ticker__label mono" aria-hidden="true"><span class="ticker__dot"></span><span class="ticker__long">Prices I check too often</span><span class="ticker__short">Watching</span></span>
     <div class="ticker__viewport">
       <div class="ticker__track" id="ticker">
         <!-- filled by main.js; this is the no-JS fallback -->
@@ -60,10 +60,17 @@
       </div>
     </div>
   </div>
-  <!-- the animated ticker above is aria-hidden decoration; this carries the same prices for screen readers -->
-  <ul class="ticker__sr" id="ticker-sr">
-    <li>BTC</li><li>ETH</li><li>NVDA</li><li>NET</li>
-  </ul>
+  <!-- opens under a ticker item: why it's on the list, and how it's moved today (filled by main.js) -->
+  <div class="tkpop" id="tkpop" role="dialog" aria-labelledby="tkpop-s">
+    <p class="tkpop__head mono"><b id="tkpop-s"></b><span class="tkpop__name"></span><span class="tkpop__px"></span></p>
+    <svg class="tkpop__spark" viewBox="0 0 300 64" preserveAspectRatio="none" aria-hidden="true">
+      <rect class="tkpop__reg" y="0" height="64"></rect>
+      <line class="tkpop__base" x1="0" x2="300"></line>
+      <path class="tkpop__line"></path>
+    </svg>
+    <p class="tkpop__cap mono"></p>
+    <p class="tkpop__why"><span class="mono">Why I watch it</span><span class="tkpop__text"></span></p>
+  </div>
 
   <div class="shell wrap">
     <!-- Left column: pinned on desktop while the right column scrolls -->
@@ -77,6 +84,7 @@
         <p class="tagline">I build small tools that make <em>markets</em> legible.</p>
         <p class="lede">I'm doing National Service in Singapore right now, and I'll be studying Economics at Cambridge from 2027. In between, I read about markets and make apps for myself and my friends.</p>
         <p class="kin">If you trade, study economics, or build things on the side: we'll get along.</p>
+        <p class="print-only mono">ethantam.dev · eatentam@gmail.com · linkedin.com/in/ethantam- · gitlab.com/eatentam</p>
         <a class="ask mono" href="mailto:eatentam@gmail.com">Ask me one question <span class="arrow" aria-hidden="true">↗</span></a>
 
         <nav class="nav mono" aria-label="Sections">
@@ -138,7 +146,10 @@
           <li><span class="log__t mono">2019–24</span><span class="log__w">IP &amp; IB Diploma</span><span class="log__o">Anglo-Chinese School (Independent)</span></li>
         </ol>
 
-        <a class="more mono" href="https://linkedin.com/in/ethantam-" target="_blank" rel="noopener noreferrer">More on LinkedIn <span class="arrow" aria-hidden="true">↗</span></a>
+        <div class="more-row">
+          <a class="more mono" href="https://linkedin.com/in/ethantam-" target="_blank" rel="noopener noreferrer">More on LinkedIn <span class="arrow" aria-hidden="true">↗</span></a>
+          <button type="button" class="more mono" data-print>Print a one-page CV</button>
+        </div>
       </section>
 
       <section class="sec" id="work" aria-labelledby="work-h">
@@ -150,6 +161,7 @@
             <div class="card__body">
               <h3><a class="card__title" href="https://futuretracker.ethantam.dev/?demo" target="_blank" rel="noopener noreferrer">Trade Journal <span class="arrow" aria-hidden="true">↗</span></a></h3>
               <p class="card__meta mono"><span>Built Mar 2026</span> · <span>on GitLab since Oct 2026</span></p>
+              <div class="card__status mono" data-project="futuretracker" hidden></div>
               <p class="card__why">My trading felt inconsistent, and I wanted to know why.</p>
               <p>So I log every trade with its setup and tag the mistake if I made one, and the R multiple works itself out as I type. The stats show which setups hold up and which mistakes keep creeping in, so the inconsistency stops being a guess. Trades save to my own Google Sheet and sync when I am back online. The link opens it with sample trades.</p>
               <ul class="tags mono" aria-label="Built with">
@@ -167,6 +179,7 @@
             <div class="card__body">
               <h3><a class="card__title" href="https://20bucks.ethantam.dev" target="_blank" rel="noopener noreferrer">20bucks <span class="arrow" aria-hidden="true">↗</span></a></h3>
               <p class="card__meta mono"><span>Built Jun 2026</span> · <span>on GitLab since Oct 2026</span></p>
+              <div class="card__status mono" data-project="moneytracker" hidden></div>
               <p class="card__why">I wanted one place to see where my money actually goes, including PayLater instalments and the "I'll pay you back" bills that never show up in a banking app.</p>
               <p>It grew into a proper finance app: bill splits, trading P&amp;L, statement imports, offline sync. There's also an AI assistant you can ask about your money; it flags entries that look off, and nothing changes until you tap Apply.</p>
               <ul class="tags mono" aria-label="Built with">
@@ -185,6 +198,7 @@
             <div class="card__body">
               <h3><a class="card__title" href="https://markets.ethantam.dev" target="_blank" rel="noopener noreferrer">Equarian Markets <span class="arrow" aria-hidden="true">↗</span></a></h3>
               <p class="card__meta mono"><span>Built Jul 2026</span> · <span>on GitLab since Oct 2026</span> · <span>45 indicators</span> · <span>4 models</span></p>
+              <div class="card__status mono" data-project="eqmarkets" hidden></div>
               <p class="card__why">Before I trade micro futures I want rates, credit, vol and yen carry on one screen, read the way a desk would read them.</p>
               <p>It pulls free data from FRED, Yahoo, the CFTC and the BOJ. In the browser it runs four models: a risk appetite index, a growth and inflation regime map, the absorption ratio for how fragile markets are, and the NY Fed's recession model. A daily read spells out what stands out, like oil and grains rising while stocks fall, with the numbers behind it. An alt signals tab keeps the market-wide curiosities: the Pentagon Pizza Index, the Stripper Index and the moon, each tested against the index to say whether it has ever held up.</p>
               <ul class="tags mono" aria-label="Built with">
@@ -203,6 +217,7 @@
             <div class="card__body">
               <h3><a class="card__title" href="https://list.ethantam.dev" target="_blank" rel="noopener noreferrer">The List <span class="arrow" aria-hidden="true">↗</span></a></h3>
               <p class="card__meta mono"><span>Built Aug 2026</span></p>
+              <div class="card__status mono" data-project="thelist" hidden></div>
               <p class="card__why">My friends and I kept forgetting where we'd eaten and where we still wanted to go.</p>
               <p>So now there's a shared list. We rate places and keep a leaderboard. When someone adds a place to the want list, it goes and finds a good TikTok and the details by itself. It also lives in our Telegram group as a bot.</p>
               <ul class="tags mono" aria-label="Built with">
@@ -220,6 +235,7 @@
             <div class="card__body">
               <h3><a class="card__title" href="https://oracular.ethantam.dev" target="_blank" rel="noopener noreferrer">Oracular <span class="arrow" aria-hidden="true">↗</span></a></h3>
               <p class="card__meta mono"><span>Built Sep 2026</span> · <span>on GitLab since Oct 2026</span></p>
+              <div class="card__status mono" data-project="oracular" hidden></div>
               <p class="card__why">I wanted the read a desk would write on one ticker, every number on the page and nothing taken on faith.</p>
               <p>Any US ticker, read off live data: a Council of twelve seats votes on the numbers, an AI writes the plain-English memo and argues both sides, and seasonality, derivatives and levels each show their work. There's a Market tab too, with a Fear &amp; Greed index built from seven indicators, plus a chat that answers with the ticker's own data in front of it.</p>
               <ul class="tags mono" aria-label="Built with">
@@ -265,7 +281,7 @@
       </section>
 
       <footer class="foot mono">
-        <p class="colophon">Plain HTML, CSS and a bit of JavaScript, no framework. Set in Geist and Instrument Serif; layout borrows from Brittany Chiang's site. The painting is Bosschaert's <i>Vase of Flowers in a Window</i>, from the Mauritshuis (public domain). Last updated 23 Oct 2026.</p>
+        <p class="colophon">Plain HTML, CSS and a bit of JavaScript, no framework. Set in Geist and Instrument Serif; layout borrows from Brittany Chiang's site. The painting is Bosschaert's <i>Vase of Flowers in a Window</i>, from the Mauritshuis (public domain). Last updated <span data-deploy>with every push to main</span>. <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="https://gitlab.com/eatentam/ethantam.dev/-/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a></p>
         <button type="button" class="hint" data-open-term><span class="hint__key">Press <kbd>~</kbd> for a terminal</span><span class="hint__tap">Open the terminal</span></button>
       </footer>
     </main>
@@ -291,6 +307,6 @@
     </div>
   </div>
 
-  <script src="main.js?v=2026.10.23" defer></script>
+  <script src="main.js?v=2026.10.24" defer></script>
 </body>
 </html>

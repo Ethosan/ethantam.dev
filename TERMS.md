@@ -2,6 +2,8 @@
 
 These terms cover your use of ethantam.dev, the personal site of Ethan Tam. By using the site you agree to them.
 
+This page is also published at [ethantam.dev/terms](https://ethantam.dev/terms).
+
 ## The content is mine
 
 The design, writing, code, and artwork on this site belong to Ethan Tam unless credited otherwise. The dithered painting is a public-domain work (Ambrosius Bosschaert the Elder, c.1618, Mauritshuis). Project screenshots show real interfaces; demo data shown in screenshots is not real user data.
@@ -12,7 +14,7 @@ The live ticker shows stock and crypto prices for context. Nothing on this site 
 
 ## Third-party content
 
-Stock and crypto prices come from Yahoo Finance. Project descriptions may mention third-party services (Cloudflare, Netlify, Supabase, etc.) — their own terms apply to their services.
+Stock prices come from Yahoo Finance, and crypto prices from Binance (with Coinbase as a backup). Project descriptions may mention third-party services (Cloudflare, Netlify, Supabase, etc.); their own terms apply to their services.
 
 ## Fair use
 

@@ -10,3 +10,7 @@ README.md
 package.json
 package-lock.json
 docs
+PRIVACY.md
+TERMS.md
+LICENSE
+.gitlab-ci.yml

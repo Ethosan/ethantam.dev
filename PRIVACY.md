@@ -2,6 +2,8 @@
 
 ethantam.dev is the personal site of Ethan Tam. It has no user accounts, no comments, no analytics, and no tracking.
 
+This page is also published at [ethantam.dev/privacy](https://ethantam.dev/privacy).
+
 ## What is collected
 
 - **Nothing.** The site doesn't ask for your name, email, or any personal information. There are no cookies set for tracking, no analytics scripts, and no ads.

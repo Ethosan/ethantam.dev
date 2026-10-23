@@ -1,6 +1,10 @@
-// Cloudflare Worker for ethantam.dev. Static files are served from the assets binding; this script handles the ticker:
-//   GET /api/live    WebSocket that streams every price change as it happens
-//   GET /api/quotes  the same prices as one JSON snapshot (first paint, and the fallback when a socket can't connect)
+// Cloudflare Worker for ethantam.dev. Static files are served from the assets binding; this script handles:
+//   GET /              the home page, with "Last updated" stamped from the deploy (date and commit)
+//   GET /api/live      WebSocket that streams every price change as it happens
+//   GET /api/quotes    the same prices as one JSON snapshot (first paint, and the fallback when a socket can't connect)
+//   GET /api/spark     one symbol's path for the ticker popover (edge-cached 60s)
+//   GET /api/projects  whether each project's app is up, and its last commit on GitLab (edge-cached 2 min)
+// The ticker:
 // Both come from one Durable Object, so every visitor sees the same numbers. While anyone is watching it holds two upstream
 // sockets, Yahoo's streamer for the stocks and Binance's market-data stream for the crypto (one tick a second each), and
 // polls Yahoo's chart endpoint for the previous closes and for whatever a socket misses. When the last visitor leaves it
@@ -356,10 +360,99 @@ export class Ticker extends DurableObject {
   }
 }
 
+// ---------- the projects' status: is each app up, and when was it last worked on ----------
+
+const PROJECTS = { // GitLab repo under eatentam -> the live app
+  futuretracker: "https://futuretracker.ethantam.dev/",
+  moneytracker: "https://20bucks.ethantam.dev/",
+  eqmarkets: "https://markets.ethantam.dev/",
+  thelist: "https://list.ethantam.dev/",
+  oracular: "https://oracular.ethantam.dev/",
+};
+
+async function project([repo, site]) {
+  const started = Date.now();
+  const [ping, commit] = await Promise.all([
+    fetch(site, { headers: { "user-agent": UA }, signal: AbortSignal.timeout(8000) })
+      .then((r) => { r.body?.cancel(); return { up: r.ok, status: r.status, ms: Date.now() - started }; })
+      .catch(() => ({ up: false, status: 0, ms: null })),
+    fetch(`https://gitlab.com/api/v4/projects/${encodeURIComponent(`eatentam/${repo}`)}/repository/commits?per_page=1`, { headers: { "user-agent": UA } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((list) => list?.[0] && { id: list[0].short_id, at: list[0].committed_date, title: list[0].title, url: list[0].web_url })
+      .catch(() => null),
+  ]);
+  return [repo, { ...ping, commit }];
+}
+
+// ---------- one symbol's path for the ticker popover: today's session for a stock, the last 24 hours for a coin ----------
+
+async function spark(s) {
+  if (COINS[s]) {
+    const r = await fetch(`https://data-api.binance.vision/api/v3/klines?symbol=${COINS[s]}&interval=15m&limit=96`, { headers: { "user-agent": UA } });
+    if (!r.ok) throw new Error(r.status);
+    const bars = await r.json(); // [open time, open, high, low, close, ...]
+    return { s, prev: +bars[0][1], start: bars[0][0] / 1000, end: Math.round(Date.now() / 1000), points: bars.map((b) => [b[0] / 1000, +b[4]]) };
+  }
+  const r = await fetch(
+    `https://query1.finance.yahoo.com/v8/finance/chart/${s}?range=1d&interval=5m&includePrePost=true`,
+    { headers: { "user-agent": UA } },
+  );
+  if (!r.ok) throw new Error(r.status);
+  const res = (await r.json())?.chart?.result?.[0];
+  const m = res?.meta;
+  if (!m) throw new Error("no chart");
+  const period = (name) => m.tradingPeriods?.[name]?.flat?.().at(-1) ?? m.currentTradingPeriod?.[name];
+  const close = res.indicators?.quote?.[0]?.close ?? [];
+  const points = (res.timestamp ?? []).map((t, i) => [t, close[i]]).filter(([, c]) => c != null).map(([t, c]) => [t, round(c, 4)]);
+  const pre = period("pre"), reg = period("regular"), post = period("post");
+  return {
+    s, prev: m.chartPreviousClose ?? m.previousClose, points,
+    start: pre?.start ?? points[0]?.[0], end: post?.end ?? points.at(-1)?.[0],
+    regular: reg && [reg.start, reg.end],
+  };
+}
+
+// Cache API at this data center: fresh for `ttl` seconds, plus a day-old copy for when the sources are down
+async function cached(request, ctx, ttl, build) {
+  const cache = caches.default;
+  const key = new Request(request.url);
+  const staleKey = new Request(`${request.url}${request.url.includes("?") ? "&" : "?"}stale`);
+  const hit = await cache.match(key);
+  if (hit) return hit;
+  const body = await build().catch(() => null);
+  if (!body) return (await cache.match(staleKey)) ?? json({ error: "unavailable" }, 503);
+  const res = (age) => new Response(JSON.stringify(body), {
+    headers: { "content-type": "application/json; charset=utf-8", "cache-control": `public, max-age=${age}` },
+  });
+  ctx.waitUntil(Promise.all([cache.put(key, res(ttl)), cache.put(staleKey, res(86_400))]));
+  return res(ttl);
+}
+
+// ---------- the home page: "Last updated" comes from the deploy itself, not from a date typed by hand ----------
+
+const dateFmt = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" });
+
+async function home(request, env) {
+  const v = env.VERSION ?? {};
+  // the page changes with every deploy even when index.html doesn't, so the deploy's id is the ETag
+  const etag = v.id ? `"${v.id}"` : null;
+  if (etag && request.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers: { etag } });
+  const res = await env.ASSETS.fetch(new Request(request.url, { headers: { accept: "text/html" } }));
+  if (!res.ok || !res.headers.get("content-type")?.includes("text/html") || !v.timestamp) return res;
+  const when = new Date(v.timestamp);
+  const stamp = `<time datetime="${when.toISOString()}">${dateFmt.format(when)}</time>`
+    + (/^[0-9a-f]{7,40}$/.test(v.tag ?? "") ? ` (<a href="https://gitlab.com/eatentam/ethantam.dev/-/commit/${v.tag}">${v.tag}</a>)` : "");
+  const out = new HTMLRewriter().on("[data-deploy]", { element: (el) => el.setInnerContent(stamp, { html: true }) }).transform(res);
+  const headers = new Headers(out.headers);
+  if (etag) headers.set("etag", etag);
+  return new Response(out.body, { status: out.status, headers });
+}
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    if ((url.pathname === "/api/live" || url.pathname === "/api/quotes") && request.method === "GET") {
+    if (request.method !== "GET") return env.ASSETS.fetch(request);
+    if (url.pathname === "/api/live" || url.pathname === "/api/quotes") {
       // the socket is for this site's own page
       const origin = request.headers.get("origin");
       const host = (() => { try { return new URL(origin).host; } catch { return null; } })();
@@ -370,6 +463,18 @@ export default {
         return json({ t: Date.now(), quotes: [] }, 503);
       }
     }
+    if (url.pathname === "/api/projects") {
+      return cached(request, ctx, 120, async () => ({
+        t: Date.now(),
+        projects: Object.fromEntries(await Promise.all(Object.entries(PROJECTS).map(project))),
+      }));
+    }
+    if (url.pathname === "/api/spark") {
+      const s = url.searchParams.get("s");
+      if (!ORDER.includes(s)) return json({ error: "unknown symbol" }, 404);
+      return cached(new Request(`${url.origin}/api/spark?s=${s}`), ctx, 60, () => spark(s));
+    }
+    if (url.pathname === "/") return home(request, env);
     return env.ASSETS.fetch(request);
   },
 };

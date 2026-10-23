@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script>try{const t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t;else if(matchMedia("(prefers-color-scheme: light)").matches)document.documentElement.dataset.theme="light"}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <title>Privacy · Ethan Tam</title>
+  <meta name="description" content="What ethantam.dev collects (nothing) and who else handles data to run it.">
+  <meta name="theme-color" content="#0c0b0a" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)">
+  <link rel="canonical" href="https://ethantam.dev/privacy">
+  <link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/fonts.css?v=2026.10.18" fetchpriority="high">
+  <link rel="stylesheet" href="/styles.css?v=2026.10.24">
+</head>
+<body>
+  <!-- the same text as PRIVACY.md in the repo; keep the two in step -->
+  <main class="wrap doc">
+    <a href="/" class="brand mono" aria-label="Ethan Tam, home">
+      <img src="/assets/mark.svg" alt="" width="22" height="22">
+      <span>ethantam<span class="dim">.dev</span></span>
+    </a>
+    <h1>Privacy</h1>
+    <p class="lede">ethantam.dev is the personal site of Ethan Tam. It has no user accounts, no comments, no analytics, and no tracking.</p>
+
+    <h2>What is collected</h2>
+    <ul>
+      <li><strong>Nothing.</strong> The site doesn't ask for your name, email, or any personal information. There are no cookies set for tracking, no analytics scripts, and no ads.</li>
+      <li><strong>This device.</strong> Theme preference (dark/light mode) is saved in your browser's local storage. Clearing your browser data removes it.</li>
+      <li><strong>Stock and crypto prices.</strong> The ticker streams live quotes over a WebSocket from a Cloudflare Worker, which gets stock prices from Yahoo Finance and crypto prices from Binance (with Coinbase as a backup). Your browser only talks to ethantam.dev for this, unless the Worker can't be reached, in which case it asks CoinGecko for the crypto prices directly. Every visitor gets the same prices, and the Worker doesn't log who is watching.</li>
+    </ul>
+
+    <h2>Who else processes data</h2>
+    <ul>
+      <li><strong>Cloudflare:</strong> hosts the site and the Worker, and keeps the latest prices in a Durable Object.</li>
+      <li><strong>Yahoo Finance:</strong> provides the stock prices.</li>
+      <li><strong>Binance and Coinbase:</strong> provide the crypto prices.</li>
+    </ul>
+
+    <h2>What is not done</h2>
+    <ul>
+      <li>No ads, no analytics, no tracking pixels, no cross-site tracking.</li>
+      <li>No selling or sharing of personal data (there isn't any to sell).</li>
+    </ul>
+
+    <h2>Contact</h2>
+    <p><a href="mailto:eatentam@gmail.com">eatentam@gmail.com</a></p>
+
+    <p class="doc__foot mono"><a class="accent-link" href="/">← Back to ethantam.dev</a><a href="/terms">Terms</a></p>
+  </main>
+</body>
+</html>

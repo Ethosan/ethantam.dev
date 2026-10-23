@@ -94,7 +94,25 @@
   }
 
   /* ---------- ticker ---------- */
-  const WATCHLIST = ["BTC", "ETH", "SOL", "AXTI", "MU", "NBIS", "CRWV", "LLY", "GS", "IBKR", "NVDA", "CRWD", "NET", "CAT", "TWLO"];
+  // What's on the list and why: [name, the reason]. Tap a price to read it. The order here is the order on the strip.
+  const WATCH = {
+    BTC: ["Bitcoin", "The one market that never closes, so it's my read on risk appetite at 3am, before anything else opens."],
+    ETH: ["Ether", "Crypto's second engine. When it outruns Bitcoin, people are reaching for risk; when it lags, they're hiding in the big one."],
+    SOL: ["Solana", "The high-beta end of crypto: it runs furthest in a melt-up and falls hardest when the tide goes out."],
+    AXTI: ["AXT Inc", "A small maker of the indium phosphide wafers under optical AI networking, with its factories in China, so export rules move it as much as earnings do."],
+    MU: ["Micron", "Memory is the most cyclical corner of chips. High-bandwidth memory for AI is the test of whether this cycle is different."],
+    NBIS: ["Nebius", "An AI cloud spun out of Yandex, and one of the cleanest bets on whether renting out GPUs stays a good business."],
+    CRWV: ["CoreWeave", "The biggest pure-play GPU cloud, built on a lot of debt. If AI spending wobbles, I'd expect to see it here first."],
+    LLY: ["Eli Lilly", "GLP-1 drugs turned a pharma company into a growth stock. I'm watching how long it can be priced like one."],
+    GS: ["Goldman Sachs", "Dealmaking and trading in one ticker. When IPOs and M&A come back, it tends to show up here before the headlines."],
+    IBKR: ["Interactive Brokers", "A broker that wins by being cheap and boring. Its monthly account numbers are a live read on how hard retail is trading."],
+    NVDA: ["NVIDIA", "The AI trade in one stock. Its earnings move the whole market, not just chips."],
+    CRWD: ["CrowdStrike", "Security is the last budget companies cut. It also had the outage of the decade in 2024 and kept its customers."],
+    NET: ["Cloudflare", "This site runs on it. It's also a bet that more of the internet's code ends up running at the edge."],
+    CAT: ["Caterpillar", "The old economy's order book: construction, mining, and now the generators going into data centres."],
+    TWLO: ["Twilio", "Paid per message sent, so its usage is an early read on whether software customers are growing or trimming."],
+  };
+  const WATCHLIST = Object.keys(WATCH);
   const COINS = { BTC: "bitcoin", ETH: "ethereum", SOL: "solana" };
   const SESSIONS = { pre: "pre-market", ah: "after hours" };
   const PX_PER_SEC = 45;
@@ -104,17 +122,24 @@
   const fmtPx = (n) => n >= 1000
     ? n.toLocaleString("en-US", { maximumFractionDigits: 0 })
     : n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtChg = (c) => `${c >= 0 ? "▲" : "▼"} ${Math.abs(c).toFixed(1)}%`;
   const ticker = $(".ticker");
   const track = $("#ticker");
-  const srList = $("#ticker-sr");
-  // Build the strip once (two copies so the CSS loop can translate -50% seamlessly),
-  // then only swap the numbers inside it, so the scroll never restarts.
-  track.innerHTML = [0, 1].map(() => WATCHLIST.map((s) =>
-    `<span class="tk" data-s="${s}"><b>${s}</b><span class="tk__p">…</span><i></i><small></small></span>`).join("")).join("");
-  const cells = new Map(WATCHLIST.map((s) => [s, [...track.querySelectorAll(`[data-s="${s}"]`)].map((el) => el.children)]));
+  // Build the strip once. The first copy is buttons; the second only makes the CSS loop (translate -50%) seamless,
+  // so it stays out of the tab order and away from screen readers. After that only the numbers inside change,
+  // so the scroll never restarts.
+  const item = (s, tag, attrs) => `<${tag} class="tk" data-s="${s}" ${attrs}><b>${s}</b><span class="tk__p">…</span><i></i><small></small></${tag}>`;
+  track.innerHTML = WATCHLIST.map((s) => item(s, "button", `type="button" aria-haspopup="dialog" aria-expanded="false" aria-describedby="why-${s}"`)).join("")
+    + WATCHLIST.map((s) => item(s, "span", `aria-hidden="true"`)).join("");
+  // the reasons, for screen readers; the popover shows them on screen
+  const reasons = document.createElement("div");
+  reasons.hidden = true;
+  reasons.append(...WATCHLIST.map((s) => Object.assign(document.createElement("span"), { id: `why-${s}`, textContent: WATCH[s][1] })));
+  document.body.append(reasons);
+  const cells = new Map(WATCHLIST.map((s) => [s, [...track.querySelectorAll(`[data-s="${s}"]`)]]));
   const painted = new Map(); // the price on screen, so a change can flash up or down
   const dirty = new Set();
-  let paintRaf = 0, speedSet = false;
+  let paintRaf = 0, speedSet = false, popS = null;
 
   const paint = () => {
     paintRaf = 0;
@@ -125,24 +150,22 @@
       const was = painted.get(s);
       const tone = typeof was === "number" && fmtPx(was) !== px ? (p > was ? "--up" : "--down") : null;
       painted.set(s, p);
-      for (const [, pEl, cEl, xEl] of cells.get(s)) {
+      for (const el of cells.get(s)) {
+        const [, pEl, cEl, xEl] = el.children;
         pEl.textContent = px;
         cEl.className = typeof c === "number" ? (c >= 0 ? "up" : "dn") : "";
-        cEl.textContent = typeof c === "number" ? `${c >= 0 ? "▲" : "▼"} ${Math.abs(c).toFixed(1)}%` : "";
+        cEl.textContent = typeof c === "number" ? fmtChg(c) : "";
         xEl.textContent = x ?? "";
         if (tone) {
           css ??= getComputedStyle(document.documentElement);
           pEl.animate?.([{ color: css.getPropertyValue(tone).trim(), offset: 0 }], { duration: 1200, easing: "ease-out" });
         }
       }
+      const chg = typeof c === "number" ? `, ${c >= 0 ? "up" : "down"} ${Math.abs(c).toFixed(1)}%` : "";
+      cells.get(s)[0].setAttribute("aria-label", `${WATCH[s][0]}: ${px}${chg}${x ? `, ${SESSIONS[x]}` : ""}`);
+      if (s === popS) drawPop();
     }
     dirty.clear();
-    if (srList) srList.innerHTML = WATCHLIST.map((s) => {
-      const { p, c, x } = quotes.get(s);
-      const val = typeof p === "number" ? fmtPx(p) : "…";
-      const chg = typeof c === "number" ? `, ${c >= 0 ? "up" : "down"} ${Math.abs(c).toFixed(1)}%` : "";
-      return `<li>${s}: ${val}${chg}${x ? `, ${SESSIONS[x]}` : ""}</li>`;
-    }).join("");
     if (!speedSet && painted.size) {
       track.style.animationDuration = `${Math.round(track.scrollWidth / 2 / PX_PER_SEC)}s`;
       speedSet = true;
@@ -158,6 +181,100 @@
     }
     if (dirty.size && !paintRaf) paintRaf = requestAnimationFrame(paint);
   };
+
+  // Tap a price: why it's on the list, and its path today (a stock's session in New York, or a coin's last 24 hours),
+  // with the live price as the last point and the dashed line at the price the change is measured from.
+  const pop = $("#tkpop");
+  const popEl = {
+    s: $("#tkpop-s"), name: $(".tkpop__name", pop), px: $(".tkpop__px", pop), cap: $(".tkpop__cap", pop),
+    why: $(".tkpop__text", pop), reg: $(".tkpop__reg", pop), base: $(".tkpop__base", pop), line: $(".tkpop__line", pop),
+  };
+  const sparks = new Map(); // symbol -> { at, data }, kept for a minute
+  const SW = 300, SH = 64, SPAD = 5;
+  const weekday = new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone: "America/New_York" });
+  const drawPop = () => {
+    const s = popS;
+    const { p, c, x, t } = quotes.get(s);
+    popEl.s.textContent = s;
+    popEl.name.textContent = WATCH[s][0];
+    popEl.px.innerHTML = typeof p === "number"
+      ? `${fmtPx(p)}${typeof c === "number" ? ` <i class="${c >= 0 ? "up" : "dn"}">${fmtChg(c)}</i>` : ""}`
+      : "…";
+    pop.classList.toggle("is-down", typeof c === "number" && c < 0);
+    const got = sparks.get(s);
+    if (!got?.data) {
+      popEl.line.setAttribute("d", "");
+      popEl.reg.setAttribute("width", 0);
+      popEl.base.setAttribute("visibility", "hidden");
+      popEl.cap.textContent = got ? "No chart right now." : "Loading the chart…";
+      return;
+    }
+    const d = got.data;
+    const pts = d.points.slice();
+    const now = (t ?? Date.now()) / 1000;
+    if (typeof p === "number" && (!pts.length || now > pts.at(-1)[0])) pts.push([now, p]);
+    if (!pts.length) return;
+    const x0 = d.start, x1 = Math.max(d.end, pts.at(-1)[0]);
+    const vals = pts.map(([, v]) => v).concat(d.prev ?? []);
+    const lo = Math.min(...vals), span = Math.max(...vals) - lo || 1;
+    const X = (tt) => ((tt - x0) / (x1 - x0 || 1)) * SW;
+    const Y = (v) => SPAD + (1 - (v - lo) / span) * (SH - 2 * SPAD);
+    popEl.line.setAttribute("d", pts.map(([tt, v], i) => `${i ? "L" : "M"}${X(tt).toFixed(1)} ${Y(v).toFixed(1)}`).join(""));
+    popEl.base.setAttribute("visibility", d.prev ? "visible" : "hidden");
+    if (d.prev) ["y1", "y2"].forEach((a) => popEl.base.setAttribute(a, Y(d.prev).toFixed(1)));
+    popEl.reg.setAttribute("x", d.regular ? X(d.regular[0]).toFixed(1) : 0);
+    popEl.reg.setAttribute("width", d.regular ? Math.max(0, X(d.regular[1]) - X(d.regular[0])).toFixed(1) : 0);
+    popEl.cap.textContent = COINS[s]
+      ? `Last 24 hours · 24h ago ${fmtPx(d.prev)}`
+      : `${Date.now() / 1000 < d.end ? "Today in New York" : `${weekday.format(d.start * 1000)}'s session`}${x ? ` · ${SESSIONS[x]}` : ""} · prev close ${fmtPx(d.prev)}`;
+  };
+  const closePop = () => {
+    if (!popS) return;
+    cells.get(popS)[0].setAttribute("aria-expanded", "false");
+    pop.classList.remove("is-open");
+    ticker.classList.remove("is-open");
+    popS = null;
+  };
+  let popAt = null; // the item the card hangs under
+  const placePop = () => {
+    if (!popS) return;
+    const r = popAt.getBoundingClientRect(), w = pop.offsetWidth, vw = document.documentElement.clientWidth;
+    pop.style.left = `${Math.round(Math.min(Math.max(16, r.left + r.width / 2 - w / 2), vw - w - 16))}px`;
+    pop.style.top = `${Math.round(ticker.getBoundingClientRect().bottom + 8)}px`;
+  };
+  const openPop = (s, el) => {
+    closePop();
+    popS = s;
+    popAt = el;
+    popEl.why.textContent = WATCH[s][1];
+    cells.get(s)[0].setAttribute("aria-expanded", "true");
+    pop.classList.add("is-open");
+    ticker.classList.add("is-open"); // the strip holds still while the card is open
+    drawPop();
+    placePop();
+    const have = sparks.get(s);
+    if (have && Date.now() - have.at < 60_000) return;
+    fetch(`/api/spark?s=${s}`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.status))))
+      .then((data) => data, () => null)
+      .then((data) => { sparks.set(s, { at: Date.now(), data }); if (popS === s) drawPop(); });
+  };
+  track.addEventListener("click", (e) => {
+    const el = e.target.closest(".tk[data-s]");
+    if (!el) return;
+    if (popS === el.dataset.s) closePop();
+    else openPop(el.dataset.s, el);
+  });
+  document.addEventListener("click", (e) => { if (popS && !e.target.closest(".tkpop, .ticker__track")) closePop(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape" || !popS) return;
+    const btn = cells.get(popS)[0];
+    closePop();
+    btn.focus();
+  });
+  addEventListener("resize", closePop);
+  // the strip scrolls when a focused item is brought into view, or by hand under reduced motion: the card follows
+  $(".ticker__viewport").addEventListener("scroll", placePop, { passive: true });
 
   // Live: a WebSocket to /api/live, where one Durable Object (worker/index.js) streams Yahoo for the stocks and
   // Binance for the crypto to every visitor. Until it connects, or while it's down, poll /api/quotes every 5s;
@@ -231,6 +348,47 @@
   addEventListener("pageshow", (e) => { if (e.persisted) resume(); });
   poll();
   connect();
+
+  /* ---------- projects: is each app up, and when was it last worked on ---------- */
+  // from /api/projects (worker/index.js): the Worker loads each app and reads its last commit on GitLab, every 2 minutes
+  const statuses = [...document.querySelectorAll(".card__status[data-project]")];
+  if (statuses.length) {
+    const rel = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+    const UNITS = [["year", 31_536_000], ["month", 2_592_000], ["week", 604_800], ["day", 86_400], ["hour", 3_600], ["minute", 60]];
+    const ago = (iso) => {
+      const sec = (Date.parse(iso) - Date.now()) / 1000;
+      const [unit, n] = UNITS.find(([, n]) => Math.abs(sec) >= n) ?? [];
+      return unit ? rel.format(Math.round(sec / n), unit) : "just now";
+    };
+    const span = (cls, text) => Object.assign(document.createElement("span"), { className: cls, textContent: text });
+    fetch("/api/projects")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
+      .then(({ t, projects }) => {
+        const checked = new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        for (const el of statuses) {
+          const p = projects?.[el.dataset.project];
+          if (!p) continue;
+          const state = span("card__state", p.up ? `Live${p.ms ? ` · ${p.ms} ms` : ""}` : `Down right now${p.status ? ` (HTTP ${p.status})` : ""}`);
+          state.prepend(Object.assign(document.createElement("span"), { className: p.up ? "dot" : "dot dot--down" }));
+          state.title = `Checked from Cloudflare at ${checked}`;
+          el.replaceChildren(state);
+          if (p.commit) {
+            const link = Object.assign(document.createElement("a"), {
+              href: p.commit.url, target: "_blank", rel: "noopener noreferrer",
+              textContent: `last commit ${ago(p.commit.at)}`, title: `${p.commit.id}: ${p.commit.title}`,
+            });
+            const commit = span("card__commit", "");
+            commit.append(span("dim", "·"), link); // the dot travels with the link when the line wraps
+            el.append(commit);
+          }
+          el.hidden = false;
+        }
+      })
+      .catch(() => { /* no status beats a wrong one */ });
+  }
+
+  /* ---------- print: the page prints as a one-page CV (see @media print in styles.css) ---------- */
+  document.querySelectorAll("[data-print]").forEach((btn) => btn.addEventListener("click", () => window.print()));
 
   /* ---------- dithered painting ---------- */
   const art = $("#art");
@@ -359,6 +517,8 @@
       "projects    what I've built",
       "record      background, briefly",
       "watchlist   prices I check too often, live",
+      "why &lt;x&gt;     why a ticker is on the list, e.g. why nvda",
+      "cv          print a one-page CV",
       "contact     how to reach me",
       "open &lt;x&gt;    open gitlab | linkedin | 20bucks | list | markets | journal | oracular",
       "tulip       a cautionary tale",
@@ -397,6 +557,15 @@
       const chg = typeof q.c === "number" ? `<span class="${q.c >= 0 ? "up" : "dn"}">${q.c >= 0 ? "+" : ""}${q.c.toFixed(2)}%</span>` : "";
       return `${q.s.padEnd(6)}${px.padStart(10)}   ${chg}${q.x ? ` <span class="dim">${SESSIONS[q.x]}</span>` : ""}`;
     }).join("\n") + "\n\nnot financial advice. see also: tulip",
+    why: (arg) => {
+      const s = arg.toUpperCase();
+      if (!WATCH[s]) return `why: pick one of ${WATCHLIST.join(" ").toLowerCase()}`;
+      return `${s}  ${WATCH[s][0]}\n${esc(WATCH[s][1])}`;
+    },
+    cv: () => {
+      setTimeout(() => window.print(), 50);
+      return "opening the print dialog. save it as a PDF for a one-page CV.";
+    },
     tulip: () => "Feb 1637: a single Semper Augustus bulb was quoted at more than a house on an\nAmsterdam canal. A few weeks later, buyers stopped showing up.\nThe painting on the front page is from about 20 years before the peak.",
     ls: () => "about  now  projects  record  watchlist  contact  tulip",
     whoami: () => "guest. but you could be a friend: try `contact`",
