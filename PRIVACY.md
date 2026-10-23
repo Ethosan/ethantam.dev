@@ -6,13 +6,13 @@ ethantam.dev is the personal site of Ethan Tam. It has no user accounts, no comm
 
 - **Nothing.** The site doesn't ask for your name, email, or any personal information. There are no cookies set for tracking, no analytics scripts, and no ads.
 - **This device.** Theme preference (dark/light mode) is saved in your browser's local storage. Clearing your browser data removes it.
-- **Stock and crypto prices.** The ticker streams live quotes over a WebSocket from a Cloudflare Worker, which gets stock prices from Yahoo Finance and crypto prices from Coinbase. Your browser only talks to ethantam.dev for this, unless the Worker can't be reached, in which case it asks CoinGecko for the crypto prices directly. Every visitor gets the same prices, and the Worker doesn't log who is watching.
+- **Stock and crypto prices.** The ticker streams live quotes over a WebSocket from a Cloudflare Worker, which gets stock prices from Yahoo Finance and crypto prices from Binance (with Coinbase as a backup). Your browser only talks to ethantam.dev for this, unless the Worker can't be reached, in which case it asks CoinGecko for the crypto prices directly. Every visitor gets the same prices, and the Worker doesn't log who is watching.
 
 ## Who else processes data
 
 - **Cloudflare:** hosts the site and the Worker, and keeps the latest prices in a Durable Object.
 - **Yahoo Finance:** provides the stock prices.
-- **Coinbase:** provides the crypto prices.
+- **Binance and Coinbase:** provide the crypto prices.
 
 ## What is not done
 

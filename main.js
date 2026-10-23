@@ -160,7 +160,7 @@
   };
 
   // Live: a WebSocket to /api/live, where one Durable Object (worker/index.js) streams Yahoo for the stocks and
-  // Coinbase for the crypto to every visitor. Until it connects, or while it's down, poll /api/quotes every 5s;
+  // Binance for the crypto to every visitor. Until it connects, or while it's down, poll /api/quotes every 5s;
   // on a plain static preview with no Worker, CoinGecko for the crypto only.
   const fromApi = async () => {
     const r = await fetch("/api/quotes", { cache: "no-store" });

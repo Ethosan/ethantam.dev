@@ -2,12 +2,15 @@
 //   GET /api/live    WebSocket that streams every price change as it happens
 //   GET /api/quotes  the same prices as one JSON snapshot (first paint, and the fallback when a socket can't connect)
 // Both come from one Durable Object, so every visitor sees the same numbers. While anyone is watching it holds two upstream
-// sockets, Yahoo's streamer for the stocks and Coinbase's ticker for the crypto, and polls Yahoo's chart endpoint for the
-// previous closes and for whatever a socket misses. When the last visitor leaves it closes them and goes to sleep.
+// sockets, Yahoo's streamer for the stocks and Binance's market-data stream for the crypto (one tick a second each), and
+// polls Yahoo's chart endpoint for the previous closes and for whatever a socket misses. When the last visitor leaves it
+// closes them and goes to sleep. (Coinbase's feed goes quiet after its first few messages when called from a Worker,
+// most likely because it sits behind Cloudflare too; Binance and Yahoo don't.)
 
 import { DurableObject } from "cloudflare:workers";
 
-const COINS = { BTC: "BTC-USD", ETH: "ETH-USD", SOL: "SOL-USD" }; // Coinbase product ids
+const COINS = { BTC: "BTCUSDT", ETH: "ETHUSDT", SOL: "SOLUSDT" }; // Binance symbols
+const COINBASE = { BTC: "BTC-USD", ETH: "ETH-USD", SOL: "SOL-USD" }; // last resort when Binance's REST is down
 const STOCKS = ["AXTI", "MU", "NBIS", "CRWV", "LLY", "GS", "IBKR", "NVDA", "CRWD", "NET", "CAT", "TWLO"];
 const ORDER = [...Object.keys(COINS), ...STOCKS];
 
@@ -80,10 +83,25 @@ async function stockRest(s) {
   }
 }
 
-// One coin from Coinbase: last trade, and the change against the price 24 hours ago (what the socket reports too).
-async function coinRest(s) {
+// The coins from Binance: last trade, and the change against the price 24 hours ago (what the socket reports too).
+async function coinsRest() {
   try {
-    const base = `https://api.exchange.coinbase.com/products/${COINS[s]}`;
+    const symbols = encodeURIComponent(JSON.stringify(Object.values(COINS)));
+    const r = await fetch(`https://data-api.binance.vision/api/v3/ticker/24hr?symbols=${symbols}&type=MINI`, { headers: { "user-agent": UA } });
+    if (!r.ok) throw new Error(r.status);
+    const bySymbol = Object.fromEntries(Object.entries(COINS).map(([s, b]) => [b, s]));
+    return (await r.json()).map((d) => {
+      const p = +d.lastPrice, open = +d.openPrice;
+      return { s: bySymbol[d.symbol], p, t: d.closeTime, c: open ? ((p - open) / open) * 100 : null };
+    });
+  } catch {
+    return Promise.all(Object.keys(COINS).map(coinbaseRest));
+  }
+}
+
+async function coinbaseRest(s) {
+  try {
+    const base = `https://api.exchange.coinbase.com/products/${COINBASE[s]}`;
     const [tick, stats] = await Promise.all(
       [`${base}/ticker`, `${base}/stats`].map((u) => fetch(u, { headers: { "user-agent": UA } }).then((r) => (r.ok ? r.json() : null))),
     );
@@ -101,10 +119,10 @@ export class Ticker extends DurableObject {
     this.quotes = new Map(); // symbol -> { s, p, c, t, x? }
     this.prev = new Map();   // stock -> previous regular-session close
     this.dirty = new Set();
-    this.up = { yahoo: null, coinbase: null }; // upstream sockets
-    this.heard = { yahoo: 0, coinbase: 0 };
+    this.up = { yahoo: null, binance: null }; // upstream sockets
+    this.heard = { yahoo: 0, binance: 0 };
     this.opening = {};
-    this.debug = { yahoo: {}, coinbase: {} }; // upstream state for /api/quotes?debug
+    this.debug = { yahoo: {}, binance: {} }; // upstream state for /api/quotes?debug
     this.session = null;     // [pre-market open, post-market close] in ms, from Yahoo
     this.lastStockRest = 0;
     this.lastSent = 0;
@@ -155,16 +173,16 @@ export class Ticker extends DurableObject {
     else if (now - this.lastVisitor > IDLE_MS) return this.sleep();
 
     // reconnect anything that dropped or went quiet
-    if (this.up.coinbase && now - this.heard.coinbase > 30_000) this.drop("coinbase");
+    if (this.up.binance && now - this.heard.binance > 30_000) this.drop("binance");
     if (this.up.yahoo && this.marketOpen() && now - this.heard.yahoo > 60_000) this.drop("yahoo");
     this.openYahoo();
-    this.openCoinbase();
+    this.openBinance();
     try { this.up.yahoo?.send(JSON.stringify({ subscribe: STOCKS })); } catch {} // Yahoo forgets idle subscriptions
 
     // REST fills in whatever a socket isn't delivering
     const jobs = [];
     if (!this.healthy("yahoo") || now - this.lastStockRest > STOCK_REST_MS) jobs.push(this.refreshStocks());
-    if (!this.healthy("coinbase")) jobs.push(this.refreshCoins());
+    if (!this.healthy("binance")) jobs.push(this.refreshCoins());
     await Promise.all(jobs);
 
     if (now - this.lastSent > WATCHDOG_MS - 1000) this.broadcast([]); // heartbeat: visitors reconnect if they hear nothing
@@ -174,13 +192,13 @@ export class Ticker extends DurableObject {
 
   wake() {
     this.openYahoo();
-    this.openCoinbase();
+    this.openBinance();
     this.ctx.storage.getAlarm().then((at) => at || this.ctx.storage.setAlarm(Date.now() + WATCHDOG_MS));
   }
 
   async sleep() {
     this.drop("yahoo");
-    this.drop("coinbase");
+    this.drop("binance");
     await this.save();
   }
 
@@ -200,11 +218,11 @@ export class Ticker extends DurableObject {
   healthy(name) {
     if (!this.up[name]) return false;
     const quiet = Date.now() - this.heard[name];
-    return name === "coinbase" ? quiet < 30_000 : !this.marketOpen() || quiet < 60_000;
+    return name === "binance" ? quiet < 30_000 : !this.marketOpen() || quiet < 60_000;
   }
 
   stale() {
-    return !(this.healthy("yahoo") && this.healthy("coinbase")) && Date.now() - this.lastStockRest > WATCHDOG_MS;
+    return !(this.healthy("yahoo") && this.healthy("binance")) && Date.now() - this.lastStockRest > WATCHDOG_MS;
   }
 
   // merge one price, newest wins. REST is `force`d while its socket is down, since then it's the newest there is.
@@ -257,7 +275,7 @@ export class Ticker extends DurableObject {
   }
 
   async refreshCoins() {
-    for (const q of await Promise.all(Object.keys(COINS).map(coinRest))) if (q) this.put(q, !this.healthy("coinbase"));
+    for (const q of await coinsRest()) if (q) this.put(q, !this.healthy("binance"));
   }
 
   save() {
@@ -291,7 +309,7 @@ export class Ticker extends DurableObject {
         this.debug[name].last = `closed ${e?.code ?? ""} ${e?.reason ?? e?.message ?? ""}`.trim();
         if (this.up[name] !== ws) return;
         this.up[name] = null;
-        if (this.ctx.getWebSockets().length) setTimeout(() => (name === "yahoo" ? this.openYahoo() : this.openCoinbase()), 2000);
+        if (this.ctx.getWebSockets().length) setTimeout(() => (name === "yahoo" ? this.openYahoo() : this.openBinance()), 2000);
       };
       ws.addEventListener("close", gone);
       ws.addEventListener("error", gone);
@@ -319,18 +337,20 @@ export class Ticker extends DurableObject {
     );
   }
 
-  openCoinbase() {
-    const ids = Object.fromEntries(Object.entries(COINS).map(([s, id]) => [id, s]));
+  // a mini ticker per coin every second: last price (c) and the price 24 hours ago (o)
+  openBinance() {
+    const ids = Object.fromEntries(Object.entries(COINS).map(([s, b]) => [b, s]));
+    const streams = Object.values(COINS).map((b) => `${b.toLowerCase()}@miniTicker`).join("/");
     return this.connect(
-      "coinbase",
-      "https://ws-feed.exchange.coinbase.com",
+      "binance",
+      `https://data-stream.binance.vision/stream?streams=${streams}`,
       {},
-      (ws) => ws.send(JSON.stringify({ type: "subscribe", product_ids: Object.values(COINS), channels: ["ticker"] })),
+      () => {},
       (data) => {
-        const m = JSON.parse(data);
-        if (m.type !== "ticker" || !ids[m.product_id]) return;
-        const p = +m.price, open = +m.open_24h;
-        this.put({ s: ids[m.product_id], p, c: open ? ((p - open) / open) * 100 : null, t: Date.parse(m.time) || Date.now() });
+        const d = JSON.parse(data).data;
+        if (!ids[d?.s]) return;
+        const p = +d.c, open = +d.o;
+        this.put({ s: ids[d.s], p, c: open ? ((p - open) / open) * 100 : null, t: d.E || Date.now() });
       },
     );
   }
