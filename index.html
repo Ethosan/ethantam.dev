@@ -184,11 +184,11 @@
           <article class="card">
             <div class="card__body">
               <h3><a class="card__title" href="https://markets.ethantam.dev" target="_blank" rel="noopener noreferrer">Equarian Markets <span class="arrow" aria-hidden="true">↗</span></a></h3>
-              <p class="card__meta mono"><span>Built Jul 2026</span> · <span>on GitLab since Oct 2026</span> · <span>36 indicators</span> · <span>4 models</span></p>
+              <p class="card__meta mono"><span>Built Jul 2026</span> · <span>on GitLab since Oct 2026</span> · <span>45 indicators</span> · <span>4 models</span></p>
               <p class="card__why">Before I trade micro futures I want rates, credit, vol and yen carry on one screen, read the way a desk would read them.</p>
-              <p>It pulls free data from FRED, Yahoo, the CFTC and the BOJ. In the browser it runs four models: a risk appetite index, a growth and inflation regime map, the absorption ratio for how fragile markets are, and the NY Fed's recession model. A daily read spells out what stands out, like oil and grains rising while stocks fall, with the numbers behind it.</p>
+              <p>It pulls free data from FRED, Yahoo, the CFTC and the BOJ. In the browser it runs four models: a risk appetite index, a growth and inflation regime map, the absorption ratio for how fragile markets are, and the NY Fed's recession model. A daily read spells out what stands out, like oil and grains rising while stocks fall, with the numbers behind it. An alt signals tab keeps the market-wide curiosities: the Pentagon Pizza Index, the Stripper Index and the moon, each tested against the index to say whether it has ever held up.</p>
               <ul class="tags mono" aria-label="Built with">
-                <li>JavaScript</li><li>Vite</li><li>Netlify</li><li>PWA</li>
+                <li>JavaScript</li><li>Vite</li><li>Cloudflare Pages</li><li>PWA</li>
               </ul>
               <a class="card__src mono" href="https://gitlab.com/eatentam/eqmarkets" target="_blank" rel="noopener noreferrer">Source</a>
             </div>
@@ -213,6 +213,22 @@
             <div class="card__media">
               <img src="assets/list-leaderboard.webp" alt="The List leaderboard: restaurants ranked by combined score, each with its price tier and when it was visited. Demo data." width="390" height="720" loading="lazy" decoding="async">
               <img src="assets/list-place.webp" alt="The List place page: one restaurant's scores for food, ambiance, aesthetics and service from each person. Demo data." width="390" height="720" loading="lazy" decoding="async">
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__body">
+              <h3><a class="card__title" href="https://oracular.ethantam.dev" target="_blank" rel="noopener noreferrer">Oracular <span class="arrow" aria-hidden="true">↗</span></a></h3>
+              <p class="card__meta mono"><span>Built Sep 2026</span> · <span>on GitLab since Oct 2026</span></p>
+              <p class="card__why">I wanted the read a desk would write on one ticker, every number on the page and nothing taken on faith.</p>
+              <p>Any US ticker, read off live data: a Council of twelve seats votes on the numbers, an AI writes the plain-English memo and argues both sides, and seasonality, derivatives and levels each show their work. There's a Market tab too, with a Fear &amp; Greed index built from seven indicators, plus a chat that answers with the ticker's own data in front of it.</p>
+              <ul class="tags mono" aria-label="Built with">
+                <li>React</li><li>Vite</li><li>Tailwind</li><li>Cloudflare Workers</li><li>Mistral AI</li>
+              </ul>
+            </div>
+            <div class="card__media">
+              <img src="assets/oracular-market.webp" alt="Oracular Market tab: the Fear &amp; Greed Index gauge, its 180-day history chart, and the seven indicator scores. Live data." width="390" height="720" loading="lazy" decoding="async">
+              <img src="assets/oracular-overview.webp" alt="Oracular Overview for SPY: live price, a one-year candle chart, and the Council's verdict card. Live data." width="390" height="720" loading="lazy" decoding="async">
             </div>
           </article>
 
@@ -248,7 +264,7 @@
       </section>
 
       <footer class="foot mono">
-        <p class="colophon">Plain HTML, CSS and a bit of JavaScript, no framework. Set in Geist and Instrument Serif; layout borrows from Brittany Chiang's site. The painting is Bosschaert's <i>Vase of Flowers in a Window</i>, from the Mauritshuis (public domain). Last updated 19 Oct 2026.</p>
+        <p class="colophon">Plain HTML, CSS and a bit of JavaScript, no framework. Set in Geist and Instrument Serif; layout borrows from Brittany Chiang's site. The painting is Bosschaert's <i>Vase of Flowers in a Window</i>, from the Mauritshuis (public domain). Last updated 23 Oct 2026.</p>
         <button type="button" class="hint" data-open-term><span class="hint__key">Press <kbd>~</kbd> for a terminal</span><span class="hint__tap">Open the terminal</span></button>
       </footer>
     </main>

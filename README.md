@@ -36,7 +36,7 @@ Settings: none on the site. The CI deploy needs a `CLOUDFLARE_API_TOKEN` CI/CD v
 - **Ticker:** live prices for a watchlist of stocks and crypto, fetched from Yahoo by the Worker (`/api/quotes`, edge-cached 60s, falls back to the last good result). If that endpoint isn't there, the page falls back to CoinGecko for crypto only.
 - **Painting:** Ambrosius Bosschaert the Elder, *Vase of Flowers in a Window* (c.1618, Mauritshuis, public domain), dithered in the browser on a canvas. Hover or tap to see the original.
 - **Layout:** on desktop the name and section nav stay pinned on the left while the rest scrolls on the right, and the nav marks the section you're reading (the layout follows Brittany Chiang's site). Phones and tablets get one column with sticky section titles.
-- **Project cards:** each project with why it exists, what it grew into, and two screenshots: 780×1440 captures saved as WebP in `assets/`. Live data for Equarian Markets; demo data for 20bucks, The List and Trade Journal; test data for Tally.
+- **Project cards:** each project with why it exists, what it grew into, and two screenshots: 780×1440 captures saved as WebP in `assets/`. Live data for Equarian Markets and Oracular; demo data for 20bucks, The List and Trade Journal; test data for Tally.
 - **Terminal:** press `~` anywhere (or the `~` button) and type `help`.
 - **Themes:** dark and light mode with a toggle button. Respects `prefers-color-scheme` by default, persists the choice in `localStorage`. The dithered painting re-renders in theme colours.
 - **Self-hosted fonts:** Geist, Geist Mono and Instrument Serif served as woff2 from `assets/fonts/` (latin subset only, about 80 KB in all). No Google Fonts dependency.

@@ -261,6 +261,7 @@
     list: "https://list.ethantam.dev",
     markets: "https://markets.ethantam.dev",
     journal: "https://futuretracker.ethantam.dev/?demo",
+    oracular: "https://oracular.ethantam.dev",
   };
   const a = (href, text = href) => `<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
   const esc = (t) => String(t).replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
@@ -282,7 +283,7 @@
       "record      background, briefly",
       "watchlist   prices I check too often, live",
       "contact     how to reach me",
-      "open &lt;x&gt;    open gitlab | linkedin | 20bucks | list | markets | journal",
+      "open &lt;x&gt;    open gitlab | linkedin | 20bucks | list | markets | journal | oracular",
       "tulip       a cautionary tale",
       "clear       clear the screen",
       "exit        close (or press esc)",
@@ -297,6 +298,7 @@
       `20bucks     personal finance PWA: splits, PayLater, P&L, AI review   ${a(LINKS["20bucks"], "app")} ${a("https://gitlab.com/eatentam/moneytracker", "src")}`,
       `Markets     macro dashboard: risk, regime, absorption, recession     ${a(LINKS.markets, "app")} ${a("https://gitlab.com/eatentam/eqmarkets", "src")}`,
       `The List    ratings, leaderboard, auto want list, Telegram bot       ${a(LINKS.list, "app")} ${a("https://gitlab.com/eatentam/thelist", "src")}`,
+      `Oracular    research terminal: council votes, seasonality, options   ${a(LINKS.oracular, "app")}`,
       `Tally       escrow trust layer: Cardano, evidence, reliability       ${a("https://github.com/xiaoyang4c/actual-token2049-hackathon-repo", "src")}`,
     ].join("\n"),
     record: () => [
