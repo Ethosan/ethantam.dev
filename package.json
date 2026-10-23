@@ -1,6 +1,7 @@
 {
   "name": "ethantam-dev",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy"
