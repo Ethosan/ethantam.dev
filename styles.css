@@ -153,6 +153,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   letter-spacing: .08em;
 }
 .ticker__short { display: none; }
+/* lit while the live socket is up, dim while the page falls back to polling */
+.ticker__dot { width: 6px; height: 6px; margin-right: 8px; border-radius: 50%; background: currentColor; opacity: .3; transition: opacity .4s; }
+.ticker.is-live .ticker__dot { opacity: 1; animation: live 2.4s ease-in-out infinite; }
+@keyframes live { 50% { opacity: .4; } }
 .ticker__viewport {
   flex: 1; min-width: 0;
   display: flex; align-items: center;
@@ -169,6 +173,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .tk { color: var(--muted); font-variant-numeric: tabular-nums; }
 .tk b { color: var(--fg); font-weight: 500; margin-right: .5em; }
 .tk i { font-style: normal; margin-left: .35em; }
+.tk small { margin-left: .45em; font-size: .85em; letter-spacing: .06em; text-transform: uppercase; opacity: .75; } /* PRE / AH outside 9:30-16:00 New York */
+.tk i:empty, .tk small:empty { display: none; }
 .up { color: var(--up); }
 .dn { color: var(--down); }
 @keyframes tick { to { transform: translateX(-50%); } }
@@ -706,6 +712,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .ticker__track { animation: none; }
+  .ticker.is-live .ticker__dot { animation: none; }
   .ticker__viewport { overflow-x: auto; mask-image: none; }
   .art__frame img, .art__frame canvas, .card, .card::before, .card__media img, .arrow, .nav__line { transition: none; }
 }

@@ -9,6 +9,11 @@
     "not_found_handling": "404-page",
     "run_worker_first": ["/api/*"]
   },
+  // the ticker's hub: one Durable Object streams the watchlist to every visitor (worker/index.js)
+  "durable_objects": {
+    "bindings": [{ "name": "TICKER", "class_name": "Ticker" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Ticker"] }],
   // PR builds run `wrangler preview`, which needs this block (it can stay empty)
   "previews": {}
 }

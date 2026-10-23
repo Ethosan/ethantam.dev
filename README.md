@@ -25,7 +25,7 @@ Personal site of Ethan Tam: who I am, what I'm doing now, and the projects I've 
 | --- | --- |
 | **Live** | https://ethantam.dev |
 | **Hosting** | Cloudflare Worker `ethantam-dev` with static assets; every push to `main` deploys through GitLab CI (`.gitlab-ci.yml`) |
-| **Data** | None stored. The ticker reads Yahoo through the Worker's `/api/quotes`. |
+| **Data** | None stored. The ticker streams from the Worker's `/api/live` (Yahoo for stocks, Coinbase for crypto). |
 | **Run locally** | `npm install && npm run dev` |
 | **Source** | [gitlab.com/eatentam/ethantam.dev](https://gitlab.com/eatentam/ethantam.dev) (moved from GitHub on 17 Oct 2026) |
 
@@ -33,7 +33,7 @@ Settings: none on the site. The CI deploy needs a `CLOUDFLARE_API_TOKEN` CI/CD v
 
 ## Features
 
-- **Ticker:** live prices for a watchlist of stocks and crypto, fetched from Yahoo by the Worker (`/api/quotes`, edge-cached 60s, falls back to the last good result). If that endpoint isn't there, the page falls back to CoinGecko for crypto only.
+- **Ticker:** streaming prices for a watchlist of stocks and crypto, tick by tick. One Durable Object holds an upstream socket to Yahoo's streamer (stocks) and one to Coinbase's ticker (crypto), and pushes every change to each visitor over a WebSocket (`/api/live`), at most four times a second. Every visitor sees the same numbers. A price flashes green or red as it moves, and the dot by the label is lit while the stream is up. Outside 9:30-16:00 New York, stocks show the pre-market or after-hours price, tagged `PRE` or `AH`, with the change against the previous close. Crypto change is over the last 24 hours. If the socket can't connect, the page polls `/api/quotes` every 5s, and without the Worker at all it falls back to CoinGecko for crypto only. A hidden tab lets go of the socket after a minute and catches up the moment it's back. With nobody watching, the Durable Object closes its upstreams and sleeps.
 - **Painting:** Ambrosius Bosschaert the Elder, *Vase of Flowers in a Window* (c.1618, Mauritshuis, public domain), dithered in the browser on a canvas. Hover or tap to see the original.
 - **Layout:** on desktop the name and section nav stay pinned on the left while the rest scrolls on the right, and the nav marks the section you're reading (the layout follows Brittany Chiang's site). Phones and tablets get one column with sticky section titles.
 - **Project cards:** each project with why it exists, what it grew into, and two screenshots: 780×1440 captures saved as WebP in `assets/`. Live data for Equarian Markets and Oracular; demo data for 20bucks, The List and Trade Journal; test data for Tally.
@@ -50,15 +50,20 @@ Settings: none on the site. The CI deploy needs a `CLOUDFLARE_API_TOKEN` CI/CD v
 
 ```
 Browser ──▶ Cloudflare Worker ethantam-dev
-              ├─ GET /api/quotes  ──▶ Yahoo Finance   (edge-cached 60s, last good result kept)
+              ├─ GET /api/live    (WebSocket) ─┐
+              ├─ GET /api/quotes  (snapshot)  ─┴─▶ Durable Object Ticker ──▶ Yahoo streamer   (stocks, socket)
+              │                                                           ├─▶ Coinbase ticker  (crypto, socket)
+              │                                                           └─▶ Yahoo chart API  (previous closes; fills gaps while a socket is down)
               └─ everything else  ──▶ static assets   (404.html for unknown paths)
 ```
+
+The Durable Object keeps the last good prices in its storage, so a cold start with Yahoo down still has something to show.
 
 | Path | Purpose |
 | --- | --- |
 | `index.html`, `styles.css`, `main.js` | The page, its styles and its script |
-| `worker/index.js` | Handles `GET /api/quotes`; everything else is a static file |
-| `wrangler.jsonc` | Worker config; serves `404.html` for unknown paths |
+| `worker/index.js` | Handles `GET /api/live` and `GET /api/quotes` through the `Ticker` Durable Object; everything else is a static file |
+| `wrangler.jsonc` | Worker config: the `TICKER` Durable Object binding and its migration; serves `404.html` for unknown paths |
 | `.assetsignore` | Keeps the README, docs, config and Worker source from being served |
 | `_headers` | Security headers (CSP, HSTS, COOP, CORP, Permissions-Policy) and cache-control rules |
 | `manifest.json`, `sw.js` | PWA manifest; service worker (network-first for HTML, CSS and JS, cache-first for images and fonts) |

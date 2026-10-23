@@ -96,42 +96,72 @@
   /* ---------- ticker ---------- */
   const WATCHLIST = ["BTC", "ETH", "SOL", "AXTI", "MU", "NBIS", "CRWV", "LLY", "GS", "IBKR", "NVDA", "CRWD", "NET", "CAT", "TWLO"];
   const COINS = { BTC: "bitcoin", ETH: "ethereum", SOL: "solana" };
+  const SESSIONS = { pre: "pre-market", ah: "after hours" };
   const PX_PER_SEC = 45;
-  let quotes = WATCHLIST.map((s) => ({ s }));
+  const POLL_MS = 5_000;
+  const quotes = new Map(WATCHLIST.map((s) => [s, { s }]));
 
   const fmtPx = (n) => n >= 1000
     ? n.toLocaleString("en-US", { maximumFractionDigits: 0 })
     : n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const itemInner = ({ s, p, c }) => {
-    const val = typeof p === "number" ? fmtPx(p) : "…";
-    const chg = typeof c === "number"
-      ? ` <i class="${c >= 0 ? "up" : "dn"}">${c >= 0 ? "▲" : "▼"} ${Math.abs(c).toFixed(1)}%</i>`
-      : "";
-    return `<b>${s}</b>${val}${chg}`;
-  };
+  const ticker = $(".ticker");
   const track = $("#ticker");
   const srList = $("#ticker-sr");
   // Build the strip once (two copies so the CSS loop can translate -50% seamlessly),
   // then only swap the numbers inside it, so the scroll never restarts.
-  track.innerHTML = [0, 1].map(() => WATCHLIST.map((s) => `<span class="tk" data-s="${s}"></span>`).join("")).join("");
-  let speedSet = false;
-  const renderTicker = () => {
-    for (const q of quotes) {
-      track.querySelectorAll(`[data-s="${q.s}"]`).forEach((el) => { el.innerHTML = itemInner(q); });
+  track.innerHTML = [0, 1].map(() => WATCHLIST.map((s) =>
+    `<span class="tk" data-s="${s}"><b>${s}</b><span class="tk__p">…</span><i></i><small></small></span>`).join("")).join("");
+  const cells = new Map(WATCHLIST.map((s) => [s, [...track.querySelectorAll(`[data-s="${s}"]`)].map((el) => el.children)]));
+  const painted = new Map(); // the price on screen, so a change can flash up or down
+  const dirty = new Set();
+  let paintRaf = 0, speedSet = false;
+
+  const paint = () => {
+    paintRaf = 0;
+    let css;
+    for (const s of dirty) {
+      const { p, c, x } = quotes.get(s);
+      const px = typeof p === "number" ? fmtPx(p) : "…";
+      const was = painted.get(s);
+      const tone = typeof was === "number" && fmtPx(was) !== px ? (p > was ? "--up" : "--down") : null;
+      painted.set(s, p);
+      for (const [, pEl, cEl, xEl] of cells.get(s)) {
+        pEl.textContent = px;
+        cEl.className = typeof c === "number" ? (c >= 0 ? "up" : "dn") : "";
+        cEl.textContent = typeof c === "number" ? `${c >= 0 ? "▲" : "▼"} ${Math.abs(c).toFixed(1)}%` : "";
+        xEl.textContent = x ?? "";
+        if (tone) {
+          css ??= getComputedStyle(document.documentElement);
+          pEl.animate?.([{ color: css.getPropertyValue(tone).trim(), offset: 0 }], { duration: 1200, easing: "ease-out" });
+        }
+      }
     }
-    if (srList) srList.innerHTML = quotes.map(({ s, p, c }) => {
+    dirty.clear();
+    if (srList) srList.innerHTML = WATCHLIST.map((s) => {
+      const { p, c, x } = quotes.get(s);
       const val = typeof p === "number" ? fmtPx(p) : "…";
       const chg = typeof c === "number" ? `, ${c >= 0 ? "up" : "down"} ${Math.abs(c).toFixed(1)}%` : "";
-      return `<li>${s}: ${val}${chg}</li>`;
+      return `<li>${s}: ${val}${chg}${x ? `, ${SESSIONS[x]}` : ""}</li>`;
     }).join("");
-    if (!speedSet && quotes.some((q) => typeof q.p === "number")) {
+    if (!speedSet && painted.size) {
       track.style.animationDuration = `${Math.round(track.scrollWidth / 2 / PX_PER_SEC)}s`;
       speedSet = true;
     }
   };
+  // newest wins, so a slow snapshot never undoes a tick that already streamed in
+  const merge = (list) => {
+    for (const q of list ?? []) {
+      const cur = quotes.get(q.s);
+      if (!cur || typeof q.p !== "number" || q.t < cur.t) continue;
+      quotes.set(q.s, q);
+      dirty.add(q.s);
+    }
+    if (dirty.size && !paintRaf) paintRaf = requestAnimationFrame(paint);
+  };
 
-  // Primary: our own /api/quotes (the Worker in worker/index.js, stocks + crypto, edge-cached 60s).
-  // Fallback for local preview or if Yahoo is down: CoinGecko for the crypto only.
+  // Live: a WebSocket to /api/live, where one Durable Object (worker/index.js) streams Yahoo for the stocks and
+  // Coinbase for the crypto to every visitor. Until it connects, or while it's down, poll /api/quotes every 5s;
+  // on a plain static preview with no Worker, CoinGecko for the crypto only.
   const fromApi = async () => {
     const r = await fetch("/api/quotes", { cache: "no-store" });
     if (!r.ok) throw new Error(r.status);
@@ -141,19 +171,66 @@
   };
   const fromCoinGecko = async () => {
     const ids = Object.values(COINS).join(",");
-    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true&include_last_updated_at=true`);
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
-    return WATCHLIST.map((s) => COINS[s] && d[COINS[s]] ? { s, p: d[COINS[s]].usd, c: d[COINS[s]].usd_24h_change } : { s });
+    return Object.entries(COINS).filter(([, id]) => d[id]).map(([s, id]) => ({ s, p: d[id].usd, c: d[id].usd_24h_change, t: d[id].last_updated_at * 1000 }));
   };
-  const loadQuotes = async () => {
-    try { quotes = await fromApi(); }
-    catch { try { quotes = await fromCoinGecko(); } catch { /* keep last */ } }
-    renderTicker();
+
+  let sock = null, heard = 0, tries = 0, polling = false, pollTimer = 0, retryTimer = 0, sleepTimer = 0;
+  const isLive = () => sock?.readyState === 1; // OPEN
+  const poll = async () => {
+    if (polling) return;
+    polling = true;
+    clearTimeout(pollTimer);
+    try { merge(await fromApi()); }
+    catch { try { merge(await fromCoinGecko()); } catch { /* keep last */ } }
+    finally { polling = false; }
+    // keep polling only while there's no socket and someone is looking
+    if (!isLive() && !document.hidden) pollTimer = setTimeout(poll, POLL_MS);
   };
-  renderTicker();
-  loadQuotes();
-  setInterval(loadQuotes, 60_000);
+  // forget the socket now rather than wait out a dead one's close handshake
+  const drop = () => {
+    const ws = sock;
+    sock = null;
+    ticker.classList.remove("is-live");
+    if (ws) { ws.onclose = ws.onmessage = null; try { ws.close(); } catch { /* already gone */ } }
+  };
+  const connect = () => {
+    clearTimeout(retryTimer);
+    if (sock || document.hidden || !("WebSocket" in window)) return;
+    const ws = sock = new WebSocket(`${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/api/live`);
+    ws.onopen = () => { tries = 0; heard = Date.now(); ticker.classList.add("is-live"); };
+    ws.onmessage = (e) => {
+      heard = Date.now();
+      try { merge(JSON.parse(e.data).quotes); } catch { /* skip a bad frame */ }
+    };
+    ws.onclose = () => {
+      if (sock !== ws) return;
+      drop();
+      if (document.hidden) return; // picked up again when the page is visible
+      poll();
+      retryTimer = setTimeout(connect, Math.min(30_000, 1000 * 2 ** tries++));
+    };
+  };
+  const resume = () => {
+    if (document.hidden || (sock && sock.readyState <= 1)) return; // connecting or open
+    drop();
+    poll();
+    connect();
+  };
+  // the hub sends a heartbeat every 10s; silence for longer means the connection died without saying so
+  setInterval(() => { if (isLive() && Date.now() - heard > 25_000) { drop(); resume(); } }, 5_000);
+  // a hidden tab lets go after a minute so the hub can sleep, and catches up the moment it's back
+  document.addEventListener("visibilitychange", () => {
+    clearTimeout(sleepTimer);
+    if (document.hidden) sleepTimer = setTimeout(drop, 60_000);
+    else resume();
+  });
+  addEventListener("online", () => { drop(); resume(); });
+  addEventListener("pageshow", (e) => { if (e.persisted) resume(); });
+  poll();
+  connect();
 
   /* ---------- dithered painting ---------- */
   const art = $("#art");
@@ -315,10 +392,10 @@
       window.open(url, "_blank", "noopener");
       return `opening ${arg}…`;
     },
-    watchlist: () => quotes.map((q) => {
+    watchlist: () => [...quotes.values()].map((q) => {
       const px = typeof q.p === "number" ? fmtPx(q.p) : "…";
       const chg = typeof q.c === "number" ? `<span class="${q.c >= 0 ? "up" : "dn"}">${q.c >= 0 ? "+" : ""}${q.c.toFixed(2)}%</span>` : "";
-      return `${q.s.padEnd(6)}${px.padStart(10)}   ${chg}`;
+      return `${q.s.padEnd(6)}${px.padStart(10)}   ${chg}${q.x ? ` <span class="dim">${SESSIONS[q.x]}</span>` : ""}`;
     }).join("\n") + "\n\nnot financial advice. see also: tulip",
     tulip: () => "Feb 1637: a single Semper Augustus bulb was quoted at more than a house on an\nAmsterdam canal. A few weeks later, buyers stopped showing up.\nThe painting on the front page is from about 20 years before the peak.",
     ls: () => "about  now  projects  record  watchlist  contact  tulip",
