@@ -46,7 +46,7 @@ Settings: none on the site. The CI deploy needs a `CLOUDFLARE_API_TOKEN` CI/CD v
 - **Copy email:** one-click copy next to the email address, with the Clipboard API and an `execCommand` fallback.
 - **PWA:** installable (`manifest.json`) with offline support through a service worker (`sw.js`); the site works without a connection once cached.
 - **One-page CV:** printing the page (the button under About, or `cv` in the terminal) gives an A4 CV: name, contact line, Now, the background log and each project with its link and stack. The painting, screenshots, ticker and controls stay on screen only.
-- **Last updated:** stamped by the Worker from the deploy itself (date, and the commit it was built from, linked), so it is never a date typed by hand.
+- **Last updated:** stamped by the Worker from the live deploy: its date, and the newest commit on `main` as of that moment (looked up on GitLab, linked). Never a date typed by hand, and right whichever pipeline did the deploy. `/api/version` shows the same.
 - **Privacy and terms:** `/privacy` and `/terms`, linked from the footer; the same text as `PRIVACY.md` and `TERMS.md`.
 
 ## Architecture
@@ -57,7 +57,7 @@ Browser ──▶ Cloudflare Worker ethantam-dev
               ├─ GET /api/quotes  (snapshot)  ─┴─▶ Durable Object Ticker ──▶ Yahoo streamer   (stocks, socket)
               │                                                           ├─▶ Binance stream   (crypto, socket)
               │                                                           └─▶ Yahoo chart API  (previous closes; fills gaps while a socket is down)
-              ├─ GET /api/spark   ──▶ Yahoo chart / Binance klines   (one symbol's day, edge-cached 60s)
+              ├─ GET /api/spark   ──▶ Yahoo chart   (a stock's session or a coin's 24 hours, edge-cached 60s)
               ├─ GET /api/projects ─▶ each app + GitLab commits       (edge-cached 2 min)
               ├─ GET /            ──▶ index.html, with "Last updated" stamped from the deploy
               └─ everything else  ──▶ static assets   (404.html for unknown paths)
@@ -90,7 +90,7 @@ That serves the static files and the `/api/quotes` endpoint together. A plain st
 
 ### Deploy
 
-Every push to `main` runs the `deploy` job in `.gitlab-ci.yml`, which runs `wrangler deploy --tag <short commit>` with the `CLOUDFLARE_API_TOKEN` variable; the tag is what "Last updated" links to. To deploy by hand: `npm run deploy` (the stamp then shows the date without a commit).
+Every push to `main` runs the `deploy` job in `.gitlab-ci.yml`, which runs `wrangler deploy --tag <short commit>` with the `CLOUDFLARE_API_TOKEN` variable. To deploy by hand: `npm run deploy`.
 
 ## Legal
 

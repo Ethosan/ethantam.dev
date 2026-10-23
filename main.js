@@ -209,7 +209,8 @@
       popEl.cap.textContent = got ? "No chart right now." : "Loading the chart…";
       return;
     }
-    const d = got.data;
+    // a coin's baseline is the price 24 hours ago implied by its live change, so the dashed line matches the number shown
+    const d = COINS[s] && typeof p === "number" && typeof c === "number" ? { ...got.data, prev: p / (1 + c / 100) } : got.data;
     const pts = d.points.slice();
     const now = (t ?? Date.now()) / 1000;
     if (typeof p === "number" && (!pts.length || now > pts.at(-1)[0])) pts.push([now, p]);

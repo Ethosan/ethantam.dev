@@ -4,6 +4,7 @@
 //   GET /api/quotes    the same prices as one JSON snapshot (first paint, and the fallback when a socket can't connect)
 //   GET /api/spark     one symbol's path for the ticker popover (edge-cached 60s)
 //   GET /api/projects  whether each project's app is up, and its last commit on GitLab (edge-cached 2 min)
+//   GET /api/version   the live deploy: its id, time, and the commit it was built from
 // The ticker:
 // Both come from one Durable Object, so every visitor sees the same numbers. While anyone is watching it holds two upstream
 // sockets, Yahoo's streamer for the stocks and Binance's market-data stream for the crypto (one tick a second each), and
@@ -14,7 +15,7 @@
 import { DurableObject } from "cloudflare:workers";
 
 const COINS = { BTC: "BTCUSDT", ETH: "ETHUSDT", SOL: "SOLUSDT" }; // Binance symbols
-const COINBASE = { BTC: "BTC-USD", ETH: "ETH-USD", SOL: "SOL-USD" }; // last resort when Binance's REST is down
+const COINBASE = { BTC: "BTC-USD", ETH: "ETH-USD", SOL: "SOL-USD" }; // REST for the coins (see coinsRest)
 const STOCKS = ["AXTI", "MU", "NBIS", "CRWV", "LLY", "GS", "IBKR", "NVDA", "CRWD", "NET", "CAT", "TWLO"];
 const ORDER = [...Object.keys(COINS), ...STOCKS];
 
@@ -87,21 +88,10 @@ async function stockRest(s) {
   }
 }
 
-// The coins from Binance: last trade, and the change against the price 24 hours ago (what the socket reports too).
-async function coinsRest() {
-  try {
-    const symbols = encodeURIComponent(JSON.stringify(Object.values(COINS)));
-    const r = await fetch(`https://data-api.binance.vision/api/v3/ticker/24hr?symbols=${symbols}&type=MINI`, { headers: { "user-agent": UA } });
-    if (!r.ok) throw new Error(`binance ${r.status}`);
-    const bySymbol = Object.fromEntries(Object.entries(COINS).map(([s, b]) => [b, s]));
-    return (await r.json()).map((d) => {
-      const p = +d.lastPrice, open = +d.openPrice;
-      return { s: bySymbol[d.symbol], p, t: d.closeTime, c: open ? ((p - open) / open) * 100 : null };
-    });
-  } catch (err) {
-    coinsRest.lastError = String(err);
-    return Promise.all(Object.keys(COINS).map(coinbaseRest));
-  }
+// The coins over REST, for a cold start or while the Binance socket is down. Binance's REST API answers 403 to requests
+// from Cloudflare (its socket is fine), so this asks Coinbase: last trade, and the change against 24 hours ago.
+function coinsRest() {
+  return Promise.all(Object.keys(COINS).map(coinbaseRest));
 }
 
 async function coinbaseRest(s) {
@@ -158,7 +148,7 @@ export class Ticker extends DurableObject {
       const up = Object.fromEntries(Object.keys(this.up).map((n) => [n, {
         open: !!this.up[n], healthy: this.healthy(n), quietMs: this.heard[n] ? now - this.heard[n] : null, ...this.debug[n],
       }]));
-      return json({ t: now, visitors: this.ctx.getWebSockets().length, marketOpen: this.marketOpen(), up, coinsRest: coinsRest.lastError ?? "ok" });
+      return json({ t: now, visitors: this.ctx.getWebSockets().length, marketOpen: this.marketOpen(), up });
     }
     if (this.stale()) await this.refresh();
     return json({ t: Date.now(), quotes: this.snapshot() });
@@ -388,14 +378,11 @@ async function project([repo, site]) {
 // ---------- one symbol's path for the ticker popover: today's session for a stock, the last 24 hours for a coin ----------
 
 async function spark(s) {
-  if (COINS[s]) {
-    const r = await fetch(`https://data-api.binance.vision/api/v3/klines?symbol=${COINS[s]}&interval=15m&limit=96`, { headers: { "user-agent": UA } });
-    if (!r.ok) throw new Error(r.status);
-    const bars = await r.json(); // [open time, open, high, low, close, ...]
-    return { s, prev: +bars[0][1], start: bars[0][0] / 1000, end: Math.round(Date.now() / 1000), points: bars.map((b) => [b[0] / 1000, +b[4]]) };
-  }
+  // a coin's last 24 hours comes from Yahoo too (Binance's REST refuses Cloudflare); the page draws the baseline from
+  // the live 24h change, so it matches the number shown
+  const coin = !!COINS[s];
   const r = await fetch(
-    `https://query1.finance.yahoo.com/v8/finance/chart/${s}?range=1d&interval=5m&includePrePost=true`,
+    `https://query1.finance.yahoo.com/v8/finance/chart/${coin ? `${s}-USD` : s}?${coin ? "range=2d&interval=15m" : "range=1d&interval=5m&includePrePost=true"}`,
     { headers: { "user-agent": UA } },
   );
   if (!r.ok) throw new Error(r.status);
@@ -405,6 +392,10 @@ async function spark(s) {
   const period = (name) => m.tradingPeriods?.[name]?.flat?.().at(-1) ?? m.currentTradingPeriod?.[name];
   const close = res.indicators?.quote?.[0]?.close ?? [];
   const points = (res.timestamp ?? []).map((t, i) => [t, close[i]]).filter(([, c]) => c != null).map(([t, c]) => [t, round(c, 4)]);
+  if (coin) {
+    const now = Math.round(Date.now() / 1000), day = points.filter(([t]) => t >= now - 86_400);
+    return { s, prev: day[0]?.[1], start: now - 86_400, end: now, points: day };
+  }
   const pre = period("pre"), reg = period("regular"), post = period("post");
   return {
     s, prev: m.chartPreviousClose ?? m.previousClose, points,
@@ -434,9 +425,25 @@ async function cached(request, ctx, ttl, build) {
 
 const dateFmt = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" });
 
-async function home(request, env) {
+// The commit behind the live deploy: the newest on main as of the deploy's time, kept for a day per deploy. Every push to
+// main deploys, and more than one pipeline does it, so the deploy's own tag isn't reliable.
+async function deployedCommit(v, ctx) {
+  if (!v.id || !v.timestamp) return null;
+  const key = new Request(`https://ethantam.dev/api/version?commit=${v.id}`);
+  const hit = await caches.default.match(key);
+  if (hit) return (await hit.json()).id;
+  const r = await fetch(
+    `https://gitlab.com/api/v4/projects/${encodeURIComponent("eatentam/ethantam.dev")}/repository/commits?ref_name=main&per_page=1&until=${encodeURIComponent(v.timestamp)}`,
+    { headers: { "user-agent": UA }, signal: AbortSignal.timeout(3000) },
+  ).catch(() => null);
+  const id = r?.ok ? (await r.json().catch(() => null))?.[0]?.short_id : null;
+  if (id) ctx.waitUntil(caches.default.put(key, new Response(JSON.stringify({ id }), { headers: { "cache-control": "public, max-age=86400" } })));
+  return id;
+}
+
+async function home(request, env, ctx) {
   const v = env.VERSION ?? {};
-  const commit = env.COMMIT || v.tag || ""; // CI passes the commit both ways (--var COMMIT and --tag)
+  const commit = (await deployedCommit(v, ctx)) ?? "";
   // the page changes with every deploy even when index.html doesn't, so the deploy's id is the ETag
   const etag = v.id ? `"${v.id}"` : null;
   if (etag && request.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers: { etag } });
@@ -477,8 +484,8 @@ export default {
       if (!ORDER.includes(s)) return json({ error: "unknown symbol" }, 404);
       return cached(new Request(`${url.origin}/api/spark?s=${s}`), ctx, 60, () => spark(s));
     }
-    if (url.pathname === "/") return home(request, env);
-    if (url.pathname === "/api/version") return json({ ...(env.VERSION ?? {}), commit: env.COMMIT ?? null });
+    if (url.pathname === "/") return home(request, env, ctx);
+    if (url.pathname === "/api/version") return json({ ...(env.VERSION ?? {}), commit: await deployedCommit(env.VERSION ?? {}, ctx) });
     return env.ASSETS.fetch(request);
   },
 };
