@@ -104,6 +104,7 @@ export class Ticker extends DurableObject {
     this.up = { yahoo: null, coinbase: null }; // upstream sockets
     this.heard = { yahoo: 0, coinbase: 0 };
     this.opening = {};
+    this.debug = { yahoo: {}, coinbase: {} }; // upstream state for /api/quotes?debug
     this.session = null;     // [pre-market open, post-market close] in ms, from Yahoo
     this.lastStockRest = 0;
     this.lastSent = 0;
@@ -128,6 +129,13 @@ export class Ticker extends DurableObject {
       if (this.stale()) this.refresh().finally(hello);
       else hello();
       return new Response(null, { status: 101, webSocket: client });
+    }
+    if (new URL(request.url).searchParams.has("debug")) {
+      const now = Date.now();
+      const up = Object.fromEntries(Object.keys(this.up).map((n) => [n, {
+        open: !!this.up[n], healthy: this.healthy(n), quietMs: this.heard[n] ? now - this.heard[n] : null, ...this.debug[n],
+      }]));
+      return json({ t: now, visitors: this.ctx.getWebSockets().length, marketOpen: this.marketOpen(), up });
     }
     if (this.stale()) await this.refresh();
     return json({ t: Date.now(), quotes: this.snapshot() });
@@ -269,15 +277,18 @@ export class Ticker extends DurableObject {
     try {
       const r = await fetch(url, { headers: { upgrade: "websocket", "user-agent": UA, ...headers } });
       const ws = r.webSocket;
-      if (!ws) throw new Error(`${name} upgrade refused: ${r.status}`);
+      if (!ws) throw new Error(`upgrade refused: ${r.status} ${(await r.text().catch(() => "")).slice(0, 120)}`);
       ws.accept();
       this.up[name] = ws;
       this.heard[name] = Date.now();
+      this.debug[name] = { since: Date.now(), messages: 0 };
       ws.addEventListener("message", (e) => {
         this.heard[name] = Date.now();
+        this.debug[name].messages++;
         try { onMessage(e.data); } catch {}
       });
-      const gone = () => {
+      const gone = (e) => {
+        this.debug[name].last = `closed ${e?.code ?? ""} ${e?.reason ?? e?.message ?? ""}`.trim();
         if (this.up[name] !== ws) return;
         this.up[name] = null;
         if (this.ctx.getWebSockets().length) setTimeout(() => (name === "yahoo" ? this.openYahoo() : this.openCoinbase()), 2000);
@@ -286,7 +297,7 @@ export class Ticker extends DurableObject {
       ws.addEventListener("error", gone);
       onOpen(ws);
     } catch (err) {
-      console.log(String(err));
+      this.debug[name] = { last: String(err), at: Date.now() };
     } finally {
       this.opening[name] = false;
     }
