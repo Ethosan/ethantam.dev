@@ -15,4 +15,4 @@ deploy:
   script:
     - npm ci --no-audit --no-fund
     # the tag is the commit; the home page reads it back for "Last updated"
-    - npx wrangler deploy --tag "$CI_COMMIT_SHORT_SHA"
+    - npx wrangler deploy --tag "$CI_COMMIT_SHORT_SHA" --var "COMMIT:$CI_COMMIT_SHORT_SHA"

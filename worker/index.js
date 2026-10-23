@@ -92,13 +92,14 @@ async function coinsRest() {
   try {
     const symbols = encodeURIComponent(JSON.stringify(Object.values(COINS)));
     const r = await fetch(`https://data-api.binance.vision/api/v3/ticker/24hr?symbols=${symbols}&type=MINI`, { headers: { "user-agent": UA } });
-    if (!r.ok) throw new Error(r.status);
+    if (!r.ok) throw new Error(`binance ${r.status}`);
     const bySymbol = Object.fromEntries(Object.entries(COINS).map(([s, b]) => [b, s]));
     return (await r.json()).map((d) => {
       const p = +d.lastPrice, open = +d.openPrice;
       return { s: bySymbol[d.symbol], p, t: d.closeTime, c: open ? ((p - open) / open) * 100 : null };
     });
-  } catch {
+  } catch (err) {
+    coinsRest.lastError = String(err);
     return Promise.all(Object.keys(COINS).map(coinbaseRest));
   }
 }
@@ -157,7 +158,7 @@ export class Ticker extends DurableObject {
       const up = Object.fromEntries(Object.keys(this.up).map((n) => [n, {
         open: !!this.up[n], healthy: this.healthy(n), quietMs: this.heard[n] ? now - this.heard[n] : null, ...this.debug[n],
       }]));
-      return json({ t: now, visitors: this.ctx.getWebSockets().length, marketOpen: this.marketOpen(), up });
+      return json({ t: now, visitors: this.ctx.getWebSockets().length, marketOpen: this.marketOpen(), up, coinsRest: coinsRest.lastError ?? "ok" });
     }
     if (this.stale()) await this.refresh();
     return json({ t: Date.now(), quotes: this.snapshot() });
@@ -419,8 +420,9 @@ async function cached(request, ctx, ttl, build) {
   const staleKey = new Request(`${request.url}${request.url.includes("?") ? "&" : "?"}stale`);
   const hit = await cache.match(key);
   if (hit) return hit;
-  const body = await build().catch(() => null);
-  if (!body) return (await cache.match(staleKey)) ?? json({ error: "unavailable" }, 503);
+  let why = null;
+  const body = await build().catch((err) => { why = String(err); return null; });
+  if (!body) return (await cache.match(staleKey)) ?? json({ error: "unavailable", why }, 503);
   const res = (age) => new Response(JSON.stringify(body), {
     headers: { "content-type": "application/json; charset=utf-8", "cache-control": `public, max-age=${age}` },
   });
@@ -434,6 +436,7 @@ const dateFmt = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short
 
 async function home(request, env) {
   const v = env.VERSION ?? {};
+  const commit = env.COMMIT || v.tag || ""; // CI passes the commit both ways (--var COMMIT and --tag)
   // the page changes with every deploy even when index.html doesn't, so the deploy's id is the ETag
   const etag = v.id ? `"${v.id}"` : null;
   if (etag && request.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers: { etag } });
@@ -441,7 +444,7 @@ async function home(request, env) {
   if (!res.ok || !res.headers.get("content-type")?.includes("text/html") || !v.timestamp) return res;
   const when = new Date(v.timestamp);
   const stamp = `<time datetime="${when.toISOString()}">${dateFmt.format(when)}</time>`
-    + (/^[0-9a-f]{7,40}$/.test(v.tag ?? "") ? ` (<a href="https://gitlab.com/eatentam/ethantam.dev/-/commit/${v.tag}">${v.tag}</a>)` : "");
+    + (/^[0-9a-f]{7,40}$/.test(commit) ? ` (<a href="https://gitlab.com/eatentam/ethantam.dev/-/commit/${commit}">${commit}</a>)` : "");
   const out = new HTMLRewriter().on("[data-deploy]", { element: (el) => el.setInnerContent(stamp, { html: true }) }).transform(res);
   const headers = new Headers(out.headers);
   if (etag) headers.set("etag", etag);
@@ -475,6 +478,7 @@ export default {
       return cached(new Request(`${url.origin}/api/spark?s=${s}`), ctx, 60, () => spark(s));
     }
     if (url.pathname === "/") return home(request, env);
+    if (url.pathname === "/api/version") return json({ ...(env.VERSION ?? {}), commit: env.COMMIT ?? null });
     return env.ASSETS.fetch(request);
   },
 };
