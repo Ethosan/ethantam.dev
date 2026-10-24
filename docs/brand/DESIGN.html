@@ -1,0 +1,163 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>ethantam.dev · Design guide</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>@font-face{font-family:"Geist";font-weight:400 600;font-display:swap;src:url("../../assets/fonts/geist-latin.woff2") format("woff2")}@font-face{font-family:"Geist Mono";font-weight:400 500;font-display:swap;src:url("../../assets/fonts/geist-mono-latin.woff2") format("woff2")}@font-face{font-family:"Instrument Serif";font-style:italic;font-weight:400;font-display:swap;src:url("../../assets/fonts/instrument-serif-italic-latin.woff2") format("woff2")}</style>
+<style>
+:root{--ink:#ebe7df;--body:#cdc8be;--muted:#9a958a;--hair:rgba(235,231,223,.09);--canvas:#0c0b0a;--card:#141311;--accent:#f2a93b;--down:#e5715f;--code-bg:rgba(235,231,223,.06);--code-ink:#ebe7df;--pre-bg:#090908;--pre-ink:#ebe7df;--pre-hair:rgba(235,231,223,.09);--head-bg:rgba(12,11,10,.84);--sans:"Geist",ui-sans-serif,system-ui,sans-serif;--mono:"Geist Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;--disp:"Geist",ui-sans-serif,system-ui,sans-serif;--r:12px;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--canvas);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+code,.mono{font-family:var(--mono);font-size:.86em}
+code{background:var(--code-bg);border:1px solid var(--hair);border-radius:5px;padding:1px 5px;color:var(--code-ink)}
+pre{background:var(--pre-bg);color:var(--pre-ink);border:1px solid var(--pre-hair);border-radius:var(--r);padding:18px 20px;overflow:auto;font-size:12.5px;line-height:1.5}pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px 120px}
+header{position:sticky;top:0;z-index:5;background:var(--head-bg);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--hair)}
+header .wrap{display:flex;align-items:center;gap:14px;padding:12px 28px}
+header nav{margin-left:auto;display:flex;gap:18px;font-size:13px;font-weight:500;color:var(--muted)}header nav a{color:inherit;text-decoration:none}header nav a:hover{color:var(--accent)}
+.brandbox{flex:none;display:grid;place-items:center}.brandbox>*{display:block}
+.wm{line-height:1.2}.wm small{display:block;margin-top:3px;font:400 10px/1.2 var(--sans);letter-spacing:0;text-transform:none;color:var(--muted)}
+h1{font-family:var(--disp);font-size:44px;line-height:1.05;letter-spacing:-.04em;margin:64px 0 12px;font-weight:700}
+.lede{font-size:19px;color:var(--body);max-width:760px;margin:0 0 8px}
+h2{font-family:var(--disp);font-size:26px;letter-spacing:-.03em;margin:72px 0 6px;font-weight:700;scroll-margin-top:80px}
+h2+p{margin-top:0;color:var(--body);max-width:760px}
+h3{font-size:15px;margin:0 0 8px;font-weight:600}
+.label{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin:40px 0 8px}
+.card{background:var(--card);border:1px solid var(--hair);border-radius:var(--r);padding:22px}
+.card p{margin:0}.card p+p{margin-top:8px}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.muted{color:var(--muted)}.small{font-size:13px}
+.sw{display:flex;gap:12px;align-items:flex-start;font-size:13px;line-height:1.4}.chip{width:56px;height:56px;border-radius:10px;flex:none;border:1px solid var(--hair)}
+.sw-sm .chip{width:36px;height:36px;border-radius:8px}
+.icons{display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap}.icons figure{margin:0;text-align:center;font-size:12px;color:var(--muted)}.icons figure>:first-child{display:block;margin:0 auto 8px}
+.dont{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.dont .card{padding:14px;text-align:center;font-size:13px}.dont .fig{height:76px;display:grid;place-items:center;margin:2px 0 10px}.dont b{color:var(--down)}
+.rule{display:grid;grid-template-columns:170px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--hair);font-size:14px}.rule:last-child{border-bottom:0}.rule b{font-weight:600}
+.tt{display:flex;flex-direction:column;gap:16px}.tt .row{display:grid;grid-template-columns:210px 1fr;gap:16px;align-items:baseline}.tt .row>.mono{color:var(--muted);font-size:11px}
+table.files{width:100%;border-collapse:collapse;font-size:13.5px}table.files td{padding:10px 14px 10px 0;border-bottom:1px solid var(--hair);vertical-align:top}table.files tr:last-child td{border-bottom:0}table.files td:first-child{width:36%}
+ul.loose{margin:0;padding-left:18px}ul.loose li{margin:6px 0;font-size:14px}
+footer{margin-top:80px;font-size:12px;color:var(--muted)}
+@media(max-width:800px){.g2,.g3{grid-template-columns:1fr}.dont{grid-template-columns:1fr 1fr}header nav{display:none}.rule,.tt .row{grid-template-columns:1fr}}
+h1{font-weight:600;letter-spacing:-.045em;font-size:52px;line-height:1.05}h2{font-weight:500;letter-spacing:-.02em}
+h1 em,.em{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-style:italic;font-size:1.12em;line-height:1;letter-spacing:0;color:#f2a93b}
+.label{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.12em;color:#ebe7df;border-bottom:1px solid rgba(235,231,223,.09);padding-bottom:12px}
+header nav{font-family:var(--mono);font-weight:400}
+.dim{color:#9a958a}
+.ebrand{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;letter-spacing:.01em;color:#ebe7df}.ebrand.lt{color:#1c1914}.ebrand.lt .dim{color:#6b675e}
+.wm{font-family:var(--mono);font-weight:400;font-size:13px}
+.tk{display:flex;align-items:stretch;height:40px;border:1px solid rgba(235,231,223,.09);border-radius:8px;font-family:var(--mono);font-size:12px;white-space:nowrap;overflow:hidden;margin-top:8px}
+.tk .lb{display:flex;align-items:center;gap:8px;padding:0 14px;border-right:1px solid rgba(235,231,223,.09);color:#f2a93b;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.tk .lb i{width:6px;height:6px;border-radius:50%;background:currentColor}.tk .it{display:flex;align-items:center;gap:22px;padding:0 14px;color:#cdc8be}
+.tags{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:14px 0 0;padding:0}.tags li{padding:3px 11px;border-radius:999px;background:rgba(242,169,59,.11);color:#f2a93b;font-size:12px;line-height:1.5}
+.sech{margin-top:10px;padding:14px 0;border-bottom:1px solid rgba(235,231,223,.09);font-family:var(--mono);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.12em}
+</style>  <meta name="app-version" content="1.0.2">
+</head><body>
+<header><div class="wrap"><div class="brandbox"><svg viewBox="0 0 32 32" width="32" height="32" fill="none" style="display:block"><rect width="32" height="32" rx="7" fill="#0c0b0a"/><path d="M16 6c-3.2 2.4-5 5.4-5 8.6 0 2.8 2.2 5 5 5s5-2.2 5-5c0-3.2-1.8-6.2-5-8.6Z" fill="#f2a93b"/><path d="M16 19.6V26M16 26l-4.5-3.2M16 26l5.5-4.8" stroke="#f2a93b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="wm">ethantam<span class="dim">.dev</span><small>Design guide · v1</small></div>
+<nav><a href="#mark">Mark</a><a href="#colour">Colour</a><a href="#type">Type</a><a href="#motifs">Motifs</a><a href="#voice">Voice</a><a href="#assets">Assets</a><a href="#code">Code</a></nav></div></header>
+<div class="wrap">
+<h1>I build small tools that make <em>markets</em> legible.</h1>
+<p class="lede">ethantam.dev already has a look: near-black with warm off-white text, one amber, Geist for words, Geist Mono for the ticker and the small print, and Instrument Serif italic for a single word or line. It is the family's home page, and every project keeps its own look and appears here as a guest. This guide names the site's look so the GitLab repo and anything that links home agree with it. It changes nothing.</p>
+<p class="lede small muted">Every colour below is a token in <code>styles.css</code> at v1.0.1. The site is dark by default; a light theme follows the system or the visitor's choice. The headline is the site's own tagline.</p>
+
+<h2 id="mark">The mark</h2>
+<p>An amber tulip on a near-black rounded square: one bulb on a stem whose two leaves point down like an arrow. It is the favicon, the manifest icon and the mark beside the name at the top of the page.</p>
+<div class="card"><div class="icons"><figure><svg viewBox="0 0 32 32" width="128" height="128" fill="none" style="display:block"><rect width="32" height="32" rx="7" fill="#0c0b0a"/><path d="M16 6c-3.2 2.4-5 5.4-5 8.6 0 2.8 2.2 5 5 5s5-2.2 5-5c0-3.2-1.8-6.2-5-8.6Z" fill="#f2a93b"/><path d="M16 19.6V26M16 26l-4.5-3.2M16 26l5.5-4.8" stroke="#f2a93b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><figcaption>mark.svg · source</figcaption></figure><figure><img src="../../assets/apple-touch-icon.png" width="90" height="90" alt="" style="border-radius:20px"><figcaption>apple-touch-icon · 180</figcaption></figure><figure><svg viewBox="0 0 32 32" width="64" height="64" fill="none" style="display:block"><rect width="32" height="32" rx="7" fill="#0c0b0a"/><path d="M16 6c-3.2 2.4-5 5.4-5 8.6 0 2.8 2.2 5 5 5s5-2.2 5-5c0-3.2-1.8-6.2-5-8.6Z" fill="#f2a93b"/><path d="M16 19.6V26M16 26l-4.5-3.2M16 26l5.5-4.8" stroke="#f2a93b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><figcaption>64</figcaption></figure><figure><span style="display:flex;gap:10px;align-items:flex-end"><svg viewBox="0 0 32 32" width="22" height="22" fill="none" style="display:block"><rect width="32" height="32" rx="7" fill="#0c0b0a"/><path d="M16 6c-3.2 2.4-5 5.4-5 8.6 0 2.8 2.2 5 5 5s5-2.2 5-5c0-3.2-1.8-6.2-5-8.6Z" fill="#f2a93b"/><path d="M16 19.6V26M16 26l-4.5-3.2M16 26l5.5-4.8" stroke="#f2a93b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 32 32" width="16" height="16" fill="none" style="display:block"><rect width="32" height="32" rx="7" fill="#0c0b0a"/><path d="M16 6c-3.2 2.4-5 5.4-5 8.6 0 2.8 2.2 5 5 5s5-2.2 5-5c0-3.2-1.8-6.2-5-8.6Z" fill="#f2a93b"/><path d="M16 19.6V26M16 26l-4.5-3.2M16 26l5.5-4.8" stroke="#f2a93b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><figcaption>22 (as shipped) · 16</figcaption></figure></div></div>
+<div class="grid g2" style="margin-top:16px"><div class="card"><h3>Construction</h3><p class="small">A 32-unit grid with 7-unit corners. The bulb is one closed path from 16,6 down to a round base at 16,19.6. The stem runs to 16,26 and two leaves leave its foot to the upper left and right, stroke 2, round caps and joins. Two colours, both tokens: <code>--bg</code> <code>#0c0b0a</code> and the dark theme's <code>--accent</code> <code>#f2a93b</code>.</p></div><div class="card"><h3>What it means</h3><p class="small">A tulip, for the dithered tulip painting on the page (Bosschaert's <i>Vase of Flowers in a Window</i>). The source comment calls the stem one <i>that doubles as a rising chart</i>; drawn, the leaves point down, and the README calls it <i>an amber tulip bulb with a down arrow</i>.</p></div></div>
+<div class="label">Wordmark</div>
+<div class="grid g2"><div class="card" style="display:grid;place-items:center;min-height:150px;background:#0c0b0a"><span class="ebrand"><svg viewBox="0 0 32 32" width="22" height="22" fill="none" style="display:block"><rect width="32" height="32" rx="7" fill="#0c0b0a"/><path d="M16 6c-3.2 2.4-5 5.4-5 8.6 0 2.8 2.2 5 5 5s5-2.2 5-5c0-3.2-1.8-6.2-5-8.6Z" fill="#f2a93b"/><path d="M16 19.6V26M16 26l-4.5-3.2M16 26l5.5-4.8" stroke="#f2a93b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>ethantam<span class="dim">.dev</span></span></span></div><div class="card" style="display:grid;place-items:center;min-height:150px;background:#faf9f6;border-color:rgba(28,25,20,.1)"><span class="ebrand lt"><svg viewBox="0 0 32 32" width="22" height="22" fill="none" style="display:block"><rect width="32" height="32" rx="7" fill="#0c0b0a"/><path d="M16 6c-3.2 2.4-5 5.4-5 8.6 0 2.8 2.2 5 5 5s5-2.2 5-5c0-3.2-1.8-6.2-5-8.6Z" fill="#f2a93b"/><path d="M16 19.6V26M16 26l-4.5-3.2M16 26l5.5-4.8" stroke="#f2a93b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>ethantam<span class="dim">.dev</span></span></span></div></div>
+<p class="small muted">The mark at 22px, then ethantam.dev in Geist Mono at 13px with <i>.dev</i> in the muted colour, at the top of the sidebar. Dark theme left, light right; the mark keeps its own dark square in both. The person's name, Ethan Tam, is the page's h1 in Geist 600 at −4.5%, and the manifest's name.</p>
+<div class="label">Don't</div>
+<div class="dont"><div class="card"><div class="fig"><svg viewBox="0 0 32 32" width="64" height="64" fill="none" style="display:block"><rect width="32" height="32" rx="7" fill="#0c0b0a"/><path d="M16 6c-3.2 2.4-5 5.4-5 8.6 0 2.8 2.2 5 5 5s5-2.2 5-5c0-3.2-1.8-6.2-5-8.6Z" fill="#4f39f6"/><path d="M16 19.6V26M16 26l-4.5-3.2M16 26l5.5-4.8" stroke="#4f39f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><b>Don't</b> borrow a project's colour. Oracular's indigo, 20bucks' blue and the rest stay in their own cards and screenshots.</div><div class="card"><div class="fig"><svg viewBox="0 0 32 32" width="64" height="64" fill="none" style="display:block"><rect width="32" height="32" rx="7" fill="#0c0b0a"/><path d="M16 6c-3.2 2.4-5 5.4-5 8.6 0 2.8 2.2 5 5 5s5-2.2 5-5c0-3.2-1.8-6.2-5-8.6Z" fill="#9c5c0c"/><path d="M16 19.6V26M16 26l-4.5-3.2M16 26l5.5-4.8" stroke="#9c5c0c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><b>Don't</b> use the light theme's amber on dark. Each theme has its own amber, tuned for contrast.</div><div class="card"><div class="fig"><span style="font-family:'Instrument Serif',serif;font-style:italic;font-size:30px;color:#ebe7df">Ethan Tam</span></div><b>Don't</b> set headings in the serif. It is for one word in the tagline and the one line under the lede.</div><div class="card"><div class="fig"><svg viewBox="0 0 32 32" width="64" height="64" fill="none" style="display:block;transform:scaleY(-1)"><rect width="32" height="32" rx="7" fill="#0c0b0a"/><path d="M16 6c-3.2 2.4-5 5.4-5 8.6 0 2.8 2.2 5 5 5s5-2.2 5-5c0-3.2-1.8-6.2-5-8.6Z" fill="#f2a93b"/><path d="M16 19.6V26M16 26l-4.5-3.2M16 26l5.5-4.8" stroke="#f2a93b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><b>Don't</b> flip it. The leaves point down.</div></div>
+
+<h2 id="colour">Colour</h2>
+<p>Warm darks, warm off-whites, one amber. The page is quiet so the ticker's green and red, the only other colours, mean something: a price that just moved.</p>
+<div class="card"><div class="grid g3"><div class="sw"><div class="chip" style="background:#0c0b0a"></div><div><b>Ground</b> <code>--bg</code><br><code>#0c0b0a</code><br><span class="muted">Page, theme colour, manifest background, the mark's square</span></div></div><div class="sw"><div class="chip" style="background:#141311"></div><div><b>Ground 2</b> <code>--bg-2</code><br><code>#141311</code><br><span class="muted">The ticker's price card, the painting's frame, screenshot wells</span></div></div><div class="sw"><div class="chip" style="background:rgba(235,231,223,.035)"></div><div><b>Surface</b> <code>--surface</code><br><code>rgba(235,231,223,.035)</code><br><span class="muted">A project card on hover, the trading-hours band in the price card</span></div></div><div class="sw"><div class="chip" style="background:rgba(235,231,223,.09)"></div><div><b>Line</b> <code>--line</code><br><code>rgba(235,231,223,.09)</code><br><span class="muted">Dividers, the ticker's edges</span></div></div><div class="sw"><div class="chip" style="background:rgba(235,231,223,.18)"></div><div><b>Line 2</b> <code>--line-2</code><br><code>rgba(235,231,223,.18)</code><br><span class="muted">Stronger borders, link underlines</span></div></div><div class="sw"><div class="chip" style="background:#ebe7df"></div><div><b>Text</b> <code>--fg</code><br><code>#ebe7df</code><br><span class="muted">Headings and body</span></div></div><div class="sw"><div class="chip" style="background:#cdc8be"></div><div><b>Text 2</b> <code>--fg-2</code><br><code>#cdc8be</code><br><span class="muted">Secondary text, the serif line</span></div></div><div class="sw"><div class="chip" style="background:#9a958a"></div><div><b>Muted</b> <code>--muted</code><br><code>#9a958a</code><br><span class="muted">Ledes, meta, the <i>.dev</i></span></div></div><div class="sw"><div class="chip" style="background:#f2a93b"></div><div><b>Amber</b> <code>--accent</code><br><code>#f2a93b</code><br><span class="muted">The serif word, links, tags, the ticker label, the terminal prompt, the mark</span></div></div><div class="sw"><div class="chip" style="background:rgba(242,169,59,.11)"></div><div><b>Amber soft</b> <code>--accent-soft</code><br><code>rgba(242,169,59,.11)</code><br><span class="muted">Tag pills, hover washes</span></div></div><div class="sw"><div class="chip" style="background:#7bc48a"></div><div><b>Up</b> <code>--up</code><br><code>#7bc48a</code><br><span class="muted">A price that rose; a project that's up</span></div></div><div class="sw"><div class="chip" style="background:#e5715f"></div><div><b>Down</b> <code>--down</code><br><code>#e5715f</code><br><span class="muted">A price that fell; a project that's down</span></div></div><div class="sw"><div class="chip" style="background:#090908"></div><div><b>Terminal</b> <code>--term-bg</code><br><code>#090908</code><br><span class="muted">The terminal window</span></div></div></div></div>
+<div class="label">Light theme (same token names)</div><div class="card"><div class="grid g3"><div class="sw sw-sm"><div class="chip" style="background:#faf9f6"></div><div><b>Ground</b> <code>--bg</code><br><code>#faf9f6</code></div></div><div class="sw sw-sm"><div class="chip" style="background:#f0eee9"></div><div><b>Ground 2</b> <code>--bg-2</code><br><code>#f0eee9</code></div></div><div class="sw sw-sm"><div class="chip" style="background:#1c1914"></div><div><b>Text</b> <code>--fg</code><br><code>#1c1914</code></div></div><div class="sw sw-sm"><div class="chip" style="background:#3d3a33"></div><div><b>Text 2</b> <code>--fg-2</code><br><code>#3d3a33</code></div></div><div class="sw sw-sm"><div class="chip" style="background:#6b675e"></div><div><b>Muted</b> <code>--muted</code><br><code>#6b675e</code></div></div><div class="sw sw-sm"><div class="chip" style="background:#9c5c0c"></div><div><b>Amber</b> <code>--accent</code><br><code>#9c5c0c</code></div></div><div class="sw sw-sm"><div class="chip" style="background:#3a8f52"></div><div><b>Up</b> <code>--up</code><br><code>#3a8f52</code></div></div><div class="sw sw-sm"><div class="chip" style="background:#c44a38"></div><div><b>Down</b> <code>--down</code><br><code>#c44a38</code></div></div></div><p class="small muted" style="margin:14px 0 0">A darker amber, green and red for the cream ground.</p></div>
+<p class="small muted">Lines and surfaces are the text colour at low opacity, so they stay warm in both themes.</p>
+
+<h2 id="type">Type</h2>
+<p>Three self-hosted faces, Latin subset only, from <code>assets/fonts/</code>. Geist (variable, 400 to 600) for words; Geist Mono (400, 500) for the ticker, the nav, section titles and small print; Instrument Serif italic for one accent at a time, always in amber or the secondary text colour.</p>
+<div class="card tt"><div class="row"><span class="mono">Name · Geist 600 · 42–56 · −4.5%</span><span><span style="font-weight:600;font-size:52px;line-height:1;letter-spacing:-.045em">Ethan Tam</span></span></div><div class="row"><span class="mono">Tagline · Geist 500 · 20–23 · −2%</span><span><span style="font-weight:500;font-size:23px;line-height:1.3;letter-spacing:-.02em">I build small tools that make <span class="em">markets</span> legible.</span></span></div><div class="row"><span class="mono">Kinship line · Serif italic · 17</span><span><span style="font-family:'Instrument Serif',serif;font-style:italic;font-size:17px;color:#cdc8be">If you trade, study economics, or build things on the side: we'll get along.</span></span></div><div class="row"><span class="mono">Card title · Geist 500 · 19 · −2%</span><span><span style="font-weight:500;font-size:19px;letter-spacing:-.02em">Equarian Markets <span style="color:#9a958a;font-size:.85em">↗</span></span></span></div><div class="row"><span class="mono">Body · Geist 400 · 15 · muted</span><span><span style="font-size:15px;color:#9a958a">In between, I read about markets and make apps for myself and my friends.</span></span></div><div class="row"><span class="mono">Section title · Mono 500 · 12 · upper · +12%</span><span><span style="font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase">Projects</span></span></div><div class="row"><span class="mono">Ticker label · Mono · 11 · upper · +8%</span><span><span style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#f2a93b">Prices I check too often</span></span></div></div>
+
+
+<h2 id="motifs">Motifs</h2>
+<p>Three things the site already draws. Each project's own look stays inside its card.</p>
+<div class="grid g3"><div class="card"><h3>The ticker</h3><div class="tk"><span class="lb"><i></i>Prices I check too often</span><span class="it"><span>ES <span style="color:#7bc48a">▲</span></span><span>NQ <span style="color:#e5715f">▼</span></span><span>BTC <span style="color:#7bc48a">▲</span></span></span></div><p class="small muted" style="margin:12px 0 0">A sticky 40px strip in Geist Mono with an amber label and a dot that lights while the stream is up. Prices flash green or red as they move. (Symbols here are placeholders; the site's numbers are live.)</p></div><div class="card"><h3>Tag pills</h3><ul class="tags"><li>JavaScript</li><li>Vite</li><li>Google Sheets</li><li>PWA</li></ul><p class="small muted" style="margin:12px 0 0">Amber on an 11% amber wash, full pills, 12px. One row under each project card.</p></div><div class="card"><h3>Sticky section titles</h3><div class="sech">Tulip</div><div class="sech">Now</div><div class="sech">Projects</div><p class="small muted" style="margin:12px 0 0">Mono capitals at +12% over a hairline, stuck under the ticker on phones with a blurred bar behind them.</p></div></div>
+
+<h2 id="voice">Voice</h2>
+<p>From the copy already on the site and in the README.</p>
+<div class="card"><div class="rule"><b>First person</b><span>One person talking: <i>I build small tools that make markets legible.</i></span></div><div class="rule"><b>Specific, a little dry</b><span><i>Prices I check too often.</i> Small and true beats grand.</span></div><div class="rule"><b>Small asks</b><span><i>Ask me one question ↗</i>, not a contact form.</span></div><div class="rule"><b>Say the data</b><span>Project cards say whether their screenshots are live, demo or test data, and each shows whether the app is up right now.</span></div><div class="rule"><b>Guests keep their look</b><span>Every project appears in its own screenshots and colours; the site around them stays amber and warm grey.</span></div></div>
+
+<h2 id="assets">Assets</h2>
+<p>Every file the brand lives in today. Nothing on this page is new artwork. <code>.assetsignore</code> excludes <code>docs/</code>, so this guide is not deployed with the site.</p>
+<div class="card"><table class="files"><tr><td><code>assets/mark.svg</code></td><td>The source drawing: favicon, manifest icon, the sidebar mark</td></tr><tr><td><code>assets/apple-touch-icon.png</code></td><td>iOS home screen and manifest icon, 180×180; the README's header image</td></tr><tr><td><code>assets/og.png</code></td><td>Link preview, 1200×630: dark ground, amber accents, the dithered tulip, the ticker</td></tr><tr><td><code>assets/tulips.webp</code></td><td>The painting the canvas dithers</td></tr><tr><td><code>assets/fonts/*.woff2</code></td><td>Geist, Geist Mono, Instrument Serif italic (Latin subset)</td></tr><tr><td><code>assets/*-*.webp</code></td><td>Project screenshots for the cards, 780×1440</td></tr><tr><td><code>fonts.css, styles.css</code></td><td>Font faces; every colour token, both themes</td></tr><tr><td><code>manifest.json</code></td><td>Name (Ethan Tam), dark theme and background</td></tr></table></div>
+<div class="label">Loose ends</div>
+<div class="card"><p class="small muted" style="margin:0 0 6px">Things this guide found and did not change.</p><ul class="loose"><li><code>mark.svg</code>'s comment describes the stem as a rising chart, but the leaves point down and the README calls it a down arrow. Worth settling which it is.</li><li>The manifest has no maskable icon; platforms that mask will crop the rounded square.</li></ul></div>
+
+<h2 id="code">Code</h2>
+<p>Copied from the repo as it is, so this page and the site can't drift.</p>
+<div class="label">styles.css · fonts and dark tokens</div>
+<pre><code>:root {
+  /* fonts (shared across themes) */
+  --sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --serif: "Instrument Serif", Georgia, serif;
+
+  /* spacing &amp; shape (shared) */
+  --gutter: clamp(20px, 5vw, 48px);
+  --pad-l: max(var(--gutter), env(safe-area-inset-left));
+  --pad-r: max(var(--gutter), env(safe-area-inset-right));
+  --pad-t: env(safe-area-inset-top);
+  --pad-b: env(safe-area-inset-bottom);
+  --max: 1200px;
+  --tick-h: 40px;
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  --r-sm: 6px;
+  --r-md: 12px;
+
+  /* dark theme (default) */
+  --bg: #0c0b0a;
+  --bg-2: #141311;
+  --surface: rgba(235, 231, 223, .035);
+  --line: rgba(235, 231, 223, .09);
+  --line-2: rgba(235, 231, 223, .18);
+  --fg: #ebe7df;
+  --fg-2: #cdc8be;
+  --muted: #9a958a;
+  --accent: #f2a93b;
+  --up: #7bc48a;
+  --down: #e5715f;
+  --accent-soft: rgba(242, 169, 59, .11);
+  --spotlight: rgba(242, 169, 59, .055);
+  --card-shadow: rgba(0, 0, 0, .45);
+  --term-bg: #090908;
+  --term-fg: #ebe7df;
+  --term-muted: #9a958a;
+  --term-overlay: rgba(6, 6, 5, .72);
+  --sec-bg: rgba(12, 11, 10, .84);
+  color-scheme: dark;
+}</code></pre>
+<div class="label">styles.css · the serif accent</div>
+<pre><code>h1 em, .tagline em {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: 1.12em;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--accent);
+}</code></pre>
+<div class="label">index.html · head and brand</div>
+<pre><code>&lt;meta name="theme-color" content="#0c0b0a" media="(prefers-color-scheme: dark)"&gt;
+&lt;meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)"&gt;
+&lt;meta property="og:image" content="https://ethantam.dev/assets/og.png"&gt;
+&lt;link rel="icon" href="assets/mark.svg" type="image/svg+xml"&gt;
+&lt;link rel="apple-touch-icon" href="assets/apple-touch-icon.png"&gt;
+&lt;a href="/" class="brand mono" aria-label="Ethan Tam, home"&gt;
+&lt;img src="assets/mark.svg" alt="" width="22" height="22"&gt;
+&lt;span&gt;ethantam&lt;span class="dim"&gt;.dev&lt;/span&gt;&lt;/span&gt;</code></pre>
+<div class="label">assets/mark.svg</div>
+<pre><code>&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none"&gt;
+  &lt;rect width="32" height="32" rx="7" fill="#0c0b0a"/&gt;
+  &lt;!-- a tulip reduced to three strokes: two petals and a stem that doubles as a rising chart --&gt;
+  &lt;path d="M16 6c-3.2 2.4-5 5.4-5 8.6 0 2.8 2.2 5 5 5s5-2.2 5-5c0-3.2-1.8-6.2-5-8.6Z" fill="#f2a93b"/&gt;
+  &lt;path d="M16 19.6V26M16 26l-4.5-3.2M16 26l5.5-4.8" stroke="#f2a93b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/&gt;
+&lt;/svg&gt;</code></pre>
+<footer>ethantam.dev design guide v1 · 25 Oct 2026 · tokens read from <code>styles.css</code> at v1.0.1.</footer>
+</div></body></html>
