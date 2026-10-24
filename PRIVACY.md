@@ -23,4 +23,4 @@ This page is also published at [ethantam.dev/privacy](https://ethantam.dev/priva
 
 ## Contact
 
-[ethan@ethantam.dev](mailto:ethan@ethantam.dev)
+[contact@ethantam.dev](mailto:contact@ethantam.dev)

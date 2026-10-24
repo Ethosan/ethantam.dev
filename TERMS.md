@@ -26,4 +26,4 @@ This site is provided as it is, without warranties of any kind. As far as the la
 
 ## Contact
 
-[ethan@ethantam.dev](mailto:ethan@ethantam.dev)
+[contact@ethantam.dev](mailto:contact@ethantam.dev)
