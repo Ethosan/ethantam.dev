@@ -819,7 +819,9 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .cv__kv { display: grid; grid-template-columns: 18mm minmax(0, 1fr); row-gap: .8mm; }
   .cv__kv dt { color: var(--ink); font-weight: 600; }
 
-  .cv__foot { margin-top: auto; padding-top: 4mm; color: var(--muted); font: 6.75pt var(--mono); text-align: right; }
+  /* the disclaimer: pinned to the foot of the sheet, ruled off so it reads as a note, not small print */
+  .cv__foot { margin-top: auto; padding-top: 2.6mm; border-top: .5pt solid var(--rule); color: var(--muted); font-size: 7.75pt; }
+  .cv__foot a { color: var(--ink); }
 }
 
 /* ---------- privacy and terms ---------- */

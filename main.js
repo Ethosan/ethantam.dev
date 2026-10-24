@@ -390,9 +390,9 @@
 
   /* ---------- print: the page prints as a one-page CV (.cv in index.html, @media print in styles.css) ---------- */
   document.querySelectorAll("[data-print]").forEach((btn) => btn.addEventListener("click", () => window.print()));
-  // "Save as PDF" names the file after the title, so call it a CV while printing
+  // "Save as PDF" names the file after the title; call it a summary, since it is not the formal CV
   const pageTitle = document.title;
-  addEventListener("beforeprint", () => { document.title = "Ethan Tam CV"; });
+  addEventListener("beforeprint", () => { document.title = "Ethan Tam, summary from ethantam.dev"; });
   addEventListener("afterprint", () => { document.title = pageTitle; });
 
   /* ---------- dithered painting ---------- */
@@ -569,7 +569,7 @@
     },
     cv: () => {
       setTimeout(() => window.print(), 50);
-      return "opening the print dialog. save it as a PDF for a one-page CV.";
+      return "opening the print dialog. it is a one-page summary, not my formal CV: email me if you need that.";
     },
     tulip: () => "Feb 1637: a single Semper Augustus bulb was quoted at more than a house on an\nAmsterdam canal. A few weeks later, buyers stopped showing up.\nThe painting on the front page is from about 20 years before the peak.",
     ls: () => "about  now  projects  record  watchlist  contact  tulip",
