@@ -550,7 +550,7 @@
       "2023–24  Co-founder, ACSians Investment Club",
       "2023–24  Co-founder, Project Lumos",
     ].join("\n"),
-    contact: () => `email     ${a("mailto:eatentam@gmail.com", "eatentam@gmail.com")}\ngitlab    ${a(LINKS.gitlab, "eatentam")}\nlinkedin  ${a(LINKS.linkedin, "ethantam-")}`,
+    contact: () => `email     ${a("mailto:ethan@ethantam.dev", "ethan@ethantam.dev")}\ngitlab    ${a(LINKS.gitlab, "eatentam")}\nlinkedin  ${a(LINKS.linkedin, "ethantam-")}`,
     open: (arg) => {
       const url = LINKS[arg];
       if (!url) return `open: unknown target "${esc(arg || "")}". try: ${Object.keys(LINKS).join(", ")}`;

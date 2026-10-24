@@ -4,9 +4,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "bump-version": "node scripts/bump-version.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.151.0"
-  }
+  },
+  "version": "1.0.0"
 }
