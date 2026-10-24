@@ -45,7 +45,7 @@ Settings: none on the site. The CI deploy needs a `CLOUDFLARE_API_TOKEN` CI/CD v
 - **Now:** a section with a snapshot of what Ethan is focused on at the moment.
 - **Copy email:** one-click copy next to the email address, with the Clipboard API and an `execCommand` fallback.
 - **PWA:** installable (`manifest.json`) with offline support through a service worker (`sw.js`); the site works without a connection once cached.
-- **One-page CV:** printing the page (the button under About, or `cv` in the terminal) gives an A4 CV: name, contact line, Now, the background log and each project with its link and stack. The painting, screenshots, ticker and controls stay on screen only.
+- **One-page CV:** printing the page (the button under About, Ctrl+P, or `cv` in the terminal) gives an A4 CV: profile, education, experience, leadership, each project with its link and stack, and skills. It is its own markup (`<article class="cv">` at the end of `index.html`), hidden on screen and the only thing shown in print, so keep it in step with About and Projects. "Save as PDF" names the file "Ethan Tam CV".
 - **Last updated:** stamped by the Worker from the live deploy: its date, and the newest commit on `main` as of that moment (looked up on GitLab, linked). Never a date typed by hand, and right whichever pipeline did the deploy. `/api/version` shows the same.
 - **Privacy and terms:** `/privacy` and `/terms`, linked from the footer; the same text as `PRIVACY.md` and `TERMS.md`.
 

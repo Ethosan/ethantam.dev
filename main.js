@@ -388,8 +388,12 @@
       .catch(() => { /* no status beats a wrong one */ });
   }
 
-  /* ---------- print: the page prints as a one-page CV (see @media print in styles.css) ---------- */
+  /* ---------- print: the page prints as a one-page CV (.cv in index.html, @media print in styles.css) ---------- */
   document.querySelectorAll("[data-print]").forEach((btn) => btn.addEventListener("click", () => window.print()));
+  // "Save as PDF" names the file after the title, so call it a CV while printing
+  const pageTitle = document.title;
+  addEventListener("beforeprint", () => { document.title = "Ethan Tam CV"; });
+  addEventListener("afterprint", () => { document.title = pageTitle; });
 
   /* ---------- dithered painting ---------- */
   const art = $("#art");

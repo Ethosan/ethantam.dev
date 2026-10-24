@@ -44,7 +44,7 @@
    "inLanguage":"en"}
   </script>
   <link rel="stylesheet" href="fonts.css?v=2026.10.18" fetchpriority="high">
-  <link rel="stylesheet" href="styles.css?v=2026.10.24" fetchpriority="high">
+  <link rel="stylesheet" href="styles.css?v=2026.10.24b" fetchpriority="high">
   <noscript><link rel="stylesheet" href="noscript.css?v=2026.10.18"></noscript>
 </head>
 <body class="with-ticker">
@@ -84,7 +84,6 @@
         <p class="tagline">I build small tools that make <em>markets</em> legible.</p>
         <p class="lede">I'm doing National Service in Singapore right now, and I'll be studying Economics at Cambridge from 2027. In between, I read about markets and make apps for myself and my friends.</p>
         <p class="kin">If you trade, study economics, or build things on the side: we'll get along.</p>
-        <p class="print-only mono">ethantam.dev · eatentam@gmail.com · linkedin.com/in/ethantam- · gitlab.com/eatentam</p>
         <a class="ask mono" href="mailto:eatentam@gmail.com">Ask me one question <span class="arrow" aria-hidden="true">↗</span></a>
 
         <nav class="nav mono" aria-label="Sections">
@@ -307,6 +306,101 @@
     </div>
   </div>
 
-  <script src="main.js?v=2026.10.24" defer></script>
+  <!-- the printed CV: hidden on screen, it is the whole page under @media print (styles.css).
+       Keep it in step with About and Projects when either changes. -->
+  <article class="cv" aria-label="One-page CV">
+    <header class="cv__head">
+      <div>
+        <p class="cv__name">Ethan Tam</p>
+        <p class="cv__tag">I build small tools that make <em>markets</em> legible.</p>
+      </div>
+      <ul class="cv__contact">
+        <li>Singapore</li>
+        <li><a href="mailto:eatentam@gmail.com">eatentam@gmail.com</a></li>
+        <li><a href="https://ethantam.dev">ethantam.dev</a></li>
+        <li><a href="https://linkedin.com/in/ethantam-">linkedin.com/in/ethantam-</a></li>
+        <li><a href="https://gitlab.com/eatentam">gitlab.com/eatentam</a></li>
+      </ul>
+    </header>
+
+    <section class="cv__sec">
+      <h2 class="cv__h">Profile</h2>
+      <p class="cv__lede">On National Service in Singapore until Feb 2027, then Economics at Cambridge from Oct 2027. I read about markets and build small apps for myself and my friends.</p>
+    </section>
+
+    <section class="cv__sec">
+      <h2 class="cv__h">Education</h2>
+      <ul class="cv__list">
+        <li class="cv__row"><span><b>Economics (BA)</b> · University of Cambridge</span><span class="cv__when">From Oct 2027</span></li>
+        <li class="cv__row"><span><b>Integrated Programme &amp; IB Diploma</b> · Anglo-Chinese School (Independent)</span><span class="cv__when">2019 – 2024</span></li>
+      </ul>
+    </section>
+
+    <section class="cv__sec">
+      <h2 class="cv__h">Experience</h2>
+      <ul class="cv__list">
+        <li class="cv__row"><span><b>Finance &amp; Content</b> · <a href="https://www.advisory.sg">Advisory Singapore</a></span><span class="cv__when">2026 – present</span></li>
+        <li class="cv__row"><span><b>National Service · Transport Operator</b> · Singapore Armed Forces</span><span class="cv__when">2025 – Feb 2027</span></li>
+        <li class="cv__row"><span><b>Maths tutor</b> · IB, IP &amp; IGCSE</span><span class="cv__when">2024 – 2025</span></li>
+      </ul>
+    </section>
+
+    <section class="cv__sec">
+      <h2 class="cv__h">Leadership</h2>
+      <ul class="cv__list">
+        <li class="cv__row"><span><b>Co-founder</b> · ACSians Investment Club</span><span class="cv__when">2023 – 2024</span></li>
+        <li class="cv__row"><span><b>Co-founder</b> · Project Lumos, fundraising for migrant workers</span><span class="cv__when">2023 – 2024</span></li>
+      </ul>
+    </section>
+
+    <section class="cv__sec">
+      <h2 class="cv__h">Projects</h2>
+      <ul class="cv__list cv__list--loose">
+        <li>
+          <p class="cv__row"><span><b>Tally</b><span class="cv__url">TOKEN2049 Origins hackathon, 36 hours, with teammates</span></span><span class="cv__when">Oct 2026</span></p>
+          <p>A trust layer for deals between strangers: milestone contracts, escrow on Cardano preprod until the agreed evidence arrives, tiered disputes, and AI Coworkers that draft terms and rulings.</p>
+          <p class="cv__stack">TypeScript · React · Cardano · Masumi</p>
+        </li>
+        <li>
+          <p class="cv__row"><span><b>Oracular</b><a class="cv__url" href="https://oracular.ethantam.dev">oracular.ethantam.dev</a></span><span class="cv__when">Sep 2026</span></p>
+          <p>Any US ticker, read off live data: a twelve-seat council votes on the numbers, an AI memo argues both sides, and seasonality, derivatives and levels each show their work.</p>
+          <p class="cv__stack">React · Vite · Tailwind · Cloudflare Workers · Mistral AI</p>
+        </li>
+        <li>
+          <p class="cv__row"><span><b>The List</b><a class="cv__url" href="https://list.ethantam.dev">list.ethantam.dev</a></span><span class="cv__when">Aug 2026</span></p>
+          <p>A shared restaurant list for friends, with ratings, a leaderboard and a Telegram bot. Adding a place to the want list finds its details and a good TikTok by itself.</p>
+          <p class="cv__stack">TypeScript · Cloudflare Workers · Supabase · Telegram</p>
+        </li>
+        <li>
+          <p class="cv__row"><span><b>Equarian Markets</b><a class="cv__url" href="https://markets.ethantam.dev">markets.ethantam.dev</a></span><span class="cv__when">Jul 2026</span></p>
+          <p>A macro dashboard for trading micro futures: 45 indicators across rates, credit, vol and yen carry from FRED, Yahoo, the CFTC and the BOJ. Runs four models in the browser (risk appetite, growth and inflation regime, absorption ratio, NY Fed recession model) and writes a daily read of what stands out.</p>
+          <p class="cv__stack">JavaScript · Vite · Cloudflare Pages · PWA</p>
+        </li>
+        <li>
+          <p class="cv__row"><span><b>20bucks</b><a class="cv__url" href="https://20bucks.ethantam.dev">20bucks.ethantam.dev</a></span><span class="cv__when">Jun 2026</span></p>
+          <p>A personal finance app: spending, PayLater instalments, bill splits, trading P&amp;L, statement imports and offline sync. An AI assistant flags entries that look off and changes nothing until you tap Apply.</p>
+          <p class="cv__stack">JavaScript · Supabase · PWA</p>
+        </li>
+        <li>
+          <p class="cv__row"><span><b>Trade Journal</b><a class="cv__url" href="https://futuretracker.ethantam.dev/?demo">futuretracker.ethantam.dev</a></span><span class="cv__when">Mar 2026</span></p>
+          <p>Logs every trade with its setup and any mistake, works out the R multiple, and shows which setups hold up and what each mistake costs. Saves to a Google Sheet and syncs when back online.</p>
+          <p class="cv__stack">JavaScript · Vite · Google Sheets · PWA</p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="cv__sec">
+      <h2 class="cv__h">Skills</h2>
+      <dl class="cv__kv">
+        <dt>Code</dt><dd>JavaScript, TypeScript, React, Vite, Tailwind, HTML and CSS</dd>
+        <dt>Platforms</dt><dd>Cloudflare Workers &amp; Pages, Supabase, Google Sheets, Telegram bots, PWAs, Mistral AI</dd>
+        <dt>Data</dt><dd>FRED, Yahoo Finance, CFTC, Bank of Japan</dd>
+      </dl>
+    </section>
+
+    <p class="cv__foot">Printed from ethantam.dev, where the latest version lives.</p>
+  </article>
+
+  <script src="main.js?v=2026.10.24b" defer></script>
 </body>
 </html>
