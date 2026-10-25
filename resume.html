@@ -25,15 +25,18 @@
   <meta name="twitter:image:alt" content="Ethan Tam: I build small tools that make markets legible. Economics at Cambridge from 2027, Finance Officer at Advisory Singapore. Beside it, the first page of his CV.">
   <link rel="canonical" href="https://ethantam.dev/resume">
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"ProfilePage","url":"https://ethantam.dev/resume","name":"Resume (CV) · Ethan Tam","mainEntity":{"@type":"Person","@id":"https://ethantam.dev/#person","name":"Ethan Tam","alternateName":["Ethan Tam Qi Wei","Tam Qi Wei"],"givenName":"Ethan","familyName":"Tam","url":"https://ethantam.dev/","email":"mailto:contact@ethantam.dev","description":"Ethan Tam is from Singapore. He will read Economics at the University of Cambridge (St Edmund's College) from October 2027, is Finance Officer at Advisory Singapore, a national youth-sector non-profit, and builds market research tools including Oracular and Equarian Markets.","jobTitle":"Finance Officer","worksFor":{"@type":"Organization","name":"Advisory Singapore","url":"https://www.advisory.sg"},"homeLocation":{"@type":"Place","name":"Singapore"},"alumniOf":{"@type":"EducationalOrganization","name":"Anglo-Chinese School (Independent)"},"memberOf":{"@type":"Organization","name":"Economic Society of Singapore"},"award":["World Investment Competition 2024, 2nd Runner-Up (global)","NUS-BACC × Micron Business Analytics Case Competition 2026, 1st Runner-Up","Singapore Economics Olympiad 2025, Silver","UK Senior Mathematical Challenge 2022, Gold","NUS Entrepreneurship Society Ground Zero 2026, Semi-finalist (Top 20)"],"hasCredential":[{"@type":"EducationalOccupationalCredential","name":"Financial Modeling & Valuation Analyst (FMVA)","credentialCategory":"certificate","recognizedBy":{"@type":"Organization","name":"Corporate Finance Institute"}},{"@type":"EducationalOccupationalCredential","name":"Financial Markets, with Honours","credentialCategory":"certificate","recognizedBy":{"@type":"CollegeOrUniversity","name":"Yale University"}},{"@type":"EducationalOccupationalCredential","name":"Investment Banking and Quantitative Research Job Simulations","credentialCategory":"certificate","recognizedBy":{"@type":"Organization","name":"J.P. Morgan"}}],"knowsAbout":["Economics","Financial modelling","DCF and sum-of-the-parts valuation","Macroeconomic research","Equity research","Futures and options","Python","React","Cloudflare Workers"],"knowsLanguage":["English","Mandarin Chinese","Malay"],"sameAs":["https://linkedin.com/in/ethantam-","https://gitlab.com/eatentam"]}}
+  {"@context":"https://schema.org","@type":"ProfilePage","dateModified":"2026-10-25","url":"https://ethantam.dev/resume","name":"Resume (CV) · Ethan Tam","mainEntity":{"@type":"Person","@id":"https://ethantam.dev/#person","name":"Ethan Tam","alternateName":["Ethan Tam Qi Wei","Tam Qi Wei"],"givenName":"Ethan","familyName":"Tam","url":"https://ethantam.dev/","email":"mailto:contact@ethantam.dev","description":"Ethan Tam is from Singapore. He will read Economics at the University of Cambridge (St Edmund's College) from October 2027, is Finance Officer at Advisory Singapore, a national youth-sector non-profit, and builds market research tools including Oracular and Equarian Markets.","jobTitle":"Finance Officer","worksFor":{"@type":"Organization","name":"Advisory Singapore","url":"https://www.advisory.sg"},"homeLocation":{"@type":"Place","name":"Singapore"},"alumniOf":{"@type":"EducationalOrganization","name":"Anglo-Chinese School (Independent)"},"memberOf":{"@type":"Organization","name":"Economic Society of Singapore"},"award":["World Investment Competition 2024, 2nd Runner-Up (global)","NUS-BACC × Micron Business Analytics Case Competition 2026, 1st Runner-Up","Singapore Economics Olympiad 2025, Silver","UK Senior Mathematical Challenge 2022, Gold","NUS Entrepreneurship Society Ground Zero 2026, Semi-finalist (Top 20)"],"hasCredential":[{"@type":"EducationalOccupationalCredential","name":"Financial Modeling & Valuation Analyst (FMVA)","credentialCategory":"certificate","recognizedBy":{"@type":"Organization","name":"Corporate Finance Institute"}},{"@type":"EducationalOccupationalCredential","name":"Financial Markets, with Honours","credentialCategory":"certificate","recognizedBy":{"@type":"CollegeOrUniversity","name":"Yale University"}},{"@type":"EducationalOccupationalCredential","name":"Investment Banking and Quantitative Research Job Simulations","credentialCategory":"certificate","recognizedBy":{"@type":"Organization","name":"J.P. Morgan"}}],"knowsAbout":["Economics","Financial modelling","DCF and sum-of-the-parts valuation","Macroeconomic research","Equity research","Futures and options","Python","React","Cloudflare Workers"],"knowsLanguage":["English","Mandarin Chinese","Malay"],"sameAs":["https://linkedin.com/in/ethantam-","https://gitlab.com/eatentam"]}}
   </script>
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.json">
+  <!-- the two faces nearly all the text is set in, fetched with the page instead of after the CSS asks for them -->
+  <link rel="preload" as="font" type="font/woff2" href="assets/fonts/geist-latin.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="assets/fonts/geist-mono-latin.woff2" crossorigin>
   <link rel="stylesheet" href="fonts.css?v=2026.10.18" fetchpriority="high">
   <link rel="stylesheet" href="styles.css?v=2026.10.25m" fetchpriority="high">
   <noscript><link rel="stylesheet" href="noscript.css?v=2026.10.18"></noscript>
-  <meta name="app-version" content="1.8.2">
+  <meta name="app-version" content="1.9.0">
 </head>
 <body>
   <a class="skip" href="#cv">Skip to the CV</a>
@@ -49,6 +52,8 @@
       </div>
       <h1>Resume</h1>
       <p class="lede">My CV on one A4 page. The PDF and the printout are this same sheet.</p>
+      <!-- when the CV's text last changed: npm run cv-pdf sets it, from a hash of the text, and keeps it otherwise -->
+      <p class="resume__updated mono">Last updated <time data-cv-updated data-hash="74e664d9913f2d3a" datetime="2026-10-25">25 Oct 2026</time></p>
       <div class="resume__actions mono">
         <a class="btn btn--primary" href="ethan-tam-cv.pdf" download="Ethan Tam CV.pdf">Download PDF <span aria-hidden="true">↓</span></a>
         <button type="button" class="btn" data-print hidden>Print</button>
@@ -169,5 +174,7 @@
 
   <script src="resume.js?v=2026.10.25c" defer></script>
   <script src="share.js?v=2026.10.25b" defer></script>
+  <!-- visit counts: Cloudflare Web Analytics, no cookies (see /privacy) -->
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "166550e4e2484a1b9849675469b727da"}'></script>
 </body>
 </html>

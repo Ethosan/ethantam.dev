@@ -25,7 +25,7 @@ Personal site of Ethan Tam: who I am, what I'm doing now, and the projects I've 
 | --- | --- |
 | **Live** | https://ethantam.dev |
 | **Hosting** | Cloudflare Worker `ethantam-dev` with static assets; every push to `main` deploys through GitLab CI (`.gitlab-ci.yml`) |
-| **Data** | None stored. The ticker streams from the Worker's `/api/live` (Yahoo for stocks, Binance for crypto). |
+| **Data** | None stored. The ticker streams from the Worker's `/api/live` (Yahoo for stocks, Binance for crypto). Visits are counted by Cloudflare Web Analytics, which sets no cookies: a manual-snippet site in the eatentam@gmail.com Cloudflare account (the hosting account is a different one), token in the beacon at the end of each page. |
 | **Run locally** | `npm install && npm run dev` |
 | **Source** | [gitlab.com/eatentam/ethantam.dev](https://gitlab.com/eatentam/ethantam.dev) (moved from GitHub on 17 Oct 2026) |
 
