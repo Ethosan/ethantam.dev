@@ -11,7 +11,7 @@
     d.tabIndex = -1; // focusable, so opening can focus the screen itself rather than put a focus ring on Close
     d.innerHTML = `
       <p class="qr__name" id="qr-name">Ethan Tam</p>
-      <img class="qr__code" src="/assets/qr.svg" alt="QR code that opens ethantam.dev" width="290" height="290">
+      <img class="qr__code" src="/assets/qr.svg?v=2" alt="QR code that opens ethantam.dev" width="290" height="290">
       <p class="qr__url mono">ethantam.dev</p>
       <p class="qr__note">Scan with a phone camera for my CV, projects and how to reach me.</p>
       <button type="button" class="qr__done mono">Close</button>`;

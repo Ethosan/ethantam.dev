@@ -5,6 +5,9 @@
 //   GET /api/spark     one symbol's path for the ticker popover (edge-cached 60s)
 //   GET /api/projects  whether each project's app is up, and its last commit on GitLab (edge-cached 2 min)
 //   GET /api/version   the live deploy: its id, time, and the commit it was built from
+//   GET /ethan-tam-cv.pdf  the CV's PDF, counted as a download
+//   GET /P, /Q         what the QR codes open (P the one printed on the CV, Q the one shown full screen), counted, then /
+//   GET /stats         those counts, and the latest downloads and scans, behind a password (the STATS_KEY secret)
 // The ticker:
 // Both come from one Durable Object, so every visitor sees the same numbers. While anyone is watching it holds two upstream
 // sockets, Yahoo's streamer for the stocks and Binance's market-data stream for the crypto (one tick a second each), and
@@ -358,6 +361,214 @@ export class Ticker extends DurableObject {
   }
 }
 
+// ---------- who got the CV: downloads of the PDF and scans of the two QR codes ----------
+// Each is a row in the Stats Durable Object's SQLite: when, which, the place and network Cloudflare puts the request in,
+// the device, and for a download the page or site that linked to it. No IP address and no cookie. So that one person
+// fetching twice counts once, a repeat within 30 minutes is dropped, matched by a code made from the IP and browser with a
+// salt that's replaced every day (so it can't be turned back into either) and blanked after a day. Rows are kept a year.
+// Crawlers and link previews are kept too, marked, and left out of the totals. /stats shows it all, behind STATS_KEY.
+
+const QR = { "/P": "qr-cv", "/p": "qr-cv", "/Q": "qr-phone", "/q": "qr-phone" }; // what the codes encode (capitals pack tighter)
+const DID = { cv: "Downloaded the CV", "qr-cv": "Scanned the QR on your CV", "qr-phone": "Scanned the QR on your phone" };
+const TILE = { cv: "CV downloads", "qr-cv": "Scans of the QR on your CV", "qr-phone": "Scans of the QR on your phone" };
+const REPEAT_MS = 30 * 60_000;
+const KEEP_MS = 365 * 86_400_000;
+const BOT = /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|headless|lighthouse|google-|curl|wget|python|go-http|node-fetch|axios|okhttp|java\/|httpclient|scrapy|^whatsapp\//i;
+
+export class Stats extends DurableObject {
+  constructor(ctx, env) {
+    super(ctx, env);
+    this.sql = ctx.storage.sql;
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS events (ts INTEGER NOT NULL, kind TEXT NOT NULL, source TEXT, city TEXT,
+      country TEXT, network TEXT, device TEXT, bot INTEGER NOT NULL DEFAULT 0, visitor TEXT)`);
+    this.sql.exec("CREATE INDEX IF NOT EXISTS events_ts ON events (ts)");
+  }
+
+  async record(row, who) {
+    const now = Date.now();
+    const visitor = row.bot ? null : await this.visitor(who, now);
+    const seen = visitor && this.sql.exec(
+      "SELECT 1 FROM events WHERE kind = ? AND visitor = ? AND ts > ? LIMIT 1", row.kind, visitor, now - REPEAT_MS,
+    ).toArray().length;
+    if (seen) return;
+    this.sql.exec(
+      "INSERT INTO events (ts, kind, source, city, country, network, device, bot, visitor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      now, row.kind, row.source, row.city, row.country, row.network, row.device, row.bot ? 1 : 0, visitor,
+    );
+    this.sql.exec("UPDATE events SET visitor = NULL WHERE visitor IS NOT NULL AND ts < ?", now - 86_400_000);
+    this.sql.exec("DELETE FROM events WHERE ts < ?", now - KEEP_MS);
+  }
+
+  // today's code for this IP and browser; the salt is random and lasts until the day (UTC) changes
+  async visitor(who, now) {
+    const day = new Date(now).toISOString().slice(0, 10);
+    let salt = await this.ctx.storage.get("salt");
+    if (salt?.day !== day) await this.ctx.storage.put("salt", (salt = { day, value: crypto.randomUUID() }));
+    const hash = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${salt.value}|${who}`)));
+    return [...hash.subarray(0, 8)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async report(limit = 200) {
+    const now = Date.now();
+    const totals = this.sql.exec(
+      "SELECT kind, SUM(ts > ?) AS week, SUM(ts > ?) AS month, COUNT(*) AS total FROM events WHERE bot = 0 GROUP BY kind",
+      now - 7 * 86_400_000, now - 30 * 86_400_000,
+    ).toArray();
+    const { since, bots } = this.sql.exec("SELECT MIN(ts) AS since, SUM(bot) AS bots FROM events").one();
+    const recent = this.sql.exec(
+      "SELECT ts, kind, source, city, country, network, device, bot FROM events ORDER BY ts DESC LIMIT ?", limit,
+    ).toArray();
+    return { totals, since, bots, recent };
+  }
+}
+
+function device(ua) {
+  const os = /iPhone|iPod/.test(ua) ? "iPhone" : /iPad/.test(ua) ? "iPad"
+    : /Android/.test(ua) ? (/Mobile/.test(ua) ? "Android phone" : "Android tablet")
+    : /Windows/.test(ua) ? "Windows" : /Macintosh/.test(ua) ? "Mac" : /CrOS/.test(ua) ? "Chromebook" : /Linux/.test(ua) ? "Linux" : "";
+  const app = /LinkedInApp/.test(ua) ? "LinkedIn app" : /Instagram/.test(ua) ? "Instagram app" : /FBAN|FBAV/.test(ua) ? "Facebook app"
+    : /Edg(A|iOS)?\//.test(ua) ? "Edge" : /SamsungBrowser/.test(ua) ? "Samsung Internet" : /OPR\/|OPT\//.test(ua) ? "Opera"
+    : /Firefox|FxiOS/.test(ua) ? "Firefox" : /Chrome|CriOS/.test(ua) ? "Chrome" : /Safari/.test(ua) ? "Safari" : "";
+  return [os, app].filter(Boolean).join(" · ") || "unknown device";
+}
+
+const botName = (ua) => (ua.match(/[\w-]*(?:bot|crawler|spider|preview)[\w-]*/i)?.[0] ?? (ua.split(/[\s/;(]/)[0] || "no user agent")).slice(0, 40);
+
+// where a download was linked from: a path on this site, another site's name (never the rest of its address), or null
+// when nothing says (typed, a chat or email app, a saved link)
+function linkedFrom(request, url) {
+  try {
+    const ref = new URL(request.headers.get("referer"));
+    return ref.host === url.host ? ref.pathname : ref.hostname.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+}
+
+function count(kind, request, url, env, ctx) {
+  const ua = request.headers.get("user-agent") ?? "";
+  const bot = !ua || BOT.test(ua);
+  const cf = request.cf ?? {};
+  const row = {
+    kind,
+    source: kind === "cv" ? linkedFrom(request, url) : null,
+    city: cf.city ?? null,
+    country: cf.country ?? null,
+    network: cf.asOrganization ?? null,
+    device: bot ? botName(ua) : device(ua),
+    bot,
+  };
+  const who = `${request.headers.get("cf-connecting-ip") ?? ""}|${ua}`;
+  ctx.waitUntil((async () => {
+    try { await env.STATS.get(env.STATS.idFromName("ethantam.dev")).record(row, who); } catch {}
+  })());
+}
+
+// Basic auth: any user name, STATS_KEY as the password, compared in constant time
+async function allowed(request, key) {
+  const [scheme, b64] = (request.headers.get("authorization") ?? "").split(" ");
+  if (scheme?.toLowerCase() !== "basic" || !b64) return false;
+  let pass;
+  try {
+    pass = text.decode(Uint8Array.from(atob(b64), (ch) => ch.charCodeAt(0))).split(":").slice(1).join(":");
+  } catch {
+    return false;
+  }
+  const enc = new TextEncoder();
+  const [a, b] = await Promise.all([pass, key].map((s) => crypto.subtle.digest("SHA-256", enc.encode(s))));
+  return crypto.subtle.timingSafeEqual(a, b);
+}
+
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
+const regionName = new Intl.DisplayNames(["en"], { type: "region" });
+const countryName = (code) => { try { return regionName.of(code); } catch { return code; } };
+const whenFmt = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Asia/Singapore",
+});
+
+function statsPage({ totals, since, bots, recent }) {
+  const tile = (kind) => {
+    const t = totals.find((r) => r.kind === kind) ?? {};
+    return `<section class="tile"><h2>${TILE[kind]}</h2><p class="n">${t.total ?? 0}</p>
+      <p class="sub">${t.week ?? 0} this week · ${t.month ?? 0} in 30 days</p></section>`;
+  };
+  const item = (e) => {
+    const place = [e.city, e.country && countryName(e.country)].filter(Boolean);
+    if (place[0] === place[1]) place.pop(); // Singapore, Singapore
+    const from = e.kind !== "cv" ? null : !e.source ? (e.bot ? null : "a direct link") : e.source === "/" ? "your home page"
+      : e.source.startsWith("/") ? `your ${e.source} page` : e.source;
+    const what = e.bot ? `${esc(e.device)} ${e.kind === "cv" ? "fetched the CV" : "followed a QR link"}` : DID[e.kind];
+    const meta = [place.join(", "), e.network, e.bot ? null : e.device, from && `from ${from}`].filter(Boolean).map(esc).join(" · ");
+    return `<li${e.bot ? ' class="bot"' : ""}><p><strong>${what}</strong><span class="when">${whenFmt.format(e.ts)}</span></p>
+      <p class="meta">${meta}</p></li>`;
+  };
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Stats · ethantam.dev</title>
+<link rel="stylesheet" href="/fonts.css">
+<style>
+  :root { color-scheme: light dark; --ink: #1b1b19; --muted: #6d6c67; --line: #e3e1da; --bg: #faf9f6; }
+  @media (prefers-color-scheme: dark) { :root { --ink: #ecebe7; --muted: #9b9a95; --line: #2d2d2a; --bg: #121211; } }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 Geist, system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .lede, .meta, .note, .when, .sub, .tile h2 { color: var(--muted); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 24px 0 32px; }
+  .tile { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .tile h2 { font-size: .85rem; font-weight: 500; margin: 0 0 6px; }
+  .tile p { margin: 0; }
+  .n { font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .sub, .when { font-size: .8rem; font-variant-numeric: tabular-nums; }
+  h2.list { font-size: 1rem; margin: 0 0 8px; }
+  ol { list-style: none; padding: 0; margin: 0; }
+  li { border-top: 1px solid var(--line); padding: 10px 0; }
+  li p { margin: 0; }
+  .when { margin-left: 8px; }
+  .meta { font-size: .875rem; overflow-wrap: anywhere; }
+  .bot { opacity: .55; }
+  .note { font-size: .8rem; margin-top: 28px; max-width: 62ch; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Who got the CV</h1>
+  <p class="lede">${since ? `Counting since ${dateFmt.format(since)}.` : "Nothing counted yet."} Times are Singapore time.</p>
+  <div class="tiles">${Object.keys(TILE).map(tile).join("")}</div>
+  <h2 class="list">Latest</h2>
+  ${recent.length ? `<ol>${recent.map(item).join("")}</ol>` : `<p class="meta">Nothing yet. A download or scan shows up here a few seconds after it happens.</p>`}
+  <p class="note">The place and network come from the person's internet connection, not from them. A company or university
+  name shows only when they were on its network; on mobile data or home Wi-Fi you'll see the provider (Singtel, StarHub, and
+  so on), and the city can be a nearby one. The same person again within 30 minutes counts once. Your own downloads and
+  scans count too. Faded rows are crawlers and link previews (Google, Bing, LinkedIn, WhatsApp...), left out of the totals:
+  ${bots ?? 0} so far. Rows are kept for a year.</p>
+</main>
+</body>
+</html>`;
+}
+
+async function stats(request, env) {
+  const headers = { "cache-control": "no-store", "x-robots-tag": "noindex, nofollow", "referrer-policy": "no-referrer" };
+  const plain = (status, body, more = {}) =>
+    new Response(body, { status, headers: { ...headers, "content-type": "text/plain; charset=utf-8", ...more } });
+  if (!env.STATS_KEY) return plain(503, "Stats aren't set up: the Worker needs a STATS_KEY secret.");
+  if (!(await allowed(request, env.STATS_KEY))) {
+    return plain(401, "This page needs the password.", { "www-authenticate": 'Basic realm="ethantam.dev stats", charset="UTF-8"' });
+  }
+  const report = await env.STATS.get(env.STATS.idFromName("ethantam.dev")).report();
+  return new Response(statsPage(report), {
+    headers: {
+      ...headers,
+      "content-type": "text/html; charset=utf-8",
+      "content-security-policy": "default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+      "x-content-type-options": "nosniff",
+    },
+  });
+}
+
 // ---------- the projects' status: is each app up, and when was it last worked on ----------
 
 const PROJECTS = { // GitLab repo under eatentam -> the live app
@@ -483,7 +694,20 @@ async function home(request, env, ctx) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    // a QR code: count the scan, then on to the home page (a 302 that isn't cached, so every scan comes through here)
+    const scan = QR[url.pathname];
+    if (scan) {
+      if (request.method === "GET") count(scan, request, url, env, ctx);
+      return new Response(null, { status: 302, headers: { location: `${url.origin}/`, "cache-control": "no-store", "x-robots-tag": "noindex" } });
+    }
     if (request.method !== "GET") return env.ASSETS.fetch(request);
+    if (url.pathname === "/ethan-tam-cv.pdf") {
+      // a PDF viewer can fetch the file in pieces; only the piece from the start is a download
+      const range = request.headers.get("range");
+      if (!range || /^bytes=0-/.test(range)) count("cv", request, url, env, ctx);
+      return env.ASSETS.fetch(request);
+    }
+    if (url.pathname === "/stats") return stats(request, env);
     if (url.pathname === "/api/live" || url.pathname === "/api/quotes") {
       // the socket is for this site's own page
       const origin = request.headers.get("origin");

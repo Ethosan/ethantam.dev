@@ -7,16 +7,18 @@
     "directory": ".",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
-    // "/" too, so the Worker can stamp the deploy into the page
-    "run_worker_first": ["/api/*", "/"]
+    // "/" too, so the Worker can stamp the deploy into the page; the PDF and the QR codes, so it can count them
+    "run_worker_first": ["/api/*", "/", "/ethan-tam-cv.pdf", "/P", "/p", "/Q", "/q", "/stats"]
   },
   // the deploy's id, time and tag (CI tags it with the commit) for "Last updated"
   "version_metadata": { "binding": "VERSION" },
-  // the ticker's hub: one Durable Object streams the watchlist to every visitor (worker/index.js)
+  // TICKER, the ticker's hub: one Durable Object streams the watchlist to every visitor. STATS: one more, which keeps
+  // the CV downloads and QR scans for /stats (worker/index.js). Its password is the STATS_KEY secret, set with
+  // `npx wrangler secret put STATS_KEY`.
   "durable_objects": {
-    "bindings": [{ "name": "TICKER", "class_name": "Ticker" }]
+    "bindings": [{ "name": "TICKER", "class_name": "Ticker" }, { "name": "STATS", "class_name": "Stats" }]
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Ticker"] }],
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Ticker"] }, { "tag": "v2", "new_sqlite_classes": ["Stats"] }],
   // PR builds run `wrangler preview`, which needs this block (it can stay empty)
   "previews": {}
 }
