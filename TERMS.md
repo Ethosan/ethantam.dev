@@ -6,7 +6,7 @@ This page is also published at [ethantam.dev/terms](https://ethantam.dev/terms).
 
 ## The content is mine
 
-The design, writing, code, and artwork on this site belong to Ethan Tam unless credited otherwise. The dithered painting is a public-domain work (Ambrosius Bosschaert the Elder, c.1618, Mauritshuis). Project screenshots show real interfaces; demo data shown in screenshots is not real user data.
+The design, writing, code, and artwork on this site belong to Ethan Tam unless credited otherwise. The dithered painting is a public-domain work (Ambrosius Bosschaert the Elder, c.1618, Mauritshuis). The fonts are their makers' work, used under the SIL Open Font License (assets/fonts/OFL.txt in the code repository). Project screenshots show real interfaces; demo data shown in screenshots is not real user data.
 
 ## Not financial advice
 

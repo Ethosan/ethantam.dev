@@ -100,4 +100,4 @@ Every push to `main` runs the `deploy` job in `.gitlab-ci.yml`, which runs `wran
 
 ## Legal
 
-See the [privacy policy](PRIVACY.md) and [terms](TERMS.md). Released under the [MIT License](LICENSE).
+See the [privacy policy](PRIVACY.md) and [terms](TERMS.md). The **code** is released under the [MIT License](LICENSE); the **content** — the CV and its PDF, the writing, and the images — belongs to Ethan Tam and isn't licensed for reuse (see the terms; the dithered painting itself is public domain). The **fonts** (Geist, Geist Mono, Instrument Serif) are not Ethan's and come under the [SIL Open Font License](assets/fonts/OFL.txt), which travels with them. `/.well-known/security.txt` says where to report a security problem.

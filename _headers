@@ -24,6 +24,9 @@
 /robots.txt
   Cache-Control: public, max-age=86400
 
+/.well-known/*
+  Cache-Control: public, max-age=86400
+
 /assets/*
   Cache-Control: public, max-age=604800, immutable
 
