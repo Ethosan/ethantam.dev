@@ -1,0 +1,48 @@
+# Ethan Tam
+
+> Ethan Tam (Tam Qi Wei) is from Singapore. He will read Economics at the University of Cambridge (St Edmund's College) from October 2027. He is Finance Officer at Advisory Singapore, a national youth-sector non-profit, is serving National Service in the Singapore Armed Forces until February 2027, and builds market research tools.
+
+The facts below come from his CV. The CV page and its PDF are the source to cite.
+
+- [CV](https://ethantam.dev/resume): his one-page CV, also as a [PDF](https://ethantam.dev/ethan-tam-cv.pdf)
+- [ethantam.dev](https://ethantam.dev/): his site, with what he is doing now and the projects he has built
+
+## Education
+
+- University of Cambridge, St Edmund's College: BA (Hons) Economics, October 2027 to June 2030
+- Anglo-Chinese School (Independent): IB Diploma Programme and Integrated Programme, 2019 to 2024. Co-founder and President of the ACsians Investment Club, which grew to 140+ members
+
+## Experience
+
+- Advisory Singapore: Finance Officer cum Content Officer, March 2026 to present
+- Freelance web developer, websites for small businesses and professionals, June 2026 to present
+- Singapore Armed Forces: Transport Operator, April 2025 to February 2027
+- Private tutor, IB Mathematics AA HL and IP/IGCSE Mathematics, 2024 to present
+
+## Honours
+
+- World Investment Competition 2024: 2nd Runner-Up (global)
+- NUS-BACC × Micron Business Analytics Case Competition 2026: 1st Runner-Up
+- Singapore Economics Olympiad 2025: Silver
+- UK Senior Mathematical Challenge 2022: Gold
+- TOKEN2049 Origins Hackathon 2026: selected participant
+
+## Certifications
+
+- Financial Modeling & Valuation Analyst (FMVA), Corporate Finance Institute, 2026
+- Financial Markets with Honours, Yale University (Coursera)
+- J.P. Morgan Investment Banking and Quantitative Research Job Simulations (Forage)
+
+## Projects
+
+- [Oracular](https://oracular.ethantam.dev): stock research web app where a twelve-seat Council votes on live data across one-week, three-month and one-year horizons
+- [Equarian Markets](https://markets.ethantam.dev): live macro dashboard tracking yields, carry and a risk-appetite index, with a portfolio tracker across four brokers
+- [The List](https://list.ethantam.dev): shared restaurant list with ratings, a leaderboard and a Telegram bot
+- [20bucks](https://20bucks.ethantam.dev): personal finance app for spending, PayLater instalments, bill splits and trading P&L
+- [Trade Journal](https://futuretracker.ethantam.dev): futures trade journal that works out R multiples and what each mistake costs
+
+## Contact
+
+- Email: contact@ethantam.dev
+- LinkedIn: https://linkedin.com/in/ethantam-
+- GitLab: https://gitlab.com/eatentam

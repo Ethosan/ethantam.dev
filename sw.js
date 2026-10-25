@@ -45,8 +45,8 @@ self.addEventListener("fetch", (e) => {
   // Never cache API calls or external requests
   if (url.pathname.startsWith("/api/") || url.origin !== self.location.origin) return;
 
-  // Network-first for HTML, CSS, JS and the CV's PDF and contact card so deploys show up on the next load; cache-first for images and fonts
-  if (request.destination === "document" || /\.(html|css|js|pdf|vcf)$/.test(url.pathname)) {
+  // Network-first for HTML, CSS, JS and the CV's PDF so deploys show up on the next load; cache-first for images and fonts
+  if (request.destination === "document" || /\.(html|css|js|pdf)$/.test(url.pathname)) {
     e.respondWith(
       fetch(request)
         .then((res) => {

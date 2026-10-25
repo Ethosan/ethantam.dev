@@ -914,8 +914,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 @keyframes sheet-fade { from { opacity: 0; } }
 
 /* ---------- saving my contact, and the QR code full screen (share.js) ---------- */
-.contact__save { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-.resume__actions + .resume__actions { margin-top: 10px; }
+.contact__more { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
 /* black on white whatever the theme, since that's what scans; clear of the notch and home bar */
 .qr {
   position: fixed; inset: 0;
