@@ -12,7 +12,13 @@ const root = document.documentElement;
 const themeBtn = document.querySelector("[data-toggle-theme]");
 const isLight = () => root.dataset.theme === "light" ||
   (!root.dataset.theme && matchMedia("(prefers-color-scheme: light)").matches);
-const updateThemeBtn = () => themeBtn.setAttribute("aria-pressed", String(isLight()));
+// the phone's status bar takes its colour from theme-color, which only knows the system setting; follow the toggle
+const themeColors = document.querySelectorAll('meta[name="theme-color"]');
+const updateThemeBtn = () => {
+  themeBtn.setAttribute("aria-pressed", String(isLight()));
+  const bg = getComputedStyle(root).getPropertyValue("--bg").trim();
+  if (bg) themeColors.forEach((m) => m.setAttribute("content", bg));
+};
 themeBtn.addEventListener("click", () => {
   const next = isLight() ? "dark" : "light";
   const apply = () => {

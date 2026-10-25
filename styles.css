@@ -104,7 +104,8 @@ body {
 }
 img, canvas { display: block; max-width: 100%; }
 a { color: inherit; }
-button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; touch-action: manipulation; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; touch-action: manipulation; -webkit-user-select: none; user-select: none; } /* a long press shouldn't select a control's label */
+/* Hover effects below sit in (hover: hover) and (pointer: fine): on a phone the first tap fakes a hover that stays until the next tap. */
 ::selection { background: var(--accent); color: var(--bg); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
 
@@ -173,10 +174,12 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 .tk { padding: 0; border: 0; background: none; color: var(--muted); font: inherit; letter-spacing: inherit; font-variant-numeric: tabular-nums; cursor: pointer; }
 .tk b { color: var(--fg); font-weight: 500; margin-right: .5em; transition: color .15s; }
-.tk:hover b, .tk[aria-expanded="true"] b { color: var(--accent); }
+.tk[aria-expanded="true"] b { color: var(--accent); }
+@media (hover: hover) and (pointer: fine) { .tk:hover b { color: var(--accent); } }
 .tk:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; border-radius: 2px; }
 /* hold still while you're pointing at it, tabbing through it, or reading one */
-.ticker:hover .ticker__track, .ticker:focus-within .ticker__track, .ticker.is-open .ticker__track { animation-play-state: paused; }
+.ticker:focus-within .ticker__track, .ticker.is-open .ticker__track { animation-play-state: paused; }
+@media (hover: hover) and (pointer: fine) { .ticker:hover .ticker__track { animation-play-state: paused; } } /* a tap would leave it stuck */
 .tk i { font-style: normal; margin-left: .35em; }
 .tk small { margin-left: .45em; font-size: .85em; letter-spacing: .06em; text-transform: uppercase; opacity: .75; } /* PRE / AH outside 9:30-16:00 New York */
 .tk i:empty, .tk small:empty { display: none; }
@@ -245,8 +248,8 @@ h1 em, .tagline em {
 /* kinship line + small-ask CTA under the lede */
 .kin { margin: 10px 0 0; max-width: 34ch; font-family: var(--serif); font-style: italic; font-size: 1.0625rem; line-height: 1.5; color: var(--fg-2); }
 .ask { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; padding-block: 8px; color: var(--accent); text-decoration: none; transition: color .15s; }
-.ask:hover { color: var(--fg); }
-.ask:hover .arrow { transform: translate(2px, -2px); }
+@media (hover: hover) and (pointer: fine) { .ask:hover { color: var(--fg); } }
+@media (hover: hover) and (pointer: fine) { .ask:hover .arrow { transform: translate(2px, -2px); } }
 
 .nav { display: none; }
 .tabbar { display: none; } /* phones only, styled in the max-width: 560px block */
@@ -257,7 +260,7 @@ h1 em, .tagline em {
 .dot { flex: none; margin-left: 4px; width: 7px; height: 7px; border-radius: 50%; background: var(--up); box-shadow: 0 0 0 4px color-mix(in srgb, var(--up) 18%, transparent); }
 .social { display: flex; flex-wrap: wrap; align-items: center; gap: 0 clamp(14px, 4.5vw, 22px); list-style: none; margin: 0; padding: 0; }
 .social a { display: inline-block; padding-block: 11px; color: var(--muted); text-decoration: none; transition: color .15s; }
-.social a:hover { color: var(--fg); }
+@media (hover: hover) and (pointer: fine) { .social a:hover { color: var(--fg); } }
 @media (max-width: 560px) { .social__cv { display: none; } } /* keeps the row to one line on phones; About links the resume there */
 .term-btn {
   display: grid; place-items: center;
@@ -266,7 +269,7 @@ h1 em, .tagline em {
   color: var(--accent);
   transition: border-color .15s, background-color .15s;
 }
-.term-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
+@media (hover: hover) and (pointer: fine) { .term-btn:hover { border-color: var(--accent); background: var(--accent-soft); } }
 
 
 /* ---------- theme toggle ---------- */
@@ -278,7 +281,7 @@ h1 em, .tagline em {
   font-size: 0.875rem;
   transition: border-color .15s, background-color .15s, color .15s;
 }
-.theme-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+@media (hover: hover) and (pointer: fine) { .theme-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); } }
 .theme-btn__light { display: none; }
 :root[data-theme="light"] .theme-btn__dark { display: none; }
 :root[data-theme="light"] .theme-btn__light { display: inline; }
@@ -372,6 +375,7 @@ html.theme-wipe::view-transition-new(root) {
 .now div { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); align-content: start; gap: 12px; align-items: baseline; }
 .now dt { color: var(--muted); }
 .now dd { margin: 0; color: var(--fg); }
+.now dd span { white-space: nowrap; } /* a date stays in one piece */
 @container (min-width: 460px) {
   .now { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
   .now div { grid-template-columns: 1fr; gap: 4px; }
@@ -410,7 +414,7 @@ html.theme-wipe::view-transition-new(root) {
   text-decoration: none;
   transition: color .15s;
 }
-.card__src:hover { color: var(--fg); }
+@media (hover: hover) and (pointer: fine) { .card__src:hover { color: var(--fg); } }
 /* is the app up, and when was it last worked on (main.js fills it from /api/projects) */
 .card__status { position: relative; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 8px; color: var(--muted); font-size: 0.75rem; }
 .card__status[hidden] { display: none; }
@@ -418,7 +422,7 @@ html.theme-wipe::view-transition-new(root) {
 .card__status .dot { margin-left: 0; width: 6px; height: 6px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--up) 18%, transparent); }
 .card__status .dot--down { box-shadow: 0 0 0 3px color-mix(in srgb, var(--down) 18%, transparent); }
 .card__status a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line-2); transition: color .15s, border-color .15s; }
-.card__status a:hover { color: var(--accent); border-color: var(--accent); }
+@media (hover: hover) and (pointer: fine) { .card__status a:hover { color: var(--accent); border-color: var(--accent); } }
 
 .card__media { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 420px; }
 .card__media img {
@@ -455,13 +459,13 @@ html.theme-wipe::view-transition-new(root) {
   text-decoration: none;
   transition: color .15s;
 }
-.more:hover { color: var(--accent); }
-.more:hover .arrow { transform: translate(2px, -2px); }
-.more:hover .arrow--in { transform: translateX(3px); } /* a page on this site, not a new tab */
+@media (hover: hover) and (pointer: fine) { .more:hover { color: var(--accent); } }
+@media (hover: hover) and (pointer: fine) { .more:hover .arrow { transform: translate(2px, -2px); } }
+@media (hover: hover) and (pointer: fine) { .more:hover .arrow--in { transform: translateX(3px); } /* a page on this site, not a new tab */ }
 .more-row { display: flex; flex-wrap: wrap; column-gap: 28px; }
 button.more { padding-inline: 0; border: 0; background: none; cursor: pointer; }
 .more-row button.more { color: var(--muted); }
-.more-row button.more:hover { color: var(--accent); }
+@media (hover: hover) and (pointer: fine) { .more-row button.more:hover { color: var(--accent); } }
 
 /* background */
 .log { display: grid; gap: 20px; list-style: none; margin: 0; padding: 0; }
@@ -471,7 +475,7 @@ button.more { padding-inline: 0; border: 0; background: none; cursor: pointer; }
 .log__o { grid-column: 2; color: var(--muted); font-size: 0.9375rem; }
 /* inline links in the now list and background log: quiet underline, accent on hover */
 .now dd a, .log__o a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line-2); transition: color .15s, border-color .15s; }
-.now dd a:hover, .log__o a:hover { color: var(--accent); border-color: var(--accent); }
+@media (hover: hover) and (pointer: fine) { .now dd a:hover, .log__o a:hover { color: var(--accent); border-color: var(--accent); } }
 @container (min-width: 460px) {
   .log li { grid-template-columns: 6.5rem minmax(0, 1fr); column-gap: 24px; }
 }
@@ -501,8 +505,12 @@ button.more { padding-inline: 0; border: 0; background: none; cursor: pointer; }
   font-size: 0.75rem;
   transition: color .15s, border-color .15s, background-color .15s;
 }
-.copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+@media (hover: hover) and (pointer: fine) { .copy-btn:hover { color: var(--accent); border-color: var(--accent); } }
 .copy-btn.copied { color: var(--up); border-color: var(--up); background: color-mix(in srgb, var(--up) 12%, transparent); }
+/* the small buttons answer the press itself, not the release */
+.copy-btn, .theme-btn, .term-btn { transition: color .15s, border-color .15s, background-color .15s, transform .16s cubic-bezier(.23, 1, .32, 1); }
+.copy-btn:active, .theme-btn:active, .term-btn:active { transform: scale(.94); }
+@media (prefers-reduced-motion: reduce) { .copy-btn:active, .theme-btn:active, .term-btn:active { transform: none; } }
 
 
 /* footer */
@@ -510,9 +518,9 @@ button.more { padding-inline: 0; border: 0; background: none; cursor: pointer; }
 .colophon { margin: 0; max-width: 74ch; font-size: 0.75rem; line-height: 1.7; }
 .colophon i { font-style: italic; }
 .colophon a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line-2); transition: color .15s, border-color .15s; }
-.colophon a:hover { color: var(--accent); border-color: var(--accent); }
+@media (hover: hover) and (pointer: fine) { .colophon a:hover { color: var(--accent); border-color: var(--accent); } }
 .hint { justify-self: start; padding-block: 10px; color: var(--muted); font-size: 0.75rem; transition: color .15s; }
-.hint:hover { color: var(--accent); }
+@media (hover: hover) and (pointer: fine) { .hint:hover { color: var(--accent); } }
 kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2); border-radius: 3px; color: var(--accent); }
 
 /* ---------- terminal ---------- */
@@ -537,7 +545,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 }
 .term__bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); color: var(--term-muted); font-size: 0.75rem; }
 .term__x { padding: 6px 2px; color: var(--term-muted); font-size: 0.75rem; }
-.term__x:hover { color: var(--term-fg); }
+@media (hover: hover) and (pointer: fine) { .term__x:hover { color: var(--term-fg); } }
 .term__out { flex: 1; overflow-y: auto; padding: 14px; white-space: pre-wrap; word-break: break-word; line-height: 1.55; }
 .term__out a { color: var(--accent); }
 .term__out .cmd { color: var(--term-fg); }
@@ -678,19 +686,23 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .tabbar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
     display: flex; justify-content: space-around;
-    padding: 10px 0 max(10px, env(safe-area-inset-bottom));
+    padding: 4px max(4px, var(--pad-r)) max(4px, var(--pad-b)) max(4px, var(--pad-l));
     background: var(--sec-bg);
     -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
     border-top: 1px solid var(--line);
   }
   .tabbar a {
-    padding: 8px 16px;
+    padding: 12px 10px; /* a 44px row for the thumb */
     color: var(--muted);
     text-transform: uppercase; letter-spacing: .12em;
     text-decoration: none;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none;
+    transition: color .15s;
   }
   .tabbar a.is-active { color: var(--accent); }
-  body { padding-bottom: calc(48px + var(--pad-b)); }
+  .tabbar a:active { color: var(--fg); }
+  body { padding-bottom: calc(54px + var(--pad-b)); } /* the bar's height, so the footer isn't hidden under it */
 
   /* theme and terminal buttons ride beside Email instead of wrapping */
   .social { gap: 0 12px; }
@@ -747,6 +759,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .term-btn, .theme-btn { width: 44px; height: 44px; }
   .card__more, .card__src, .more, .hint { padding-block: 12px; }
   .contact__mail { padding-block: 10px; }
+  .copy-btn { min-height: 44px; padding-inline: 16px; }
   .ask, .social a { padding-block: 12px; }
   .term__x { padding-block: 14px; } /* keep the three small links at 44px+ too */
   .term__in input { font-size: 16px; } /* stops iOS zooming on focus */
@@ -773,7 +786,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 .lost .lede { margin: 0 0 36px; }
 .dot--down { background: var(--down); box-shadow: 0 0 0 4px color-mix(in srgb, var(--down) 18%, transparent); }
 .accent-link { padding-block: 10px; color: var(--accent); text-decoration: none; }
-.accent-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) { .accent-link:hover { text-decoration: underline; text-underline-offset: 3px; } }
 
 /* ---------- the CV: one A4 sheet ---------- */
 /* Its markup lives in resume.html, where it shows as a sheet of paper. The Worker copies it into the home page, hidden
@@ -844,10 +857,10 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   transition: color .15s, border-color .15s, background-color .15s, transform .16s cubic-bezier(.23, 1, .32, 1);
 }
 .btn[hidden] { display: none; }
-.btn:hover { border-color: var(--accent); color: var(--accent); }
+@media (hover: hover) and (pointer: fine) { .btn:hover { border-color: var(--accent); color: var(--accent); } }
 .btn:active { transform: scale(.97); }
 .btn--primary { border-color: var(--accent); background: var(--accent); color: var(--bg); }
-.btn--primary:hover { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+@media (hover: hover) and (pointer: fine) { .btn--primary:hover { border-color: var(--fg); background: var(--fg); color: var(--bg); } }
 @media (pointer: coarse) { .btn { min-height: 44px; } }
 
 /* the sheet: true size where it fits, scaled whole below that, and reflowed into a readable card on phones */
@@ -865,10 +878,14 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 }
 @keyframes sheet-in { from { opacity: 0; transform: translateY(14px); filter: blur(4px); } }
 .sheet .cv a { text-decoration: underline; text-decoration-color: transparent; text-underline-offset: .2em; transition: text-decoration-color .15s; }
-.sheet .cv a:hover { text-decoration-color: currentColor; }
+@media (hover: hover) and (pointer: fine) { .sheet .cv a:hover { text-decoration-color: currentColor; } }
 
+/* phones: the paper runs edge to edge, and its text lines up with the page's */
+@media (max-width: 600px) {
+  .resume .sheet { margin-inline: calc(-1 * var(--pad-l)) calc(-1 * var(--pad-r)); }
+}
 @container sheet (max-width: 600px) {
-  .sheet .cv { aspect-ratio: auto; padding: 26px 20px 30px; font-size: 14px; border-radius: var(--r-md); }
+  .sheet .cv { aspect-ratio: auto; padding: 28px var(--pad-r) 32px var(--pad-l); font-size: 14px; border-radius: 0; }
   .cv__head { flex-direction: column; align-items: flex-start; gap: 12px; }
   .cv__name { font-size: 2.15em; }
   .cv__contact { grid-template-columns: auto; }
@@ -892,9 +909,15 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 @keyframes sheet-fade { from { opacity: 0; } }
 
 /* ---------- print: the CV, alone, on one A4 page (from the home page, the resume page, or `cv` in the terminal) ---------- */
+/* Pages without the CV (privacy, terms, 404) print as themselves: light colours, and margins of their own,
+   since @page has none. */
 @media print {
+  :root, :root[data-theme="dark"], :root[data-theme="light"] {
+    --bg: #fff; --bg-2: #fff; --fg: #1c1914; --fg-2: #3d3a33; --muted: #6b675e; --accent: #9c5c0c;
+    --line: #dcd8cf; --line-2: #c9c4b8;
+  }
   html, body { background: #fff; }
-  body > :not(.cv, .resume) { display: none !important; }
+  body:has(> .cv, > .resume) > :not(.cv, .resume) { display: none !important; }
   .resume { display: block; max-width: none; padding: 0; }
   .resume > :not(.sheet) { display: none !important; }
   .sheet { container-type: normal; }
@@ -922,4 +945,9 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 .doc a { color: var(--accent); text-underline-offset: 3px; }
 .doc__foot { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 0.8125rem; }
 .doc__foot a { padding-block: 6px; text-decoration: none; }
-.doc__foot a:hover { text-decoration: underline; }
+@media (hover: hover) and (pointer: fine) { .doc__foot a:hover { text-decoration: underline; } }
+/* printed, these pages keep margins of their own (@page has none) and drop the links back to the site */
+@media print {
+  .doc, .lost { max-width: none; min-height: 0; padding: 16mm 18mm; }
+  .doc__foot, .lost .accent-link { display: none; }
+}

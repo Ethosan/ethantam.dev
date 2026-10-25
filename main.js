@@ -545,7 +545,7 @@
       "clear       clear the screen",
       "exit        close (or press esc)",
     ].join("\n"),
-    now: () => `National Service as a transport operator until Feb 2027.\nOn the side: finance and content at ${a("https://www.advisory.sg", "Advisory Singapore")}, and whatever I'm fixing in 20bucks this week.\nThen Economics, from Oct 2027.`,
+    now: () => `National Service as a transport operator until Feb 2027.\nOn the side: finance and content at ${a("https://www.advisory.sg", "Advisory Singapore")}, websites for small businesses, and whatever I'm fixing in 20bucks this week.\nThen Economics, from Oct 2027.`,
     ns: () => "still serving as a transport operator. back in Feb 2027.",
     makan: () => `hungry? ${a(LINKS.list, "list.ethantam.dev")} has opinions.`,
     hire: () => COMMANDS.contact(),
@@ -678,9 +678,13 @@
   const themeBtns = document.querySelectorAll("[data-toggle-theme]");
   const isLight = () => root.dataset.theme === "light" ||
     (!root.dataset.theme && matchMedia("(prefers-color-scheme: light)").matches);
+  // the phone's status bar takes its colour from theme-color, which only knows the system setting; follow the toggle
+  const themeColors = document.querySelectorAll('meta[name="theme-color"]');
   const updateThemeBtns = () => {
     const light = isLight();
     themeBtns.forEach((b) => b.setAttribute("aria-pressed", String(light)));
+    const bg = getComputedStyle(root).getPropertyValue("--bg").trim();
+    if (bg) themeColors.forEach((m) => m.setAttribute("content", bg));
   };
   const toggleTheme = (e) => {
     const light = isLight();
