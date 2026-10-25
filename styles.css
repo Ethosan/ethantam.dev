@@ -812,10 +812,13 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 .cv b { color: var(--ink); font-weight: 600; }
 .cv ::selection { background: #f2dcb8; color: var(--ink); }
 
-/* name on the left, contact as a small two-by-two table on the right, a firm rule under both */
-.cv__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 3em; padding-bottom: 1.1em; border-bottom: 1.25pt solid var(--ink); }
-.cv__name { color: var(--ink); font-size: 2.75em; font-weight: 600; line-height: 1; letter-spacing: -0.04em; }
-.cv__contact { display: grid; grid-template-columns: auto auto; column-gap: 2em; color: var(--ink-2); font: .857em/1.5 var(--mono); }
+/* name on the left; on the right, like a business card, the contact lines and a QR code to the site at the same height;
+   a firm rule under all of it */
+.cv__head { display: flex; align-items: flex-end; gap: 1.5em; padding-bottom: 1.1em; border-bottom: 1.25pt solid var(--ink); }
+.cv__name { margin-right: auto; color: var(--ink); font-size: 2.75em; font-weight: 600; line-height: 1; letter-spacing: -0.04em; }
+.cv__contact { display: grid; color: var(--ink-2); font: .857em/1.5 var(--mono); }
+.cv .cv__qr { flex: none; display: block; width: 5.14em; height: 5.14em; color: var(--ink); } /* four contact lines tall */
+.cv__qr svg { display: block; width: 100%; height: 100%; }
 
 /* each section: a label in the left column, entries on the right, baselines lined up */
 .cv__sec { display: grid; grid-template-columns: 6.75em minmax(0, 1fr); column-gap: 1.3em; align-items: baseline; padding-top: .75em; margin-top: .75em; border-top: .5pt solid var(--rule); }
