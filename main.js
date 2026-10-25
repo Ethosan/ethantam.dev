@@ -2,6 +2,11 @@
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (s, el = document) => el.querySelector(s);
 
+  // the section titles run edge to edge with 100vw, which counts a desktop scrollbar too: measure it (styles.css --sbw)
+  const measureScrollbar = () => document.documentElement.style.setProperty("--sbw", `${innerWidth - document.documentElement.clientWidth}px`);
+  measureScrollbar();
+  addEventListener("resize", measureScrollbar, { passive: true });
+
   /* ---------- clocks: Singapore and the UK ---------- */
   const clocks = [...document.querySelectorAll("[data-tz]")].map((el) => [
     el, new Intl.DateTimeFormat("en-GB", { timeZone: el.dataset.tz, hour: "2-digit", minute: "2-digit" }),
@@ -369,7 +374,7 @@
   // from /api/projects (worker/index.js): the Worker loads each app and reads its last commit on GitLab, every 2 minutes
   const statuses = [...document.querySelectorAll(".card__status[data-project]")];
   if (statuses.length) {
-    const rel = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+    const rel = new Intl.RelativeTimeFormat("en", { numeric: "auto", style: "short" }); // "18 hr. ago": fits a phone's card
     const UNITS = [["year", 31_536_000], ["month", 2_592_000], ["week", 604_800], ["day", 86_400], ["hour", 3_600], ["minute", 60]];
     const ago = (iso) => {
       const sec = (Date.parse(iso) - Date.now()) / 1000;
@@ -744,15 +749,20 @@
   });
 
   /* ---------- copy email button ---------- */
+  // a label change comes in soft-focus for a beat, so "Copy" and "Copied!" read as one button changing, not swapping
+  const relabel = (btn, label) => {
+    btn.textContent = label;
+    btn.animate?.(reduceMotion ? [{ opacity: 0.4 }, { opacity: 1 }] : [{ opacity: 0.4, filter: "blur(2px)" }, { opacity: 1, filter: "blur(0)" }], { duration: 160, easing: "ease-out" });
+  };
   document.querySelectorAll("[data-copy]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const text = btn.dataset.copy;
       try {
         await navigator.clipboard.writeText(text);
         const original = btn.textContent;
-        btn.textContent = "Copied!";
+        relabel(btn, "Copied!");
         btn.classList.add("copied");
-        setTimeout(() => { btn.textContent = original; btn.classList.remove("copied"); }, 2000);
+        setTimeout(() => { relabel(btn, original); btn.classList.remove("copied"); }, 2000);
       } catch {
         // clipboard API unavailable (e.g. non-secure context): fall back to execCommand
         const ta = document.createElement("textarea");

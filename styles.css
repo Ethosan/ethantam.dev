@@ -217,7 +217,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 /* ---------- left column ---------- */
 .side { padding-top: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--line); } /* the intro ends here; content starts below the line, not under the socials */
-.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--fg); }
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--fg); view-transition-name: brand; } /* holds its place while pages cross-fade */
+html.theme-wipe .brand { view-transition-name: none; } /* in a theme switch it wipes with the rest of the page */
 h1 {
   margin: 40px 0 0;
   font-size: clamp(2.625rem, 1.9rem + 2.4vw, 3.5rem);
@@ -353,10 +354,13 @@ html.theme-wipe::view-transition-new(root) {
 .sec__h {
   position: sticky; top: var(--pad-t); z-index: 5;
   margin: 0 0 24px;
-  width: 100vw;
+  /* half the visible width: 100vw also counts a desktop scrollbar, which made the page scroll sideways (main.js
+     measures it into --sbw; phones have none) */
+  --half: calc(50vw - var(--sbw, 0px) / 2);
+  width: calc(2 * var(--half));
   /* full-bleed, but honour asymmetric landscape insets so the bar covers the notch side */
-  margin-left: calc(50% - 50vw + (var(--pad-r) - var(--pad-l)) / 2);
-  padding: 14px calc(50vw - 50% + (var(--pad-r) - var(--pad-l)) / 2) 14px calc(50vw - 50% + (var(--pad-l) - var(--pad-r)) / 2);
+  margin-left: calc(50% - var(--half) + (var(--pad-r) - var(--pad-l)) / 2);
+  padding: 14px calc(var(--half) - 50% + (var(--pad-r) - var(--pad-l)) / 2) 14px calc(var(--half) - 50% + (var(--pad-l) - var(--pad-r)) / 2);
   background: var(--sec-bg);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
@@ -422,8 +426,13 @@ html.theme-wipe::view-transition-new(root) {
 @media (hover: hover) and (pointer: fine) { .card__src:hover { color: var(--fg); } }
 /* is the app up, and when was it last worked on (main.js fills it from /api/projects) */
 .card__status { position: relative; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 8px; color: var(--muted); font-size: 0.75rem; }
-.card__status[hidden] { display: none; }
+/* its line is kept from the start and the status fades into it: it arrives a moment after the page (two seconds on a
+   phone) and used to push each card's text down when it did */
+.card__status { min-height: calc(1lh + 2px); transition: opacity .2s ease-out; }
+.card__status[hidden] { visibility: hidden; opacity: 0; }
+@container (max-width: 459px) { .card__status { min-height: calc(2lh + 6px); } } /* narrow cards wrap it onto two lines */
 .card__state, .card__commit { display: inline-flex; align-items: center; gap: 8px; }
+.card__commit { white-space: nowrap; } /* "last commit 28 minutes ago" in one piece, so the status stays within its two reserved lines */
 .card__status .dot { margin-left: 0; width: 6px; height: 6px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--up) 18%, transparent); }
 .card__status .dot--down { box-shadow: 0 0 0 3px color-mix(in srgb, var(--down) 18%, transparent); }
 .card__status a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line-2); transition: color .15s, border-color .15s; }
@@ -503,6 +512,7 @@ button.more { padding-inline: 0; border: 0; background: none; cursor: pointer; }
 /* contact row: email + copy button */
 .contact__row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .copy-btn {
+  min-width: calc(7ch + 28px); /* as wide as "Copied!", so the row doesn't shift when it changes */
   padding: 4px 12px;
   border: 1px solid var(--line-2);
   border-radius: var(--r-sm);
@@ -745,6 +755,18 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .card:not(.is-open) .card__body > p:not(.card__why):not(.card__meta),
   .card:not(.is-open) .tags,
   .card:not(.is-open) .card__src { display: none; }
+  /* opening a card: the details fade in just below where they land, rather than snapping in */
+  .card.is-open .card__body > p:not(.card__why):not(.card__meta), .card.is-open .tags, .card.is-open .card__src {
+    transition: opacity .22s cubic-bezier(.23, 1, .32, 1), transform .22s cubic-bezier(.23, 1, .32, 1), color .15s;
+  }
+  @starting-style {
+    .card.is-open .card__body > p:not(.card__why):not(.card__meta), .card.is-open .tags, .card.is-open .card__src { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @starting-style {
+      .card.is-open .card__body > p:not(.card__why):not(.card__meta), .card.is-open .tags, .card.is-open .card__src { transform: translateY(-4px); }
+    }
+  }
   /* while a card is open, only the title and Source open the app; text stays tappable */
   .card.is-open .card__title::after { content: none; }
   .ticker__long { display: none; }
@@ -764,7 +786,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .term-btn, .theme-btn { width: 44px; height: 44px; }
   .card__more, .card__src, .more, .hint { padding-block: 12px; }
   .contact__mail { padding-block: 10px; }
-  .copy-btn { min-height: 44px; padding-inline: 16px; }
+  .copy-btn { min-height: 44px; min-width: calc(7ch + 36px); padding-inline: 16px; }
   .ask, .social a { padding-block: 12px; }
   .term__x { padding-block: 14px; } /* keep the three small links at 44px+ too */
   .term__in input { font-size: 16px; } /* stops iOS zooming on focus */
