@@ -46,7 +46,7 @@ Settings: none on the site. The CI deploy needs a `CLOUDFLARE_API_TOKEN` CI/CD v
 - **Copy email:** one-click copy next to the email address, with the Clipboard API and an `execCommand` fallback.
 - **PWA:** installable (`manifest.json`) with offline support through a service worker (`sw.js`); the site works without a connection once cached.
 - **Resume (`/resume`, also `/cv`):** Ethan's CV on one A4 page, shown as a sheet of paper next to a Download PDF button and a Print button. The sheet is true size where it fits, scales down whole on tablets, and reflows into a readable card on phones. Printing it, or printing the home page (Ctrl+P, or `cv` in the terminal), gives the same single page and nothing else. The CV's only copy is the `<article id="cv">` in `resume.html`; the Worker copies it into the home page on every request. `ethan-tam-cv.pdf` is that sheet rendered by headless Chrome: after any change to the CV run `npm run cv-pdf`, which rewrites the PDF and fails if the CV runs onto a second page. All sizes inside the sheet are in em, so it scales as one piece. "Save as PDF" names the file "Ethan Tam CV".
-- **Last updated:** stamped by the Worker from the live deploy: its date, and the newest commit on `main` as of that moment (looked up on GitLab, linked). Never a date typed by hand, and right whichever pipeline did the deploy. `/api/version` shows the same.
+- **Last updated:** stamped by the Worker from the live deploy's date. Never a date typed by hand, and right whichever pipeline did the deploy. `/api/version` has the deploy and the newest commit on `main` as of that moment (looked up on GitLab).
 - **Privacy and terms:** `/privacy` and `/terms`, linked from the footer; the same text as `PRIVACY.md` and `TERMS.md`.
 
 ## Architecture

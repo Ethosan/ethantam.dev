@@ -507,7 +507,7 @@ button.more { padding-inline: 0; border: 0; background: none; cursor: pointer; }
 
 /* footer */
 .foot { display: grid; gap: 10px; padding-block: 28px calc(44px + var(--pad-b)); border-top: 1px solid var(--line); color: var(--muted); }
-.colophon { margin: 0; max-width: 62ch; font-size: 0.75rem; line-height: 1.7; }
+.colophon { margin: 0; max-width: 74ch; font-size: 0.75rem; line-height: 1.7; }
 .colophon i { font-style: italic; }
 .colophon a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line-2); transition: color .15s, border-color .15s; }
 .colophon a:hover { color: var(--accent); border-color: var(--accent); }

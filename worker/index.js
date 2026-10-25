@@ -1,5 +1,5 @@
 // Cloudflare Worker for ethantam.dev. Static files are served from the assets binding; this script handles:
-//   GET /              the home page, with "Last updated" stamped from the deploy (date and commit)
+//   GET /              the home page, with "Last updated" stamped from the deploy's date
 //   GET /api/live      WebSocket that streams every price change as it happens
 //   GET /api/quotes    the same prices as one JSON snapshot (first paint, and the fallback when a socket can't connect)
 //   GET /api/spark     one symbol's path for the ticker popover (edge-cached 60s)
@@ -454,18 +454,17 @@ async function home(request, env, ctx) {
   // the page changes with every deploy even when index.html doesn't, so the deploy's id is the ETag
   const etag = v.id ? `"${v.id}"` : null;
   if (etag && request.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers: { etag } });
-  const [res, cv, commit] = await Promise.all([
+  const [res, cv] = await Promise.all([
     env.ASSETS.fetch(new Request(request.url, { headers: { accept: "text/html" } })),
     cvArticle(request, env),
-    deployedCommit(v, ctx),
   ]);
   if (!res.ok || !res.headers.get("content-type")?.includes("text/html")) return res;
   const rewriter = new HTMLRewriter();
   if (cv) rewriter.on("[data-cv]", { element: (el) => el.replace(cv, { html: true }) });
   if (v.timestamp) {
+    // just the date; the commit behind it is on /api/version
     const when = new Date(v.timestamp);
-    const stamp = `<time datetime="${when.toISOString()}">${dateFmt.format(when)}</time>`
-      + (/^[0-9a-f]{7,40}$/.test(commit ?? "") ? ` (<a href="https://gitlab.com/eatentam/ethantam.dev/-/commit/${commit}">${commit}</a>)` : "");
+    const stamp = `<time datetime="${when.toISOString()}">${dateFmt.format(when)}</time>`;
     rewriter.on("[data-deploy]", { element: (el) => el.setInnerContent(stamp, { html: true }) });
   }
   const out = rewriter.transform(res);
