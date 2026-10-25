@@ -1,8 +1,10 @@
 // Service worker for ethantam.dev: offline-first, cache static assets.
-const CACHE = "ethantam-v4";
+const CACHE = "ethantam-v5";
 const PRECACHE = [
   "/",
   "/index.html",
+  "/resume",
+  "/resume.js",
   "/styles.css",
   "/main.js",
   "/noscript.css",
@@ -41,8 +43,8 @@ self.addEventListener("fetch", (e) => {
   // Never cache API calls or external requests
   if (url.pathname.startsWith("/api/") || url.origin !== self.location.origin) return;
 
-  // Network-first for HTML, CSS and JS so deploys show up on the next load; cache-first for images and fonts
-  if (request.destination === "document" || /\.(html|css|js)$/.test(url.pathname)) {
+  // Network-first for HTML, CSS, JS and the CV's PDF so deploys show up on the next load; cache-first for images and fonts
+  if (request.destination === "document" || /\.(html|css|js|pdf)$/.test(url.pathname)) {
     e.respondWith(
       fetch(request)
         .then((res) => {

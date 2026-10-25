@@ -388,11 +388,10 @@
       .catch(() => { /* no status beats a wrong one */ });
   }
 
-  /* ---------- print: the page prints as a one-page CV (.cv in index.html, @media print in styles.css) ---------- */
-  document.querySelectorAll("[data-print]").forEach((btn) => btn.addEventListener("click", () => window.print()));
-  // "Save as PDF" names the file after the title; call it a summary, since it is not the formal CV
+  /* ---------- print: the page prints as the one-page CV (copied in from resume.html by the Worker; @media print in styles.css) ---------- */
+  // "Save as PDF" names the file after the title
   const pageTitle = document.title;
-  addEventListener("beforeprint", () => { document.title = "Ethan Tam, summary from ethantam.dev"; });
+  addEventListener("beforeprint", () => { document.title = "Ethan Tam CV"; });
   addEventListener("afterprint", () => { document.title = pageTitle; });
 
   /* ---------- dithered painting ---------- */
@@ -502,6 +501,7 @@
     markets: "https://markets.ethantam.dev",
     journal: "https://futuretracker.ethantam.dev/?demo",
     oracular: "https://oracular.ethantam.dev",
+    resume: "/resume",
   };
   const a = (href, text = href) => `<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
   const esc = (t) => String(t).replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
@@ -523,9 +523,9 @@
       "record      background, briefly",
       "watchlist   prices I check too often, live",
       "why &lt;x&gt;     why a ticker is on the list, e.g. why nvda",
-      "cv          print a one-page CV",
+      "cv          print my one-page CV (or: open resume)",
       "contact     how to reach me",
-      "open &lt;x&gt;    open gitlab | linkedin | 20bucks | list | markets | journal | oracular",
+      "open &lt;x&gt;    open gitlab | linkedin | 20bucks | list | markets | journal | oracular | resume",
       "tulip       a cautionary tale",
       "clear       clear the screen",
       "exit        close (or press esc)",
@@ -569,7 +569,7 @@
     },
     cv: () => {
       setTimeout(() => window.print(), 50);
-      return "opening the print dialog. it is a one-page summary, not my formal CV: email me if you need that.";
+      return `opening the print dialog: my CV, one A4 page. to read it or get the PDF: ${a("/resume", "ethantam.dev/resume")}`;
     },
     tulip: () => "Feb 1637: a single Semper Augustus bulb was quoted at more than a house on an\nAmsterdam canal. A few weeks later, buyers stopped showing up.\nThe painting on the front page is from about 20 years before the peak.",
     ls: () => "about  now  projects  record  watchlist  contact  tulip",

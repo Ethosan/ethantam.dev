@@ -36,6 +36,7 @@
   --term-muted: #9a958a;
   --term-overlay: rgba(6, 6, 5, .72);
   --sec-bg: rgba(12, 11, 10, .84);
+  --paper: #f3f1ec; /* the CV sheet: warm white, so it doesn't glare on the dark page */
   color-scheme: dark;
 }
 
@@ -58,6 +59,7 @@
   --term-bg: #1c1914;
   --term-overlay: rgba(250, 249, 246, .85);
   --sec-bg: rgba(250, 249, 246, .88);
+  --paper: #fff;
   color-scheme: light;
 }
 
@@ -81,6 +83,7 @@
     --term-bg: #1c1914;
     --term-overlay: rgba(250, 249, 246, .85);
     --sec-bg: rgba(250, 249, 246, .88);
+    --paper: #fff;
     color-scheme: light;
   }
 }
@@ -255,6 +258,7 @@ h1 em, .tagline em {
 .social { display: flex; flex-wrap: wrap; align-items: center; gap: 0 clamp(14px, 4.5vw, 22px); list-style: none; margin: 0; padding: 0; }
 .social a { display: inline-block; padding-block: 11px; color: var(--muted); text-decoration: none; transition: color .15s; }
 .social a:hover { color: var(--fg); }
+@media (max-width: 560px) { .social__cv { display: none; } } /* keeps the row to one line on phones; About links the resume there */
 .term-btn {
   display: grid; place-items: center;
   width: 36px; height: 36px;
@@ -453,6 +457,7 @@ html.theme-wipe::view-transition-new(root) {
 }
 .more:hover { color: var(--accent); }
 .more:hover .arrow { transform: translate(2px, -2px); }
+.more:hover .arrow--in { transform: translateX(3px); } /* a page on this site, not a new tab */
 .more-row { display: flex; flex-wrap: wrap; column-gap: 28px; }
 button.more { padding-inline: 0; border: 0; background: none; cursor: pointer; }
 .more-row button.more { color: var(--muted); }
@@ -770,58 +775,140 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 .accent-link { padding-block: 10px; color: var(--accent); text-decoration: none; }
 .accent-link:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-/* ---------- print: a one-page CV (the button under About, Ctrl+P, or `cv` in the terminal) ---------- */
-/* The CV is its own markup (.cv at the end of index.html), hidden on screen; in print it is the whole page.
-   No page margin, so the browser has nowhere to stamp its date and URL; the sheet pads itself instead. */
-.cv { display: none; }
+/* ---------- the CV: one A4 sheet ---------- */
+/* Its markup lives in resume.html, where it shows as a sheet of paper. The Worker copies it into the home page, hidden
+   on screen, so printing either page prints the CV and nothing else.
+   Every size inside is in em, so the sheet scales as one piece: 8.75pt type on a 210mm page, and 1em is 1.47% of
+   the page width (the sheet's font-size below). No @page margin, so the browser has nowhere to stamp its date and
+   URL; the sheet pads itself instead. */
 @page { size: A4; margin: 0; }
+.cv {
+  --ink: #1c1914; --ink-2: #3d3a33; --muted: #6b675e; --accent: #9c5c0c; --rule: #dcd8cf;
+  display: none;
+  flex-direction: column;
+  padding: 3.55em 4.5em 2.9em; /* 11mm 14mm 9mm */
+  background: #fff;
+  color: var(--ink-2);
+  font: 8.75pt/1.42 var(--sans);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+:where(.cv) :is(p, ul, dl, dd, h2) { margin: 0; padding: 0; } /* :where keeps this reset below the .cv__* rules */
+.cv ul { list-style: none; }
+.cv a { color: inherit; text-decoration: none; }
+.cv b { color: var(--ink); font-weight: 600; }
+.cv ::selection { background: #f2dcb8; color: var(--ink); }
+
+/* name on the left, contact as a small two-by-two table on the right, a firm rule under both */
+.cv__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 3em; padding-bottom: 1.1em; border-bottom: 1.25pt solid var(--ink); }
+.cv__name { color: var(--ink); font-size: 2.75em; font-weight: 600; line-height: 1; letter-spacing: -0.04em; }
+.cv__contact { display: grid; grid-template-columns: auto auto; column-gap: 2em; color: var(--ink-2); font: .857em/1.5 var(--mono); }
+
+/* each section: a label in the left column, entries on the right, baselines lined up */
+.cv__sec { display: grid; grid-template-columns: 6.75em minmax(0, 1fr); column-gap: 1.3em; align-items: baseline; padding-top: .75em; margin-top: .75em; border-top: .5pt solid var(--rule); }
+.cv__head + .cv__sec { border-top: 0; margin-top: .2em; }
+.cv__h { color: var(--accent); font: 500 .743em/1.5 var(--mono); letter-spacing: .06em; text-transform: uppercase; text-wrap: balance; }
+
+.cv__list { display: grid; gap: .55em; }
+.cv__row { display: flex; justify-content: space-between; align-items: baseline; gap: 1.5em; }
+.cv__sep { color: var(--muted); }
+.cv__when { flex: none; color: var(--muted); font: .857em var(--mono); font-variant-numeric: tabular-nums; }
+.cv__note { color: var(--muted); text-wrap: pretty; }
+.cv__keep { white-space: nowrap; } /* words that read badly split across lines */
+
+/* points: a short rule for a bullet, hung in the margin so the text keeps one left edge */
+.cv__pts { display: grid; gap: .1em; margin-top: .1em; }
+.cv__pts--loose { gap: .3em; margin-top: 0; }
+.cv__pts li { position: relative; padding-left: 1em; text-wrap: pretty; }
+.cv__pts li::before { content: ""; position: absolute; left: .15em; top: .71em; width: .45em; border-top: .75pt solid var(--muted); }
+/* a project's address sits right, on its first line, where a date would */
+.cv__url { float: right; margin-left: 1.5em; color: var(--muted); font: .857em/1.6 var(--mono); } /* a shade under one line tall, or it narrows the second line too */
+
+.cv__kv { display: grid; grid-template-columns: 6.6em minmax(0, 1fr); gap: .15em 1em; }
+.cv__kv dt { color: var(--ink); font-weight: 600; }
+.cv__kv dd { text-wrap: pretty; }
+
+/* ---------- the resume page: the sheet, with a title and the download beside it ---------- */
+.resume { padding-block: clamp(28px, 6vh, 56px) calc(56px + var(--pad-b)); }
+.resume__side { max-width: 210mm; margin: 0 auto 32px; }
+.resume__side h1 { margin: 36px 0 12px; font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem); font-weight: 500; letter-spacing: -0.035em; }
+.resume__side .lede { margin: 0; max-width: 34ch; }
+.resume__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.resume__links { margin-top: 16px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 40px; padding: 0 16px;
+  border: 1px solid var(--line-2); border-radius: var(--r-sm);
+  color: var(--fg); text-decoration: none;
+  transition: color .15s, border-color .15s, background-color .15s, transform .16s cubic-bezier(.23, 1, .32, 1);
+}
+.btn[hidden] { display: none; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn:active { transform: scale(.97); }
+.btn--primary { border-color: var(--accent); background: var(--accent); color: var(--bg); }
+.btn--primary:hover { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+@media (pointer: coarse) { .btn { min-height: 44px; } }
+
+/* the sheet: true size where it fits, scaled whole below that, and reflowed into a readable card on phones */
+.sheet { container: sheet / inline-size; }
+.sheet .cv {
+  display: flex;
+  width: min(100%, 210mm);
+  aspect-ratio: 210 / 297;
+  margin-inline: auto;
+  font-size: min(8.75pt, 1.47cqw);
+  background: var(--paper);
+  border-radius: 3px;
+  box-shadow: 0 1px 2px var(--card-shadow), 0 6px 16px -6px var(--card-shadow), 0 36px 80px -28px var(--card-shadow);
+  animation: sheet-in .7s cubic-bezier(.23, 1, .32, 1) both;
+}
+@keyframes sheet-in { from { opacity: 0; transform: translateY(14px); filter: blur(4px); } }
+.sheet .cv a { text-decoration: underline; text-decoration-color: transparent; text-underline-offset: .2em; transition: text-decoration-color .15s; }
+.sheet .cv a:hover { text-decoration-color: currentColor; }
+
+@container sheet (max-width: 600px) {
+  .sheet .cv { aspect-ratio: auto; padding: 26px 20px 30px; font-size: 14px; border-radius: var(--r-md); }
+  .cv__head { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .cv__name { font-size: 2.15em; }
+  .cv__contact { grid-template-columns: auto; }
+  .cv__sec { grid-template-columns: minmax(0, 1fr); row-gap: .7em; padding-top: 1.1em; margin-top: 1.1em; }
+  .cv__h { font-size: .8em; }
+  .cv__list { gap: 1em; }
+  .cv__row { flex-wrap: wrap; gap: 0 .75em; } /* the date drops under the name, close to it */
+  .cv__kv { grid-template-columns: minmax(0, 1fr); }
+  .cv__kv dd + dt { margin-top: .5em; }
+}
+
+@media (min-width: 1180px) {
+  .resume { display: grid; grid-template-columns: minmax(0, 1fr) 210mm; column-gap: clamp(40px, 4vw, 72px); align-items: start; max-width: 1280px; }
+  .resume__side { position: sticky; top: clamp(28px, 6vh, 56px); margin: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet .cv { animation-name: sheet-fade; }
+  .btn { transition: color .15s, border-color .15s, background-color .15s; }
+  .btn:active { transform: none; }
+}
+@keyframes sheet-fade { from { opacity: 0; } }
+
+/* ---------- print: the CV, alone, on one A4 page (from the home page, the resume page, or `cv` in the terminal) ---------- */
 @media print {
   html, body { background: #fff; }
-  body > :not(.cv) { display: none !important; }
-
-  .cv {
-    --ink: #1c1914; --ink-2: #3d3a33; --muted: #6b675e; --accent: #9c5c0c; --rule: #dcd8cf;
+  body > :not(.cv, .resume) { display: none !important; }
+  .resume { display: block; max-width: none; padding: 0; }
+  .resume > :not(.sheet) { display: none !important; }
+  .sheet { container-type: normal; }
+  .cv, .sheet .cv {
     display: flex;
-    flex-direction: column;
-    min-height: 296mm; /* a full sheet, so the footer sits at the foot of the page; a hair under 297 so rounding never starts a blank page 2 */
-    padding: 14mm 17mm 11mm;
-    color: var(--ink-2);
-    font: 9pt/1.45 var(--sans);
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    width: auto;
+    aspect-ratio: auto;
+    min-height: 296mm; /* a full sheet; a hair under 297 so rounding never starts a blank page 2 */
+    font-size: 8.75pt;
+    background: #fff;
+    border-radius: 0;
+    box-shadow: none;
+    animation: none;
   }
-  :where(.cv) :is(p, ul, dl, dd, h2) { margin: 0; padding: 0; } /* :where keeps this reset below the .cv__* rules */
-  .cv ul { list-style: none; }
-  .cv a { color: inherit; text-decoration: none; }
-  .cv b { color: var(--ink); font-weight: 600; }
-
-  /* name and line on the left, contact stacked on the right, a firm rule under both */
-  .cv__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 10mm; padding-bottom: 4.5mm; border-bottom: 1.25pt solid var(--ink); }
-  .cv__name { color: var(--ink); font-size: 26pt; font-weight: 600; line-height: 1; letter-spacing: -0.045em; }
-  .cv__tag { margin-top: 1.8mm; color: var(--ink); font-size: 11.5pt; font-weight: 500; letter-spacing: -0.015em; }
-  .cv__tag em { font-family: var(--serif); font-weight: 400; font-size: 1.12em; color: var(--accent); }
-  .cv__contact { color: var(--ink-2); font: 7.5pt/1.55 var(--mono); text-align: right; }
-
-  /* each section: a label in the left column, entries on the right */
-  .cv__sec { display: grid; grid-template-columns: 21mm minmax(0, 1fr); column-gap: 4mm; padding-top: 3mm; margin-top: 3mm; border-top: .5pt solid var(--rule); break-inside: avoid; }
-  .cv__head + .cv__sec { border-top: 0; margin-top: 1.5mm; }
-  .cv__h { color: var(--accent); font: 500 6.75pt/2.1 var(--mono); letter-spacing: .12em; text-transform: uppercase; }
-  .cv__lede { color: var(--ink-2); text-wrap: pretty; }
-
-  .cv__list { display: grid; gap: 1.4mm; }
-  .cv__list--loose { gap: 2.8mm; }
-  .cv__list--loose p:not(.cv__row) { margin-top: .5mm; text-wrap: pretty; }
-  .cv__row { display: flex; justify-content: space-between; align-items: baseline; gap: 6mm; }
-  .cv__when { flex: none; color: var(--muted); font: 7.5pt var(--mono); font-variant-numeric: tabular-nums; }
-  .cv__url { margin-left: 2.2mm; color: var(--muted); font: 7.5pt var(--mono); }
-  .cv__stack { color: var(--muted); font: 7pt/1.5 var(--mono); }
-
-  .cv__kv { display: grid; grid-template-columns: 18mm minmax(0, 1fr); row-gap: .8mm; }
-  .cv__kv dt { color: var(--ink); font-weight: 600; }
-
-  /* the disclaimer: pinned to the foot of the sheet, ruled off so it reads as a note, not small print */
-  .cv__foot { margin-top: auto; padding-top: 2.6mm; border-top: .5pt solid var(--rule); color: var(--muted); font-size: 7.75pt; }
-  .cv__foot a { color: var(--ink); }
 }
 
 /* ---------- privacy and terms ---------- */

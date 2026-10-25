@@ -441,18 +441,34 @@ async function deployedCommit(v, ctx) {
   return id;
 }
 
+// The CV's only copy is the article with id="cv" in resume.html. The home page gets it too, hidden on screen,
+// so printing the home page prints the CV.
+async function cvArticle(request, env) {
+  const res = await env.ASSETS.fetch(new Request(new URL("/resume", request.url), { headers: { accept: "text/html" } })).catch(() => null);
+  if (!res?.ok) return null;
+  return (await res.text()).match(/<article\b[^>]*\bid="cv"[^>]*>[\s\S]*?<\/article>/)?.[0] ?? null;
+}
+
 async function home(request, env, ctx) {
   const v = env.VERSION ?? {};
-  const commit = (await deployedCommit(v, ctx)) ?? "";
   // the page changes with every deploy even when index.html doesn't, so the deploy's id is the ETag
   const etag = v.id ? `"${v.id}"` : null;
   if (etag && request.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers: { etag } });
-  const res = await env.ASSETS.fetch(new Request(request.url, { headers: { accept: "text/html" } }));
-  if (!res.ok || !res.headers.get("content-type")?.includes("text/html") || !v.timestamp) return res;
-  const when = new Date(v.timestamp);
-  const stamp = `<time datetime="${when.toISOString()}">${dateFmt.format(when)}</time>`
-    + (/^[0-9a-f]{7,40}$/.test(commit) ? ` (<a href="https://gitlab.com/eatentam/ethantam.dev/-/commit/${commit}">${commit}</a>)` : "");
-  const out = new HTMLRewriter().on("[data-deploy]", { element: (el) => el.setInnerContent(stamp, { html: true }) }).transform(res);
+  const [res, cv, commit] = await Promise.all([
+    env.ASSETS.fetch(new Request(request.url, { headers: { accept: "text/html" } })),
+    cvArticle(request, env),
+    deployedCommit(v, ctx),
+  ]);
+  if (!res.ok || !res.headers.get("content-type")?.includes("text/html")) return res;
+  const rewriter = new HTMLRewriter();
+  if (cv) rewriter.on("[data-cv]", { element: (el) => el.replace(cv, { html: true }) });
+  if (v.timestamp) {
+    const when = new Date(v.timestamp);
+    const stamp = `<time datetime="${when.toISOString()}">${dateFmt.format(when)}</time>`
+      + (/^[0-9a-f]{7,40}$/.test(commit ?? "") ? ` (<a href="https://gitlab.com/eatentam/ethantam.dev/-/commit/${commit}">${commit}</a>)` : "");
+    rewriter.on("[data-deploy]", { element: (el) => el.setInnerContent(stamp, { html: true }) });
+  }
+  const out = rewriter.transform(res);
   const headers = new Headers(out.headers);
   if (etag) headers.set("etag", etag);
   return new Response(out.body, { status: out.status, headers });

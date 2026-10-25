@@ -38,14 +38,14 @@ Settings: none on the site. The CI deploy needs a `CLOUDFLARE_API_TOKEN` CI/CD v
 - **Layout:** on desktop the name and section nav stay pinned on the left while the rest scrolls on the right, and the nav marks the section you're reading (the layout follows Brittany Chiang's site). Phones and tablets get one column with sticky section titles.
 - **Why I watch it:** tap a price on the ticker for a card with why it is on the list and its path today (a stock's session in New York with the regular hours shaded, or a coin's last 24 hours), the live price as the last point and a dashed line at the price the change is measured from. The reasons live in `WATCH` at the top of the ticker code in `main.js`. The strip holds still while you hover, tab through it or read a card, and every item is a real button for keyboards and screen readers.
 - **Project cards:** each project with why it exists, what it grew into, and two screenshots: 780×1440 captures saved as WebP in `assets/`. Live data for Equarian Markets and Oracular; demo data for 20bucks, The List and Trade Journal; test data for Tally. Under each title, whether the app is up right now (and how fast it answered) and when its last commit landed, from `/api/projects`.
-- **Terminal:** press `~` anywhere (or the `~` button) and type `help`. `why nvda` gives a ticker's reason, `cv` prints the CV.
+- **Terminal:** press `~` anywhere (or the `~` button) and type `help`. `why nvda` gives a ticker's reason, `cv` prints the CV, `open resume` opens `/resume`.
 - **Themes:** dark and light mode with a toggle button. Respects `prefers-color-scheme` by default, persists the choice in `localStorage`. The dithered painting re-renders in theme colours.
 - **Self-hosted fonts:** Geist, Geist Mono and Instrument Serif served as woff2 from `assets/fonts/` (latin subset only, about 80 KB in all). No Google Fonts dependency.
 - **View transitions:** a smooth cross-fade when moving between sections through the nav (the View Transitions API, where supported).
 - **Now:** a section with a snapshot of what Ethan is focused on at the moment.
 - **Copy email:** one-click copy next to the email address, with the Clipboard API and an `execCommand` fallback.
 - **PWA:** installable (`manifest.json`) with offline support through a service worker (`sw.js`); the site works without a connection once cached.
-- **One-page CV:** printing the page (the button under About, Ctrl+P, or `cv` in the terminal) gives an A4 CV: profile, education, experience, leadership, each project with its link and stack, and skills. It is its own markup (`<article class="cv">` at the end of `index.html`), hidden on screen and the only thing shown in print, so keep it in step with About and Projects. A note at the foot says it is a summary, not the formal CV, and to email for that; "Save as PDF" names the file "Ethan Tam, summary from ethantam.dev".
+- **Resume (`/resume`, also `/cv`):** Ethan's CV on one A4 page, shown as a sheet of paper next to a Download PDF button and a Print button. The sheet is true size where it fits, scales down whole on tablets, and reflows into a readable card on phones. Printing it, or printing the home page (Ctrl+P, or `cv` in the terminal), gives the same single page and nothing else. The CV's only copy is the `<article id="cv">` in `resume.html`; the Worker copies it into the home page on every request. `ethan-tam-cv.pdf` is that sheet rendered by headless Chrome: after any change to the CV run `npm run cv-pdf`, which rewrites the PDF and fails if the CV runs onto a second page. All sizes inside the sheet are in em, so it scales as one piece. "Save as PDF" names the file "Ethan Tam CV".
 - **Last updated:** stamped by the Worker from the live deploy: its date, and the newest commit on `main` as of that moment (looked up on GitLab, linked). Never a date typed by hand, and right whichever pipeline did the deploy. `/api/version` shows the same.
 - **Privacy and terms:** `/privacy` and `/terms`, linked from the footer; the same text as `PRIVACY.md` and `TERMS.md`.
 
@@ -59,7 +59,7 @@ Browser ──▶ Cloudflare Worker ethantam-dev
               │                                                           └─▶ Yahoo chart API  (previous closes; fills gaps while a socket is down)
               ├─ GET /api/spark   ──▶ Yahoo chart   (a stock's session or a coin's 24 hours, edge-cached 60s)
               ├─ GET /api/projects ─▶ each app + GitLab commits       (edge-cached 2 min)
-              ├─ GET /            ──▶ index.html, with "Last updated" stamped from the deploy
+              ├─ GET /            ──▶ index.html, with "Last updated" stamped from the deploy and the CV copied in from resume.html
               └─ everything else  ──▶ static assets   (404.html for unknown paths)
 ```
 
@@ -68,11 +68,11 @@ The Durable Object keeps the last good prices in its storage, so a cold start wi
 | Path | Purpose |
 | --- | --- |
 | `index.html`, `styles.css`, `main.js` | The page, its styles and its script |
-| `worker/index.js` | `GET /api/live` and `GET /api/quotes` through the `Ticker` Durable Object, `/api/spark`, `/api/projects`, and the deploy stamp on `/`; everything else is a static file |
+| `worker/index.js` | `GET /api/live` and `GET /api/quotes` through the `Ticker` Durable Object, `/api/spark`, `/api/projects`, and on `/` the deploy stamp and the CV; everything else is a static file |
 | `privacy.html`, `terms.html` | The privacy policy and terms as pages (`PRIVACY.md` and `TERMS.md` are the same text for the repo; keep them in step) |
 | `wrangler.jsonc` | Worker config: the `TICKER` Durable Object binding and its migration, the `VERSION` metadata binding; serves `404.html` for unknown paths |
-| `.assetsignore` | Keeps the README, docs, config and Worker source from being served |
-| `_headers` | Security headers (CSP, HSTS, COOP, CORP, Permissions-Policy) and cache-control rules |
+| `.assetsignore` | Keeps the README, docs, scripts, config and Worker source from being served |
+| `_headers`, `_redirects` | Security headers (CSP, HSTS, COOP, CORP, Permissions-Policy) and cache-control rules; `/cv` redirects to `/resume` |
 | `manifest.json`, `sw.js` | PWA manifest; service worker (network-first for HTML, CSS and JS, cache-first for images and fonts) |
 | `noscript.css` | Shows the plain painting when JavaScript is off |
 | `fonts.css`, `assets/fonts/` | Self-hosted `@font-face` declarations and the woff2 files |
