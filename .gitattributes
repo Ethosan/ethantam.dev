@@ -1,0 +1,2 @@
+# vCards keep the CRLF line endings their standard asks for
+*.vcf -text
