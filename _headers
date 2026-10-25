@@ -18,6 +18,10 @@
 /og-resume.png
   Cache-Control: public, max-age=3600, must-revalidate
 
+/ethan-tam.vcf
+  Content-Type: text/vcard; charset=utf-8
+  Cache-Control: public, max-age=3600, must-revalidate
+
 /sitemap.xml
   Cache-Control: public, max-age=86400
 

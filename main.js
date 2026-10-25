@@ -533,6 +533,7 @@
       "why &lt;x&gt;     why a ticker is on the list, e.g. why nvda",
       "cv          print my one-page CV (or: open resume)",
       "contact     how to reach me",
+      "qr          a QR code to this site, full screen",
       "open &lt;x&gt;    open gitlab | linkedin | 20bucks | list | markets | journal | oracular | resume",
       "tulip       a cautionary tale",
       "clear       clear the screen",
@@ -581,6 +582,7 @@
       setTimeout(() => window.print(), 50);
       return `opening the print dialog: my CV, one A4 page. to read it or get the PDF: ${a("/resume", "ethantam.dev/resume")}`;
     },
+    qr: () => { closeTerm(); document.querySelector("[data-show-qr]")?.click(); return null; },
     tulip: () => "Feb 1637: a single Semper Augustus bulb was quoted at more than a house on an\nAmsterdam canal. A few weeks later, buyers stopped showing up.\nThe painting on the front page is from about 20 years before the peak.",
     ls: () => "about  now  projects  record  watchlist  contact  tulip",
     whoami: () => "guest. but you could be a friend: try `contact`",

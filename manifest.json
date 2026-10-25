@@ -21,6 +21,9 @@
       "purpose": "any"
     }
   ],
+  "shortcuts": [
+    { "name": "Show my QR code", "short_name": "QR code", "url": "/#qr", "icons": [{ "src": "/assets/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }] }
+  ],
   "categories": ["finance", "education", "productivity"],
   "lang": "en",
   "dir": "ltr"

@@ -2,3 +2,4 @@
 .art__frame img { opacity: 1 !important; }
 .art__frame canvas { display: none !important; }
 .term-btn, .theme-btn, [data-open-term] { display: none !important; }
+[data-show-qr] { display: none !important; } /* the QR screen needs share.js */

@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Tam;Ethan;;;
+FN:Ethan Tam
+EMAIL;TYPE=INTERNET:contact@ethantam.dev
+item1.URL:https://ethantam.dev
+item1.X-ABLabel:Website
+item2.URL:https://linkedin.com/in/ethantam-
+item2.X-ABLabel:LinkedIn
+NOTE:Economics at Cambridge from 2027. CV and projects at ethantam.dev.
+END:VCARD
