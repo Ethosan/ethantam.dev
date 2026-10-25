@@ -99,18 +99,19 @@
     BTC: ["Bitcoin", "The one market that never closes, so it's my read on risk appetite at 3am, before anything else opens."],
     ETH: ["Ether", "Crypto's second engine. When it outruns Bitcoin, people are reaching for risk; when it lags, they're hiding in the big one."],
     SOL: ["Solana", "The high-beta end of crypto: it runs furthest in a melt-up and falls hardest when the tide goes out."],
+    US10Y: ["US 10-year Treasury yield", "The rate everything else is priced off, from mortgages to what a company's future earnings are worth today. When it jumps, the long-dated growth stocks on this list feel it first."],
+    USDJPY: ["US dollar in yen", "The yen carry trade in one number: borrow cheap in yen, buy everything else. A sharp fall here means that trade is unwinding, which is what shook every market at once in August 2024."],
     AXTI: ["AXT Inc", "A small maker of the indium phosphide wafers under optical AI networking, with its factories in China, so export rules move it as much as earnings do."],
     MU: ["Micron", "Memory is the most cyclical corner of chips. High-bandwidth memory for AI is the test of whether this cycle is different."],
-    NBIS: ["Nebius", "An AI cloud spun out of Yandex, and one of the cleanest bets on whether renting out GPUs stays a good business."],
-    CRWV: ["CoreWeave", "The biggest pure-play GPU cloud, built on a lot of debt. If AI spending wobbles, I'd expect to see it here first."],
+    NBIS: ["Nebius", "An AI cloud spun out of Yandex. Beyond renting out GPUs, its Token Factory sells AI models by the token, a test of whether an AI cloud can be more than a landlord for chips."],
     LLY: ["Eli Lilly", "GLP-1 drugs turned a pharma company into a growth stock. I'm watching how long it can be priced like one."],
     GS: ["Goldman Sachs", "Dealmaking and trading in one ticker. When IPOs and M&A come back, it tends to show up here before the headlines."],
+    DBS: ["DBS Group", "Singapore's biggest bank and the heaviest weight in the Straits Times Index, so it's the closest thing to a daily read on the economy I live in. Priced in Singapore dollars."],
     IBKR: ["Interactive Brokers", "A broker that wins by being cheap and boring. Its monthly account numbers are a live read on how hard retail is trading."],
     NVDA: ["NVIDIA", "The AI trade in one stock. Its earnings move the whole market, not just chips."],
     CRWD: ["CrowdStrike", "Security is the last budget companies cut. It also had the outage of the decade in 2024 and kept its customers."],
     NET: ["Cloudflare", "This site runs on it. It's also a bet that more of the internet's code ends up running at the edge."],
     CAT: ["Caterpillar", "The old economy's order book: construction, mining, and now the generators going into data centres."],
-    TWLO: ["Twilio", "Paid per message sent, so its usage is an early read on whether software customers are growing or trimming."],
   };
   const WATCHLIST = Object.keys(WATCH);
   const COINS = { BTC: "bitcoin", ETH: "ethereum", SOL: "solana" };
@@ -122,7 +123,18 @@
   const fmtPx = (n) => n >= 1000
     ? n.toLocaleString("en-US", { maximumFractionDigits: 0 })
     : n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const fmtChg = (c) => `${c >= 0 ? "▲" : "▼"} ${Math.abs(c).toFixed(1)}%`;
+  const fmtChg = (c, dp = 1) => `${c >= 0 ? "▲" : "▼"} ${Math.abs(c).toFixed(dp)}%`;
+  // each market in its own terms: the 10-year as a yield that moves in basis points (worked back from its % change),
+  // the yen to two decimals of a percent (currencies move in hundredths), DBS in Singapore dollars, everything else a
+  // plain price and its % change
+  const fmtQ = (s, n) => (s === "US10Y" ? `${n.toFixed(3)}%` : s === "DBS" ? `S$${fmtPx(n)}` : fmtPx(n));
+  const bps = (p, c) => Math.abs(p - p / (1 + c / 100)) * 100;
+  const pctDp = (s) => (s === "USDJPY" ? 2 : 1);
+  const fmtMove = (s, p, c) => (s === "US10Y" ? `${c >= 0 ? "▲" : "▼"} ${bps(p, c).toFixed(1)}bp` : fmtChg(c, pctDp(s)));
+  const sayMove = (s, p, c) => `${c >= 0 ? "up" : "down"} ${s === "US10Y" ? `${bps(p, c).toFixed(1)} basis points` : `${Math.abs(c).toFixed(pctDp(s))}%`}`;
+  // where each market keeps its hours, for the chart's caption; USDJPY trades round the clock on weekdays
+  const MARKET = { DBS: ["Singapore", "Asia/Singapore"] };
+  const NEW_YORK = ["New York", "America/New_York"];
   const ticker = $(".ticker");
   const track = $("#ticker");
   // Build the strip once. The first copy is buttons; the second only makes the CSS loop (translate -50%) seamless,
@@ -146,22 +158,22 @@
     let css;
     for (const s of dirty) {
       const { p, c, x } = quotes.get(s);
-      const px = typeof p === "number" ? fmtPx(p) : "…";
+      const px = typeof p === "number" ? fmtQ(s, p) : "…";
       const was = painted.get(s);
-      const tone = typeof was === "number" && fmtPx(was) !== px ? (p > was ? "--up" : "--down") : null;
+      const tone = typeof was === "number" && fmtQ(s, was) !== px ? (p > was ? "--up" : "--down") : null;
       painted.set(s, p);
       for (const el of cells.get(s)) {
         const [, pEl, cEl, xEl] = el.children;
         pEl.textContent = px;
         cEl.className = typeof c === "number" ? (c >= 0 ? "up" : "dn") : "";
-        cEl.textContent = typeof c === "number" ? fmtChg(c) : "";
+        cEl.textContent = typeof c === "number" ? fmtMove(s, p, c) : "";
         xEl.textContent = x ?? "";
         if (tone) {
           css ??= getComputedStyle(document.documentElement);
           pEl.animate?.([{ color: css.getPropertyValue(tone).trim(), offset: 0 }], { duration: 1200, easing: "ease-out" });
         }
       }
-      const chg = typeof c === "number" ? `, ${c >= 0 ? "up" : "down"} ${Math.abs(c).toFixed(1)}%` : "";
+      const chg = typeof c === "number" ? `, ${sayMove(s, p, c)}` : "";
       cells.get(s)[0].setAttribute("aria-label", `${WATCH[s][0]}: ${px}${chg}${x ? `, ${SESSIONS[x]}` : ""}`);
       if (s === popS) drawPop();
     }
@@ -182,8 +194,8 @@
     if (dirty.size && !paintRaf) paintRaf = requestAnimationFrame(paint);
   };
 
-  // Tap a price: why it's on the list, and its path today (a stock's session in New York, or a coin's last 24 hours),
-  // with the live price as the last point and the dashed line at the price the change is measured from.
+  // Tap a price: why it's on the list, and its path today (a session in its own market's hours, or a coin's last
+  // 24 hours), with the live price as the last point and the dashed line at the price the change is measured from.
   const pop = $("#tkpop");
   const popEl = {
     s: $("#tkpop-s"), name: $(".tkpop__name", pop), px: $(".tkpop__px", pop), cap: $(".tkpop__cap", pop),
@@ -191,14 +203,14 @@
   };
   const sparks = new Map(); // symbol -> { at, data }, kept for a minute
   const SW = 300, SH = 64, SPAD = 5;
-  const weekday = new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone: "America/New_York" });
+  const weekday = (ms, timeZone) => new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone }).format(ms);
   const drawPop = () => {
     const s = popS;
     const { p, c, x, t } = quotes.get(s);
     popEl.s.textContent = s;
     popEl.name.textContent = WATCH[s][0];
     popEl.px.innerHTML = typeof p === "number"
-      ? `${fmtPx(p)}${typeof c === "number" ? ` <i class="${c >= 0 ? "up" : "dn"}">${fmtChg(c)}</i>` : ""}`
+      ? `${fmtQ(s, p)}${typeof c === "number" ? ` <i class="${c >= 0 ? "up" : "dn"}">${fmtMove(s, p, c)}</i>` : ""}`
       : "…";
     pop.classList.toggle("is-down", typeof c === "number" && c < 0);
     const got = sparks.get(s);
@@ -225,9 +237,12 @@
     if (d.prev) ["y1", "y2"].forEach((a) => popEl.base.setAttribute(a, Y(d.prev).toFixed(1)));
     popEl.reg.setAttribute("x", d.regular ? X(d.regular[0]).toFixed(1) : 0);
     popEl.reg.setAttribute("width", d.regular ? Math.max(0, X(d.regular[1]) - X(d.regular[0])).toFixed(1) : 0);
+    const [place, tz] = MARKET[s] ?? NEW_YORK;
     popEl.cap.textContent = COINS[s]
       ? `Last 24 hours · 24h ago ${fmtPx(d.prev)}`
-      : `${Date.now() / 1000 < d.end ? "Today in New York" : `${weekday.format(d.start * 1000)}'s session`}${x ? ` · ${SESSIONS[x]}` : ""} · prev close ${fmtPx(d.prev)}`;
+      : s === "USDJPY"
+        ? `Trades round the clock on weekdays · prev close ${fmtQ(s, d.prev)}`
+        : `${Date.now() / 1000 < d.end ? `Today in ${place}` : `${weekday(d.start * 1000, tz)}'s session`}${x ? ` · ${SESSIONS[x]}` : ""} · prev close ${fmtQ(s, d.prev)}`;
   };
   const closePop = () => {
     if (!popS) return;
@@ -560,9 +575,9 @@
       return `opening ${arg}…`;
     },
     watchlist: () => [...quotes.values()].map((q) => {
-      const px = typeof q.p === "number" ? fmtPx(q.p) : "…";
-      const chg = typeof q.c === "number" ? `<span class="${q.c >= 0 ? "up" : "dn"}">${q.c >= 0 ? "+" : ""}${q.c.toFixed(2)}%</span>` : "";
-      return `${q.s.padEnd(6)}${px.padStart(10)}   ${chg}${q.x ? ` <span class="dim">${SESSIONS[q.x]}</span>` : ""}`;
+      const px = typeof q.p === "number" ? fmtQ(q.s, q.p) : "…";
+      const chg = typeof q.c === "number" ? `<span class="${q.c >= 0 ? "up" : "dn"}">${fmtMove(q.s, q.p, q.c)}</span>` : "";
+      return `${q.s.padEnd(7)}${px.padStart(10)}   ${chg}${q.x ? ` <span class="dim">${SESSIONS[q.x]}</span>` : ""}`;
     }).join("\n") + "\n\nnot financial advice. see also: tulip",
     why: (arg) => {
       const s = arg.toUpperCase();

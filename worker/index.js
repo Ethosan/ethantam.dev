@@ -16,8 +16,12 @@ import { DurableObject } from "cloudflare:workers";
 
 const COINS = { BTC: "BTCUSDT", ETH: "ETHUSDT", SOL: "SOLUSDT" }; // Binance symbols
 const COINBASE = { BTC: "BTC-USD", ETH: "ETH-USD", SOL: "SOL-USD" }; // REST for the coins (see coinsRest)
-const STOCKS = ["AXTI", "MU", "NBIS", "CRWV", "LLY", "GS", "IBKR", "NVDA", "CRWD", "NET", "CAT", "TWLO"];
-const ORDER = [...Object.keys(COINS), ...STOCKS];
+const STOCKS = ["AXTI", "MU", "NBIS", "LLY", "GS", "IBKR", "NVDA", "CRWD", "NET", "CAT"]; // on New York hours
+// Not on New York hours, so no PRE/AH tags and no say in when the market is open. Ticker label -> Yahoo symbol.
+const ELSEWHERE = { US10Y: "^TNX", USDJPY: "JPY=X", DBS: "D05.SI" };
+const YAHOO = { ...Object.fromEntries(STOCKS.map((s) => [s, s])), ...ELSEWHERE }; // everything from Yahoo, by label
+const LABEL = Object.fromEntries(Object.entries(YAHOO).map(([label, y]) => [y, label]));
+const ORDER = [...Object.keys(COINS), ...Object.keys(YAHOO)];
 
 const UA = "Mozilla/5.0 (ethantam.dev ticker)";
 const FLUSH_MS = 250;        // at most four pushes a second to each visitor
@@ -56,12 +60,14 @@ function decodePricing(b64) {
   return { s: out[1], p: out[2], t, hours: out[7], c: out[8] };
 }
 
-// One stock from Yahoo's chart endpoint. Pre- and post-market bars are included, so outside 9:30-16:00 New York
-// the last bar is newer than the regular-session price, and that's the one shown (tagged pre or ah).
+// One symbol from Yahoo's chart endpoint, by its ticker label. Pre- and post-market bars are included, so outside
+// 9:30-16:00 New York a stock's last bar is newer than the regular-session price, and that's the one shown (tagged pre
+// or ah). Only New York stocks are tagged, and only they set the session.
 async function stockRest(s) {
+  const us = !ELSEWHERE[s];
   try {
     const r = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${s}?range=1d&interval=15m&includePrePost=true`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(YAHOO[s])}?range=1d&interval=15m&includePrePost=true`,
       { headers: { "user-agent": UA } },
     );
     if (!r.ok) return null;
@@ -71,7 +77,7 @@ async function stockRest(s) {
     const q = { s, p: m.regularMarketPrice, t: m.regularMarketTime * 1000, prev: m.chartPreviousClose ?? m.previousClose };
     const reg = m.tradingPeriods?.regular?.flat?.().at(-1) ?? m.currentTradingPeriod?.regular;
     const ts = res.timestamp ?? [], close = res.indicators?.quote?.[0]?.close ?? [];
-    for (let i = ts.length - 1; i >= 0; i--) {
+    for (let i = ts.length - 1; us && i >= 0; i--) {
       if (close[i] == null) continue;
       if (reg && (ts[i] < reg.start || ts[i] >= reg.end)) {
         q.p = close[i];
@@ -81,7 +87,7 @@ async function stockRest(s) {
       break;
     }
     const day = m.currentTradingPeriod;
-    if (day?.pre && day?.post) q.session = [day.pre.start * 1000, day.post.end * 1000];
+    if (us && day?.pre && day?.post) q.session = [day.pre.start * 1000, day.post.end * 1000];
     return q;
   } catch {
     return null;
@@ -172,7 +178,7 @@ export class Ticker extends DurableObject {
     if (this.up.yahoo && this.marketOpen() && now - this.heard.yahoo > 60_000) this.drop("yahoo");
     this.openYahoo();
     this.openBinance();
-    try { this.up.yahoo?.send(JSON.stringify({ subscribe: STOCKS })); } catch {} // Yahoo forgets idle subscriptions
+    try { this.up.yahoo?.send(JSON.stringify({ subscribe: Object.values(YAHOO) })); } catch {} // Yahoo forgets idle subscriptions
 
     // REST fills in whatever a socket isn't delivering
     const jobs = [];
@@ -259,7 +265,7 @@ export class Ticker extends DurableObject {
   }
 
   async refreshStocks() {
-    const list = await Promise.all(STOCKS.map(stockRest));
+    const list = await Promise.all(Object.keys(YAHOO).map(stockRest));
     for (const q of list) {
       if (!q) continue;
       if (q.prev) this.prev.set(q.s, q.prev);
@@ -321,13 +327,14 @@ export class Ticker extends DurableObject {
       "yahoo",
       "https://streamer.finance.yahoo.com/?version=2",
       { origin: "https://finance.yahoo.com" },
-      (ws) => ws.send(JSON.stringify({ subscribe: STOCKS })),
+      (ws) => ws.send(JSON.stringify({ subscribe: Object.values(YAHOO) })),
       (data) => {
         const msg = JSON.parse(data);
         if (msg.type !== "pricing") return;
         const d = decodePricing(msg.message);
-        const x = d.hours === 0 ? "pre" : d.hours >= 2 ? "ah" : undefined;
-        this.put({ s: d.s, p: d.p, c: d.c, t: d.t, x });
+        const s = LABEL[d.s];
+        const x = ELSEWHERE[s] ? undefined : d.hours === 0 ? "pre" : d.hours >= 2 ? "ah" : undefined;
+        this.put({ s, p: d.p, c: d.c, t: d.t, x });
       },
     );
   }
@@ -375,14 +382,14 @@ async function project([repo, site]) {
   return [repo, { ...ping, commit }];
 }
 
-// ---------- one symbol's path for the ticker popover: today's session for a stock, the last 24 hours for a coin ----------
+// ---------- one symbol's path for the ticker popover: today's session (in its own market's hours), the last 24 hours for a coin ----------
 
 async function spark(s) {
   // a coin's last 24 hours comes from Yahoo too (Binance's REST refuses Cloudflare); the page draws the baseline from
   // the live 24h change, so it matches the number shown
   const coin = !!COINS[s];
   const r = await fetch(
-    `https://query1.finance.yahoo.com/v8/finance/chart/${coin ? `${s}-USD` : s}?${coin ? "range=2d&interval=15m" : "range=1d&interval=5m&includePrePost=true"}`,
+    `https://query1.finance.yahoo.com/v8/finance/chart/${coin ? `${s}-USD` : encodeURIComponent(YAHOO[s])}?${coin ? "range=2d&interval=15m" : "range=1d&interval=5m&includePrePost=true"}`,
     { headers: { "user-agent": UA } },
   );
   if (!r.ok) throw new Error(r.status);
