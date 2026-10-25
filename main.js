@@ -546,6 +546,8 @@
     record: () => [
       "2027     Economics (BA), University of Cambridge",
       "2026–    Finance & Content, Advisory Singapore",
+      "2026–    Freelance web developer, websites for small businesses",
+      "2024–    Maths tutor, IB, IP & IGCSE",
       "2025–27  National Service · Transport Operator, Singapore Armed Forces",
       "2023–24  Co-founder, ACSians Investment Club",
       "2023–24  Co-founder, Project Lumos",
