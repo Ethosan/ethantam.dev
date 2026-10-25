@@ -320,7 +320,7 @@ html.theme-wipe::view-transition-new(root) {
   width: 100%;
   aspect-ratio: 800 / 1111;
   border: 1px solid var(--line);
-  background: var(--bg-2);
+  background: var(--bg); /* the dither's own background, so nothing shifts colour as it develops in */
   overflow: hidden;
   cursor: crosshair;
 }
@@ -331,6 +331,11 @@ html.theme-wipe::view-transition-new(root) {
 }
 .art__frame img { opacity: 0; transition: opacity .7s ease; }
 .art__frame canvas { image-rendering: pixelated; transition: opacity .7s ease; }
+/* the dither develops in once, soft to sharp, like a print coming up (main.js adds .develop after painting it);
+   a CSS animation stays smooth while the page is still busy loading */
+.art__frame canvas.develop { animation: develop .7s cubic-bezier(.23, 1, .32, 1) backwards; }
+@keyframes develop { from { opacity: 0; filter: blur(6px); } }
+@keyframes develop-fade { from { opacity: 0; } }
 .art.is-plain .art__frame img { opacity: 1; }
 .art.is-plain .art__frame canvas { opacity: 0; }
 @media (hover: hover) {
@@ -777,6 +782,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .ticker.is-live .ticker__dot, .tkpop.is-open { animation: none; }
   .ticker__viewport { overflow-x: auto; mask-image: none; }
   .art__frame img, .art__frame canvas, .card, .card::before, .card__media img, .arrow, .nav__line { transition: none; }
+  .art__frame canvas.develop { animation: develop-fade .3s ease-out backwards; }
 }
 
 /* ---------- 404 ---------- */

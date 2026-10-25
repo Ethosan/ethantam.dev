@@ -462,18 +462,11 @@
         out.data[p + 3] = 255;
       }
 
-      if (reduceMotion) { ctx.putImageData(out, 0, 0); return; }
-
-      // scan the dithered image in from top to bottom
-      ctx.fillStyle = bgHex;
-      ctx.fillRect(0, 0, W, H);
-      let row = 0;
-      const step = () => {
-        row = Math.min(H, row + 6);
-        ctx.putImageData(out, 0, 0, 0, 0, W, row);
-        if (row < H) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
+      // Paint it whole, then let CSS develop it in (.develop in styles.css). A row-by-row scan from JavaScript
+      // stuttered while the page was still loading, and a theme change mid-scan ran two scans over each other.
+      // The class goes on once, so a theme change just repaints.
+      ctx.putImageData(out, 0, 0);
+      canvas.classList.add("develop");
     } catch {
       // canvas tainted (e.g. opened via file://) or unsupported: show the real painting
       art.classList.add("no-dither");
