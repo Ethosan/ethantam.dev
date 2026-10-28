@@ -28,7 +28,7 @@ Personal site of Ethan Tam: who I am, what I'm doing now, and the projects I've 
 | **Data** | Only the CV downloads and QR scans (below). The ticker streams from the Worker's `/api/live` (Yahoo for stocks, Binance for crypto). Visits are counted by Cloudflare Web Analytics, which sets no cookies: a manual-snippet site in the eatentam@gmail.com Cloudflare account (the hosting account is a different one), token in the beacon at the end of each page. |
 | **Who got the CV** | `/stats`, behind a password (any user name; the password is the Worker secret `STATS_KEY`, changed with `npx wrangler secret put STATS_KEY`). It counts downloads of the PDF and scans of each QR code, and lists the latest 200 with the time, the place and network Cloudflare puts the connection in, the device, and for a download the page or site that linked to it. Kept in the `Stats` Durable Object's SQLite for a year; no IP address and no cookie; a repeat by the same person within 30 minutes counts once (matched by a daily-salted hash, blanked after a day); crawlers and link previews are listed faded and left out of the totals. |
 | **Run locally** | `npm install && npm run dev` |
-| **Source** | [gitlab.com/eatentam/ethantam.dev](https://gitlab.com/eatentam/ethantam.dev) (moved from GitHub on 17 Oct 2026) |
+| **Source** | [gitlab.com/eatentam/ethantam.dev](https://gitlab.com/eatentam/ethantam.dev) (on GitLab since 17 Oct 2026). Read-only mirror: [github.com/Ethosan/ethantam.dev](https://github.com/Ethosan/ethantam.dev), which GitLab updates on every push |
 
 Settings: none on the site. The CI deploy needs a `CLOUDFLARE_API_TOKEN` CI/CD variable (masked and protected).
 
