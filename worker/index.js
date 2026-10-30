@@ -578,6 +578,7 @@ const PROJECTS = { // GitLab repo under eatentam -> the live app
   thelist: "https://list.ethantam.dev/",
   oracular: "https://oracular.ethantam.dev/",
 };
+const UNLINKED = new Set(["oracular"]); // source not linked from the site: up or down only, no last commit
 
 async function project([repo, site]) {
   const started = Date.now();
@@ -585,7 +586,7 @@ async function project([repo, site]) {
     fetch(site, { headers: { "user-agent": UA }, signal: AbortSignal.timeout(8000) })
       .then((r) => { r.body?.cancel(); return { up: r.ok, status: r.status, ms: Date.now() - started }; })
       .catch(() => ({ up: false, status: 0, ms: null })),
-    fetch(`https://gitlab.com/api/v4/projects/${encodeURIComponent(`eatentam/${repo}`)}/repository/commits?per_page=1`, { headers: { "user-agent": UA } })
+    UNLINKED.has(repo) ? null : fetch(`https://gitlab.com/api/v4/projects/${encodeURIComponent(`eatentam/${repo}`)}/repository/commits?per_page=1`, { headers: { "user-agent": UA } })
       .then((r) => (r.ok ? r.json() : null))
       .then((list) => list?.[0] && { id: list[0].short_id, at: list[0].committed_date, title: list[0].title, url: list[0].web_url })
       .catch(() => null),
