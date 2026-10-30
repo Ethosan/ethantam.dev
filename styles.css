@@ -213,7 +213,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .tkpop.is-down .tkpop__line { stroke: var(--down); }
 .tkpop__cap { color: var(--muted); font-size: 0.6875rem; }
 .tkpop .tkpop__why { margin-top: 14px; color: var(--fg-2); font-size: 0.875rem; line-height: 1.55; text-wrap: pretty; }
-.tkpop__why .mono { display: block; margin-bottom: 4px; color: var(--accent); font-size: 0.625rem; letter-spacing: .08em; text-transform: uppercase; }
+.tkpop__why .mono { display: block; margin-bottom: 4px; color: var(--accent); font-size: 0.6875rem; letter-spacing: .08em; text-transform: uppercase; }
 
 /* ---------- left column ---------- */
 .side { padding-top: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--line); } /* the intro ends here; content starts below the line, not under the socials */

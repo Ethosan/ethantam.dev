@@ -47,6 +47,24 @@
         "value": "instrument serif",
         "createdAt": "2026-10-30T01:55:03.899Z",
         "reason": "project design system: docs/brand/DESIGN.html and README specify Geist, Geist Mono and Instrument Serif"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-30T01:57:38.906Z",
+        "reason": "Agent: the flagged .ticker is a 40px bar whose 11-12px text is centred by flex (about 14px above and below); its children stretch to the edges but their text does not"
+      },
+      {
+        "rule": "marquee",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-30T01:57:40.545Z",
+        "reason": "Agent: domain-appropriate motion, a live stock ticker strip; pauses on hover, focus and an open card, and stops (scrollable) under prefers-reduced-motion"
       }
     ]
   }
