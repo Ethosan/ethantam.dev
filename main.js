@@ -552,8 +552,8 @@
     projects: () => [
       `Journal     futures trade journal: R multiples, what mistakes cost    ${a(LINKS.journal, "demo")} ${a("https://gitlab.com/eatentam/futuretracker", "src")}`,
       `20bucks     personal finance PWA: splits, PayLater, P&L, AI review   ${a(LINKS["20bucks"], "app")} ${a("https://gitlab.com/eatentam/moneytracker", "src")}`,
-      `Markets     macro dashboard: risk, regime, absorption, recession     ${a(LINKS.markets, "app")} ${a("https://gitlab.com/eatentam/eqmarkets", "src")}`,
-      `The List    ratings, leaderboard, auto want list, Telegram bot       ${a(LINKS.list, "app")} ${a("https://gitlab.com/eatentam/thelist", "src")}`,
+      `Markets     macro dashboard: risk, regime, absorption, recession     ${a(LINKS.markets, "app")}`,
+      `The List    ratings, leaderboard, auto want list, Telegram bot       ${a(LINKS.list, "app")}`,
       `Oracular    research terminal: council votes, seasonality, options   ${a(LINKS.oracular, "app")}`,
       `Tally       escrow trust layer: Cardano, evidence, reliability       ${a("https://github.com/xiaoyang4c/actual-token2049-hackathon-repo", "src")}`,
     ].join("\n"),

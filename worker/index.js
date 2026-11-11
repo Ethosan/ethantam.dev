@@ -578,7 +578,7 @@ const PROJECTS = { // GitLab repo under eatentam -> the live app
   thelist: "https://list.ethantam.dev/",
   oracular: "https://oracular.ethantam.dev/",
 };
-const UNLINKED = new Set(["oracular"]); // source not linked from the site: up or down only, no last commit
+const UNLINKED = new Set(["oracular", "eqmarkets", "thelist"]); // source not linked from the site: up or down only, no last commit
 
 async function project([repo, site]) {
   const started = Date.now();
