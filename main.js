@@ -538,7 +538,7 @@
     list: "https://list.ethantam.dev",
     markets: "https://markets.ethantam.dev",
     journal: "https://futuretracker.ethantam.dev/?demo",
-    oracular: "https://oracular.ethantam.dev",
+    oracular: "https://getoracular.com",
     resume: "/resume",
   };
   const a = (href, text = href) => `<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
