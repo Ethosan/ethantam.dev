@@ -13,6 +13,7 @@
   --max: 1200px;
   --tick-h: 40px;
   --ease: cubic-bezier(.16, 1, .3, 1);
+  --ease-out: cubic-bezier(.23, 1, .32, 1); /* entrances, presses, popovers */
   --r-sm: 6px;
   --r-md: 12px;
 
@@ -176,6 +177,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .tk b { color: var(--fg); font-weight: 500; margin-right: .5em; transition: color .15s; }
 .tk[aria-expanded="true"] b { color: var(--accent); }
 @media (hover: hover) and (pointer: fine) { .tk:hover b { color: var(--accent); } }
+.tk { position: relative; }
+.tk::before { content: ""; position: absolute; inset: -14px -10px; } /* the whole 40px bar is the target, not the 13px text */
 .tk:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; border-radius: 2px; }
 /* hold still while you're pointing at it, tabbing through it, or reading one */
 .ticker:focus-within .ticker__track, .ticker.is-open .ticker__track { animation-play-state: paused; }
@@ -334,7 +337,7 @@ html.theme-wipe::view-transition-new(root) {
 .art__frame canvas { image-rendering: pixelated; transition: opacity .7s ease; }
 /* the dither develops in once, soft to sharp, like a print coming up (main.js adds .develop after painting it);
    a CSS animation stays smooth while the page is still busy loading */
-.art__frame canvas.develop { animation: develop .7s cubic-bezier(.23, 1, .32, 1) backwards; }
+.art__frame canvas.develop { animation: develop .7s var(--ease-out) backwards; }
 @keyframes develop { from { opacity: 0; filter: blur(6px); } }
 @keyframes develop-fade { from { opacity: 0; } }
 .art.is-plain .art__frame img { opacity: 1; }
@@ -444,7 +447,7 @@ html.theme-wipe::view-transition-new(root) {
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   background: var(--bg-2);
-  transition: transform .45s var(--ease), filter .45s var(--ease);
+  transition: transform .25s var(--ease), filter .25s var(--ease);
 }
 
 /* narrow: the overlapping pair sits small on the left, words on the right, like the wide layout */
@@ -523,8 +526,8 @@ button.more { padding-inline: 0; border: 0; background: none; cursor: pointer; }
 @media (hover: hover) and (pointer: fine) { .copy-btn:hover { color: var(--accent); border-color: var(--accent); } }
 .copy-btn.copied { color: var(--up); border-color: var(--up); background: color-mix(in srgb, var(--up) 12%, transparent); }
 /* the small buttons answer the press itself, not the release */
-.copy-btn, .theme-btn, .term-btn { transition: color .15s, border-color .15s, background-color .15s, transform .16s cubic-bezier(.23, 1, .32, 1); }
-.copy-btn:active, .theme-btn:active, .term-btn:active { transform: scale(.94); }
+.copy-btn, .theme-btn, .term-btn { transition: color .15s, border-color .15s, background-color .15s, transform .16s var(--ease-out); }
+.copy-btn:active, .theme-btn:active, .term-btn:active { transform: scale(.97); }
 @media (prefers-reduced-motion: reduce) { .copy-btn:active, .theme-btn:active, .term-btn:active { transform: none; } }
 
 
@@ -566,6 +569,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 .term__out .cmd { color: var(--term-fg); }
 .term__out .cmd::before { content: "$ "; color: var(--accent); }
 .term__out .res { color: var(--term-muted); margin-bottom: 8px; }
+.term__out .err { color: var(--down); }
 .term__out .motd { color: var(--accent); margin-bottom: 12px; }
 .term__in { display: flex; gap: 8px; padding: 10px 14px 14px; border-top: 1px solid var(--line); }
 .term__in input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--term-fg); font: inherit; caret-color: var(--accent); }
@@ -613,7 +617,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
     letter-spacing: .12em;
     transition: color .2s;
   }
-  .nav__line { width: 32px; height: 1px; background: var(--line-2); transition: width .3s var(--ease), background-color .3s; }
+  .nav__line { width: 32px; height: 1px; background: var(--line-2); transition: width .2s var(--ease), background-color .2s; }
   .nav a:hover, .nav a:focus-visible, .nav a.is-active { color: var(--fg); }
   .nav a:hover .nav__line, .nav a:focus-visible .nav__line { width: 64px; background: var(--fg); }
   .nav a.is-active .nav__line { width: 64px; background: var(--accent); }
@@ -668,12 +672,12 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 
 /* desktop hover: lift the card under the pointer, dim the rest */
 @media (hover: hover) and (min-width: 1024px) {
-  .card { transition: opacity .3s var(--ease); }
+  .card { transition: opacity .2s var(--ease); }
   .card::before {
     content: "";
     position: absolute; inset: -24px -28px; z-index: -1;
     border-radius: var(--r-md);
-    transition: background-color .3s, box-shadow .3s;
+    transition: background-color .2s, box-shadow .2s;
   }
   .card:hover::before, .card:focus-within::before { background: var(--surface); box-shadow: inset 0 1px 0 var(--line-2); }
   .cards:hover .card:not(:hover) { opacity: .5; }
@@ -757,8 +761,10 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   .card:not(.is-open) .card__src { display: none; }
   /* opening a card: the details fade in just below where they land, rather than snapping in */
   .card.is-open .card__body > p:not(.card__why):not(.card__meta), .card.is-open .tags, .card.is-open .card__src {
-    transition: opacity .22s cubic-bezier(.23, 1, .32, 1), transform .22s cubic-bezier(.23, 1, .32, 1), color .15s;
+    transition: opacity .22s var(--ease-out), transform .22s var(--ease-out), color .15s;
   }
+  .card.is-open .tags { transition-delay: 40ms; }
+  .card.is-open .card__src { transition-delay: 80ms; }
   @starting-style {
     .card.is-open .card__body > p:not(.card__why):not(.card__meta), .card.is-open .tags, .card.is-open .card__src { opacity: 0; }
   }
@@ -784,6 +790,8 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
 }
 @media (pointer: coarse) {
   .term-btn, .theme-btn { width: 44px; height: 44px; }
+  .social .term-btn, .social .theme-btn { position: relative; }
+  .social .term-btn::before, .social .theme-btn::before { content: ""; position: absolute; inset: -6px; }
   .card__more, .card__src, .more, .hint { padding-block: 12px; }
   .contact__mail { padding-block: 10px; }
   .copy-btn { min-height: 44px; min-width: calc(7ch + 36px); padding-inline: 16px; }
@@ -898,7 +906,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   min-height: 40px; padding: 0 16px;
   border: 1px solid var(--line-2); border-radius: var(--r-sm);
   color: var(--fg); text-decoration: none;
-  transition: color .15s, border-color .15s, background-color .15s, transform .16s cubic-bezier(.23, 1, .32, 1);
+  transition: color .15s, border-color .15s, background-color .15s, transform .16s var(--ease-out);
 }
 .btn[hidden] { display: none; }
 @media (hover: hover) and (pointer: fine) { .btn:hover { border-color: var(--accent); color: var(--accent); } }
@@ -919,7 +927,7 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   background: var(--paper);
   border-radius: 3px;
   box-shadow: 0 1px 2px var(--card-shadow), 0 6px 16px -6px var(--card-shadow), 0 36px 80px -28px var(--card-shadow);
-  animation: sheet-in .7s cubic-bezier(.23, 1, .32, 1) both;
+  animation: sheet-in .7s var(--ease-out) both;
 }
 @keyframes sheet-in { from { opacity: 0; transform: translateY(14px); filter: blur(4px); } }
 .sheet .cv a { text-decoration: underline; text-decoration-color: transparent; text-underline-offset: .2em; transition: text-decoration-color .15s; }
@@ -959,11 +967,11 @@ body:has(.qr[open]) { overflow: hidden; }
 .qr__done {
   margin-top: 28px; min-height: 44px; padding: 0 24px;
   border: 1px solid #c9c4b8; border-radius: var(--r-sm); color: #1c1914;
-  transition: transform .16s cubic-bezier(.23, 1, .32, 1);
+  transition: transform .16s var(--ease-out);
 }
 .qr__done:active { transform: scale(.97); }
 /* it settles in like a card laid down: quick, since it's opened mid-conversation */
-.qr[open] { transition: opacity .22s cubic-bezier(.23, 1, .32, 1), transform .22s cubic-bezier(.23, 1, .32, 1); }
+.qr[open] { transition: opacity .22s var(--ease-out), transform .22s var(--ease-out); }
 @starting-style { .qr[open] { opacity: 0; transform: scale(.98); } }
 @media (prefers-reduced-motion: reduce) {
   .qr[open] { transition: opacity .2s ease-out; }

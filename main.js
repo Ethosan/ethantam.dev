@@ -1,6 +1,21 @@
 (() => {
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (s, el = document) => el.querySelector(s);
+  // Feedback that can't be missed, kept for the rare moments: a mistake shakes (±7px, 280ms), a success overshoots and
+  // settles. Each cancels its own last run, so a second press mid-way starts clean. Reduced motion keeps the colour only.
+  const shake = (el) => {
+    if (reduceMotion || !el.animate) return;
+    el.getAnimations().forEach((a) => a.id === "shake" && a.cancel());
+    el.animate([{ transform: "translateX(0)" }, { transform: "translateX(-7px)" }, { transform: "translateX(7px)" },
+      { transform: "translateX(-4px)" }, { transform: "translateX(2px)" }, { transform: "translateX(0)" }],
+    { duration: 280, easing: "ease-out", id: "shake" });
+  };
+  const overshoot = (el) => {
+    if (reduceMotion || !el.animate) return;
+    el.getAnimations().forEach((a) => a.id === "overshoot" && a.cancel());
+    el.animate([{ transform: "scale(1)" }, { transform: "scale(1.12)", offset: 0.35 }, { transform: "scale(1)" }],
+      { duration: 280, easing: "cubic-bezier(.23, 1, .32, 1)", id: "overshoot" });
+  };
 
   // the section titles run edge to edge with 100vw, which counts a desktop scrollbar too: measure it (styles.css --sbw)
   const measureScrollbar = () => document.documentElement.style.setProperty("--sbw", `${innerWidth - document.documentElement.clientWidth}px`);
@@ -207,6 +222,14 @@
     why: $(".tkpop__text", pop), reg: $(".tkpop__reg", pop), base: $(".tkpop__base", pop), line: $(".tkpop__line", pop),
   };
   const sparks = new Map(); // symbol -> { at, data }, kept for a minute
+  let drawn = false; // has this opening's chart come in yet (it redraws on every tick, but only arrives once)
+  const settle = () => {
+    if (drawn) return;
+    drawn = true;
+    const svg = popEl.line.ownerSVGElement;
+    svg.animate?.(reduceMotion ? [{ opacity: 0 }, { opacity: 1 }] : [{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0 0 0)" }],
+      { duration: 240, delay: 60, easing: "cubic-bezier(.23, 1, .32, 1)", fill: "backwards" });
+  };
   const SW = 300, SH = 64, SPAD = 5;
   const weekday = (ms, timeZone) => new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone }).format(ms);
   const drawPop = () => {
@@ -238,6 +261,7 @@
     const X = (tt) => ((tt - x0) / (x1 - x0 || 1)) * SW;
     const Y = (v) => SPAD + (1 - (v - lo) / span) * (SH - 2 * SPAD);
     popEl.line.setAttribute("d", pts.map(([tt, v], i) => `${i ? "L" : "M"}${X(tt).toFixed(1)} ${Y(v).toFixed(1)}`).join(""));
+    settle();
     popEl.base.setAttribute("visibility", d.prev ? "visible" : "hidden");
     if (d.prev) ["y1", "y2"].forEach((a) => popEl.base.setAttribute(a, Y(d.prev).toFixed(1)));
     popEl.reg.setAttribute("x", d.regular ? X(d.regular[0]).toFixed(1) : 0);
@@ -267,6 +291,7 @@
     closePop();
     popS = s;
     popAt = el;
+    drawn = false;
     popEl.why.textContent = WATCH[s][1];
     cells.get(s)[0].setAttribute("aria-expanded", "true");
     pop.classList.add("is-open");
@@ -596,26 +621,27 @@
     exit: () => { closeTerm(); return null; },
   };
 
-  const print = (cmd, res) => {
+  const print = (cmd, res, err = false) => {
     const c = document.createElement("div");
     c.className = "cmd"; c.textContent = cmd;
     out.append(c);
     if (res != null) {
       const r = document.createElement("div");
-      r.className = "res"; r.innerHTML = res;
+      r.className = err ? "res err" : "res"; r.innerHTML = res;
       out.append(r);
     }
     out.scrollTop = out.scrollHeight;
   };
 
   const run = (raw) => {
-    const line = raw.trim();
+    const line = raw.trim().replace(/^[$>/]\s*/, ""); // pasted from a prompt, or typed like a slash command
     if (!line) return;
     history.push(line); hIdx = history.length;
     const [name, ...args] = line.split(/\s+/);
     const fn = COMMANDS[name.toLowerCase()];
     const res = fn ? fn(args.join(" ").toLowerCase()) : `command not found: ${esc(name)}. type \`help\``;
-    if (name.toLowerCase() !== "clear") print(line, res);
+    if (name.toLowerCase() !== "clear") print(line, res, !fn);
+    if (!fn) shake(input.parentElement);
   };
 
   // everything except the terminal goes inert while it's open, so focus and screen readers stay inside
@@ -710,7 +736,7 @@
         { transform: toLight ? "translateY(100vh)" : "translateY(-100%)", opacity: 1 },
         { transform: toLight ? "translateY(-100%)" : "translateY(100vh)", opacity: 0 },
       ],
-      { duration: 560, easing: "cubic-bezier(.16, 1, .3, 1)" }
+      { duration: 480, easing: "cubic-bezier(.16, 1, .3, 1)" }
     );
     const vt = document.startViewTransition(apply);
     vt.ready.then(() => {
@@ -762,15 +788,16 @@
         const original = btn.textContent;
         relabel(btn, "Copied!");
         btn.classList.add("copied");
+        overshoot(btn);
         setTimeout(() => { relabel(btn, original); btn.classList.remove("copied"); }, 2000);
       } catch {
         // clipboard API unavailable (e.g. non-secure context): fall back to execCommand
         const ta = document.createElement("textarea");
         ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
         document.body.append(ta); ta.select();
-        try { document.execCommand("copy"); btn.textContent = "Copied!"; btn.classList.add("copied");
+        try { document.execCommand("copy"); btn.textContent = "Copied!"; btn.classList.add("copied"); overshoot(btn);
           setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
-        } catch { btn.textContent = text; }
+        } catch { btn.textContent = text; shake(btn); }
         ta.remove();
       }
     });
