@@ -19,15 +19,12 @@ import { DurableObject } from "cloudflare:workers";
 
 const COINS = { BTC: "BTCUSDT", ETH: "ETHUSDT", SOL: "SOLUSDT" }; // Binance symbols
 const COINBASE = { BTC: "BTC-USD", ETH: "ETH-USD", SOL: "SOL-USD" }; // REST for the coins (see coinsRest)
-const STOCKS = ["AXTI", "MU", "NBIS", "LLY", "GS", "IBKR", "NVDA", "CRWD", "NET", "CAT"]; // on New York hours
+const STOCKS = ["AXTI", "MU", "NBIS", "ANT", "LLY", "GS", "IBKR", "NVDA", "CRWD", "NET", "CAT"]; // on New York hours
 // Not on New York hours, so no PRE/AH tags and no say in when the market is open. Ticker label -> Yahoo symbol.
 const ELSEWHERE = { US10Y: "^TNX", USDJPY: "JPY=X", DBS: "D05.SI" };
 const YAHOO = { ...Object.fromEntries(STOCKS.map((s) => [s, s])), ...ELSEWHERE }; // everything from Yahoo, by label
 const LABEL = Object.fromEntries(Object.entries(YAHOO).map(([label, y]) => [y, label]));
-// Not listed anywhere yet, so no Yahoo or Binance feed: Anthropic's pre-IPO price comes from Hyperliquid's trade.xyz market
-// (a synthetic perpetual on the expected Nasdaq ticker). It trades round the clock, so it is treated like a coin.
-const HYPER = { ANT: "xyz:ANT" };
-const ORDER = [...Object.keys(COINS), ...Object.keys(HYPER), ...Object.keys(YAHOO)];
+const ORDER = [...Object.keys(COINS), ...Object.keys(YAHOO)];
 
 const UA = "Mozilla/5.0 (ethantam.dev ticker)";
 const FLUSH_MS = 250;        // at most four pushes a second to each visitor
@@ -104,22 +101,6 @@ async function stockRest(s) {
 // from Cloudflare (its socket is fine), so this asks Coinbase: last trade, and the change against 24 hours ago.
 function coinsRest() {
   return Promise.all(Object.keys(COINS).map(coinbaseRest));
-}
-
-// Hyperliquid's public info API: mark price and the price 24 hours ago, for the whole xyz market in one call.
-async function hyperRest() {
-  try {
-    const r = await fetch("https://api.hyperliquid.xyz/info", { method: "POST", headers: { "content-type": "application/json", "user-agent": UA }, body: JSON.stringify({ type: "metaAndAssetCtxs", dex: "xyz" }) });
-    if (!r.ok) return [];
-    const [meta, ctx] = await r.json();
-    return Object.entries(HYPER).map(([s, name]) => {
-      const i = meta.universe.findIndex((u) => u.name === name), c = ctx[i];
-      const p = +c?.markPx, prev = +c?.prevDayPx;
-      return p > 0 ? { s, p, t: Date.now(), c: prev ? ((p - prev) / prev) * 100 : null } : null;
-    });
-  } catch {
-    return [];
-  }
 }
 
 async function coinbaseRest(s) {
@@ -206,7 +187,6 @@ export class Ticker extends DurableObject {
     const jobs = [];
     if (!this.healthy("yahoo") || now - this.lastStockRest > STOCK_REST_MS) jobs.push(this.refreshStocks());
     if (!this.healthy("binance")) jobs.push(this.refreshCoins());
-    jobs.push(this.refreshHyper()); // no socket for this one: poll every watchdog tick
     await Promise.all(jobs);
 
     if (now - this.lastSent > WATCHDOG_MS - 1000) this.broadcast([]); // heartbeat: visitors reconnect if they hear nothing
@@ -283,7 +263,7 @@ export class Ticker extends DurableObject {
   }
 
   refresh() {
-    return (this.refreshing ??= Promise.all([this.refreshStocks(), this.refreshCoins(), this.refreshHyper()])
+    return (this.refreshing ??= Promise.all([this.refreshStocks(), this.refreshCoins()])
       .finally(() => { this.refreshing = null; }));
   }
 
@@ -296,10 +276,6 @@ export class Ticker extends DurableObject {
       this.put(q, !this.healthy("yahoo"));
     }
     this.lastStockRest = Date.now();
-  }
-
-  async refreshHyper() {
-    for (const q of await hyperRest()) if (q) this.put(q, false);
   }
 
   async refreshCoins() {
@@ -623,13 +599,6 @@ async function project([repo, site]) {
 async function spark(s) {
   // a coin's last 24 hours comes from Yahoo too (Binance's REST refuses Cloudflare); the page draws the baseline from
   // the live 24h change, so it matches the number shown
-  if (HYPER[s]) {
-    const now = Math.round(Date.now() / 1000), start = now - 86_400;
-    const h = await fetch("https://api.hyperliquid.xyz/info", { method: "POST", headers: { "content-type": "application/json", "user-agent": UA }, body: JSON.stringify({ type: "candleSnapshot", req: { coin: HYPER[s], interval: "15m", startTime: start * 1000, endTime: now * 1000 } }) });
-    if (!h.ok) throw new Error(h.status);
-    const points = (await h.json()).map((k) => [Math.round(k.t / 1000), round(+k.c, 4)]).filter(([, c]) => c > 0);
-    return { s, prev: points[0]?.[1], start, end: now, points };
-  }
   const coin = !!COINS[s];
   const r = await fetch(
     `https://query1.finance.yahoo.com/v8/finance/chart/${coin ? `${s}-USD` : encodeURIComponent(YAHOO[s])}?${coin ? "range=2d&interval=15m" : "range=1d&interval=5m&includePrePost=true"}`,

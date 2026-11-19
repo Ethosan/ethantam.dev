@@ -119,12 +119,12 @@
     BTC: ["Bitcoin", "The one market that never closes, so it's my read on risk appetite at 3am, before anything else opens."],
     ETH: ["Ether", "Crypto's second engine. When it outruns Bitcoin, people are reaching for risk; when it lags, they're hiding in the big one."],
     SOL: ["Solana", "The high-beta end of crypto: it runs furthest in a melt-up and falls hardest when the tide goes out."],
-    ANT: ["Anthropic (pre-IPO)", "The maker of Claude, not listed yet. This is the pre-IPO market on Hyperliquid, a synthetic contract on the expected Nasdaq ticker, so it is a market's guess, not a share price. It trades round the clock and should become a normal ticker once the shares list."],
     US10Y: ["US 10-year Treasury yield", "The rate everything else is priced off, from mortgages to what a company's future earnings are worth today. When it jumps, the long-dated growth stocks on this list feel it first."],
     USDJPY: ["US dollar in yen", "The yen carry trade in one number: borrow cheap in yen, buy everything else. A sharp fall here means that trade is unwinding, which is what shook every market at once in August 2024."],
     AXTI: ["AXT Inc", "A small maker of the indium phosphide wafers under optical AI networking, with its factories in China, so export rules move it as much as earnings do."],
     MU: ["Micron", "Memory is the most cyclical corner of chips. High-bandwidth memory for AI is the test of whether this cycle is different."],
     NBIS: ["Nebius", "An AI cloud spun out of Yandex. Beyond renting out GPUs, its Token Factory sells AI models by the token, a test of whether an AI cloud can be more than a landlord for chips."],
+    ANT: ["Anthropic", "The maker of Claude, newly listed on Nasdaq. A brand-new listing swings hard on supply and hype, and it is the clearest public read on how much the market will pay for the front of the AI race."],
     LLY: ["Eli Lilly", "GLP-1 drugs turned a pharma company into a growth stock. I'm watching how long it can be priced like one."],
     GS: ["Goldman Sachs", "Dealmaking and trading in one ticker. When IPOs and M&A come back, it tends to show up here before the headlines."],
     DBS: ["DBS Group", "Singapore's biggest bank and the heaviest weight in the Straits Times Index, so it's the closest thing to a daily read on the economy I live in. Priced in Singapore dollars."],
@@ -135,7 +135,7 @@
     CAT: ["Caterpillar", "The old economy's order book: construction, mining, and now the generators going into data centres."],
   };
   const WATCHLIST = Object.keys(WATCH);
-  const COINS = { BTC: "bitcoin", ETH: "ethereum", SOL: "solana", ANT: "" }; // ANT is not a coin but trades round the clock and shows the same 24-hour path; "" keeps it out of the CoinGecko fallback
+  const COINS = { BTC: "bitcoin", ETH: "ethereum", SOL: "solana" };
   const SESSIONS = { pre: "pre-market", ah: "after hours" };
   const PX_PER_SEC = 45;
   const POLL_MS = 5_000;
@@ -251,7 +251,7 @@
       return;
     }
     // a coin's baseline is the price 24 hours ago implied by its live change, so the dashed line matches the number shown
-    const d = s in COINS && typeof p === "number" && typeof c === "number" ? { ...got.data, prev: p / (1 + c / 100) } : got.data;
+    const d = COINS[s] && typeof p === "number" && typeof c === "number" ? { ...got.data, prev: p / (1 + c / 100) } : got.data;
     const pts = d.points.slice();
     const now = (t ?? Date.now()) / 1000;
     if (typeof p === "number" && (!pts.length || now > pts.at(-1)[0])) pts.push([now, p]);
@@ -268,7 +268,7 @@
     popEl.reg.setAttribute("x", d.regular ? X(d.regular[0]).toFixed(1) : 0);
     popEl.reg.setAttribute("width", d.regular ? Math.max(0, X(d.regular[1]) - X(d.regular[0])).toFixed(1) : 0);
     const [place, tz] = MARKET[s] ?? NEW_YORK;
-    popEl.cap.textContent = s in COINS
+    popEl.cap.textContent = COINS[s]
       ? `Last 24 hours · 24h ago ${fmtPx(d.prev)}`
       : s === "USDJPY"
         ? `Trades round the clock on weekdays · prev close ${fmtQ(s, d.prev)}`
@@ -334,11 +334,11 @@
     return q;
   };
   const fromCoinGecko = async () => {
-    const ids = Object.values(COINS).filter(Boolean).join(",");
+    const ids = Object.values(COINS).join(",");
     const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true&include_last_updated_at=true`);
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
-    return Object.entries(COINS).filter(([, id]) => id && d[id]).map(([s, id]) => ({ s, p: d[id].usd, c: d[id].usd_24h_change, t: d[id].last_updated_at * 1000 }));
+    return Object.entries(COINS).filter(([, id]) => d[id]).map(([s, id]) => ({ s, p: d[id].usd, c: d[id].usd_24h_change, t: d[id].last_updated_at * 1000 }));
   };
 
   let sock = null, heard = 0, tries = 0, polling = false, pollTimer = 0, retryTimer = 0, sleepTimer = 0;
