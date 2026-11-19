@@ -36,7 +36,7 @@ The facts below come from his CV. The CV page and its PDF are the source to cite
 ## Projects
 
 - [Oracular](https://getoracular.com): stock research web app where a twelve-seat Council votes on live data across one-week, three-month and one-year horizons
-- [Equarian Markets](https://markets.ethantam.dev): live macro dashboard tracking yields, carry and a risk-appetite index, with a portfolio tracker across four brokers
+- [Equarian Markets](https://markets.ethantam.dev): live macro dashboard tracking yields, carry and a risk-appetite index
 - [The List](https://list.ethantam.dev): shared restaurant list with ratings, a leaderboard and a Telegram bot
 - [20bucks](https://20bucks.ethantam.dev): personal finance app for spending, PayLater instalments, bill splits and trading P&L
 - [Trade Journal](https://futuretracker.ethantam.dev): futures trade journal that works out R multiples and what each mistake costs
