@@ -3,9 +3,10 @@
   "name": "ethantam-dev",
   "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
-  // the Camino page's own subdomain; worker/index.js serves camino.html on it and 404s /camino* on the main host.
-  // the deploy creates the DNS record on the ethantam.dev zone (same account) automatically
-  "custom_domains": ["spain.ethantam.dev"],
+  // the Camino page's own subdomain spain.ethantam.dev is attached at deploy time with
+  // `wrangler deploy --domain spain.ethantam.dev` (CI below); worker/index.js serves camino.html
+  // on that host and 404s /camino* on the main host. wrangler 4 ignores a top-level
+  // "custom_domains" key, so it must be a deploy flag, not config.
   "assets": {
     "directory": ".",
     "binding": "ASSETS",

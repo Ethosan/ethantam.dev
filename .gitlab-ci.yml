@@ -14,7 +14,8 @@ deploy:
     CLOUDFLARE_ACCOUNT_ID: "f4cf66898198033a983bcbc15b6f3900"
   script:
     - npm ci --no-audit --no-fund
-    # tag the version with its commit, so the Cloudflare dashboard shows which build is which
-    - npx wrangler deploy --tag "$CI_COMMIT_SHORT_SHA"
+    # tag the version with its commit, so the Cloudflare dashboard shows which build is which;
+    # --domain attaches spain.ethantam.dev (the Camino page) and creates its DNS record on the zone
+    - npx wrangler deploy --tag "$CI_COMMIT_SHORT_SHA" --domain spain.ethantam.dev
     # ask Bing and the other IndexNow engines to re-crawl the sitemap's pages; never fails the deploy
     - node scripts/indexnow.mjs
