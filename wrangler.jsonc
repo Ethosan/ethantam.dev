@@ -3,6 +3,8 @@
   "name": "ethantam-dev",
   "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
+  // the Camino page's own subdomain; worker/index.js rewrites it to camino.html, and the deploy creates the DNS record
+  "custom_domains": ["spain.ethantam.dev"],
   "assets": {
     "directory": ".",
     "binding": "ASSETS",
