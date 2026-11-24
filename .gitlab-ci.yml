@@ -31,4 +31,6 @@ pages:
     CLOUDFLARE_ACCOUNT_ID: "f4cf66898198033a983bcbc15b6f3900"
   script:
     - npm ci --no-audit --no-fund
+    # create the Pages project on first run; wrangler pages deploy needs it to exist (harmless if it does)
+    - npx wrangler pages project create spain-ethantam-dev --production-branch main || true
     - npx wrangler pages deploy spain --project-name spain-ethantam-dev
