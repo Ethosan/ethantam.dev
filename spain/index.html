@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script>try{const t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t;else if(matchMedia("(prefers-color-scheme: light)").matches)document.documentElement.dataset.theme="light"}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <title>The long way to Santiago · Ethan Tam</title>
+  <meta name="description" content="A 36-day walking pilgrimage on the Camino Francés, Saint-Jean-Pied-de-Port to Santiago de Compostela plus the Finisterre epilogue, planned day by day from 22 February.">
+  <meta name="theme-color" content="#0c0b0a" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)">
+  <link rel="canonical" href="https://spain.ethantam.dev/">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="fonts.css?v=2026.10.18" fetchpriority="high">
+  <link rel="stylesheet" href="styles.css?v=2026.11.15a">
+  <link rel="stylesheet" href="camino.css?v=2026.11.24">
+  <meta name="app-version" content="1.11.0">
+</head>
+<body>
+<div id="progress"></div>
+<header class="cam-head" id="topbar">
+  <div class="wrap cam-head__in">
+    <a class="brand mono" href="/" aria-label="Ethan Tam, home">
+      <img src="mark.svg" alt="" width="22" height="22">
+      <span>ethantam<span class="dim">.dev</span></span>
+    </a>
+    <nav class="mono" aria-label="Sections">
+      <a href="#compare">Compare</a>
+      <a href="#overview">Overview</a>
+      <a href="#route">Route</a>
+      <a href="#days">Day by day</a>
+      <a href="#practical">Practical</a>
+      <a href="#epilogue">Finisterre</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero" id="hero">
+    <p class="klabel mono reveal in"><span class="krule"></span>A pilgrimage on foot · France → Spain → the Atlantic</p>
+    <h1>The long way <em>to Santiago.</em></h1>
+    <p class="lede hero__lede reveal">The Camino Francés from Saint-Jean-Pied-de-Port to Santiago de Compostela — with a three-day epilogue to the lighthouse at Finisterre. Thirty-four days of walking, planned stage by stage, for a 22 February start in the quiet of winter. If the trip is capped at two weeks, the comparison just below cuts five routes to fit 22 Feb – 7 Mar.</p>
+    <div class="chips reveal">
+      <span class="chip"><b class="num">22 Feb → 29 Mar</b> main route</span>
+      <span class="chip"><b class="num">≈780 km</b> on foot</span>
+      <span class="chip"><b class="num">34</b> walking days</span>
+      <span class="chip"><b class="num">2</b> rest days</span>
+      <span class="chip"><b class="num">+3 days</b> to Finisterre</span>
+      <span class="chip"><b class="num">2</b> countries, one shell</span>
+    </div>
+    <div class="cta-row reveal">
+      <a class="btn btn--acc" href="#days">See the day-by-day plan <span class="arrow" aria-hidden="true">↓</span></a>
+      <a class="btn btn--ghost" href="#route">The route map</a>
+    </div>
+    <div class="hero-foot">
+      <div class="scroll-cue mono"><span class="line"></span>Scroll to walk</div>
+      <div class="hero-stat"><b class="num" id="kmCount">0</b><span>kilometres, door to door</span></div>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marqueeTrack"></div></div>
+
+  <section class="sec" id="compare">
+    <div class="sec-head reveal">
+      <div><p class="klabel mono">01 — Max two weeks</p><h2>Five ways to use <em>22 Feb – 7 Mar.</em></h2></div>
+      <span class="idx">every option fits in 14 days</span>
+    </div>
+    <p class="lede sec-lede reveal">If the trip is capped at two weeks, the full Francés below doesn't fit — so each option here is a 2-week cut that starts on 22 February and is home by 7 March. The table compares them on what matters in winter; the cards give the feel of each. Our pick is <b>A</b>, with its day-by-day under the table.</p>
+    <div class="trips">
+      <article class="trip trip--pick reveal">
+        <p class="trip__tag mono">A · our pick · earns the Compostela</p>
+        <h3>Sarria → Santiago → Finisterre</h3>
+        <p class="trip__route">Last 100 km of the Francés + the Atlantic epilogue</p>
+        <p class="trip__stats mono num">≈179 km · 8 walking days · walk 23 Feb – 3 Mar · home by 7 Mar · ≈ €0.8–1.2k</p>
+        <p class="trip__verdict">The classic two-week Camino: fly to Santiago, bus to Sarria, walk the last 100 km (that's what makes the Compostela official), then three more days to the lighthouse at Finisterre. Galicia in February is cool and rainy but rarely dangerous, and this is the best-supported stretch in winter.</p>
+      </article>
+      <article class="trip reveal">
+        <p class="trip__tag mono">B · milder, coastal</p>
+        <h3>Porto → Santiago, coastal</h3>
+        <p class="trip__route">Camino Portugués, coastal variant</p>
+        <p class="trip__stats mono num">≈274 km · 11–12 days · walk 23 Feb – 5/6 Mar · ≈ €1.0–1.5k</p>
+        <p class="trip__verdict">Atlantic beaches and boardwalks from Porto, then inland through Galicia to Santiago. The mildest weather of the walking options; arrives right at the two-week edge, so book the Porto flight early.</p>
+      </article>
+      <article class="trip reveal">
+        <p class="trip__tag mono">C · the big crossing</p>
+        <h3>Saint-Jean-Pied-de-Port → Burgos</h3>
+        <p class="trip__route">First half of the Francés: Pyrenees, Navarra, Rioja</p>
+        <p class="trip__stats mono num">≈294 km · 12–13 days · walk 22 Feb – 5 Mar · ≈ €1.0–1.4k</p>
+        <p class="trip__verdict">The Pyrenees crossing (Valcarlos route in winter — the high route is closed), the Alto del Perdón, Logroño's tapas street, and a big arrival under Burgos' cathedral. No Compostela (you stop short of Santiago), but the highest scenery-per-week of the five.</p>
+      </article>
+      <article class="trip reveal">
+        <p class="trip__tag mono">D · quiet northern Galicia</p>
+        <h3>Vilalba → Santiago</h3>
+        <p class="trip__route">Last 100 km of the Camino del Norte</p>
+        <p class="trip__stats mono num">≈102 km · 7 days · walk 23 Feb – 1 Mar · ≈ €0.7–1.1k</p>
+        <p class="trip__verdict">Rías, Mondoñedo, Guitiriz — green Galicia approached from the north coast; wetter and quieter than the Francés's last 100 km, same Compostela. Cheap and compact; pair with a day in Lugo.</p>
+      </article>
+      <article class="trip reveal">
+        <p class="trip__tag mono">E · the warm escape</p>
+        <h3>Madeira levada week</h3>
+        <p class="trip__route">Funchal → levadas &amp; ridges (Pico do Arieiro, Pico Ruivo) → Funchal</p>
+        <p class="trip__stats mono num">≈70 km of walks · 7 days · 22 Feb – 1 Mar · ≈ €0.9–1.3k</p>
+        <p class="trip__verdict">15–20 °C in February, subtropical green, waterfall and ridge walks — no pilgrimage, no Compostela, and short, but the best weather of the five by far. Pick this if February cold is the dealbreaker.</p>
+      </article>
+    </div>
+    <div class="table-scroll reveal">
+      <table class="cmp">
+        <thead>
+          <tr><th></th><th class="pick">A · Sarria→Finisterre</th><th>B · Porto coastal</th><th>C · SJPP→Burgos</th><th>D · Vilalba→Santiago</th><th>E · Madeira</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Distance</td><td class="pick">≈179 km</td><td>≈274 km</td><td>≈294 km</td><td>≈102 km</td><td>≈70 km</td></tr>
+          <tr><td>Walking days</td><td class="pick">8</td><td>11–12</td><td>12–13</td><td>7</td><td>7</td></tr>
+          <tr><td>Walk dates</td><td class="pick">23 Feb – 3 Mar</td><td>23 Feb – 5/6 Mar</td><td>22 Feb – 5 Mar</td><td>23 Feb – 1 Mar</td><td>22 Feb – 1 Mar</td></tr>
+          <tr><td>Compostela</td><td class="pick">Yes — Sarria onward</td><td>Yes — Tui onward</td><td>No (stops in Burgos)</td><td>Yes — Vilalba onward</td><td>No</td></tr>
+          <tr><td>Scenery</td><td class="pick">High — green lanes, Atlantic</td><td>High — coast + Galicia</td><td>Highest — Pyrenees, Rioja, meseta edge</td><td>High — rías, northern Galicia</td><td>High — lush, compact</td></tr>
+          <tr><td>Feb weather risk</td><td class="pick">Low–Med — cool, rainy</td><td>Low–Med — mild, rainy</td><td>Medium — cold; Valcarlos crossing</td><td>Low–Med — wet</td><td>Low — warm</td></tr>
+          <tr><td>Winter beds</td><td class="pick">Good — busiest stretch, Xunta €10, book ahead</td><td>Scarcer than Francés</td><td>APRINCA list, book ahead</td><td>Thin — plan daily</td><td>Plenty (guesthouses)</td></tr>
+          <tr><td>Est. cost incl. flights</td><td class="pick">€0.8–1.2k</td><td>€1.0–1.5k</td><td>€1.0–1.4k</td><td>€0.7–1.1k</td><td>€0.9–1.3k</td></tr>
+          <tr><td>Best for</td><td class="pick">First Camino, Compostela + ocean finish</td><td>Coast lovers, milder weather</td><td>Mountains, wine, big arrival</td><td>Quiet northern Galicia</td><td>Warmth, short trip</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="whybox reveal">
+      <div>
+        <h3>How to choose <em>within two weeks</em></h3>
+        <p>With 14 days, aim for one walking goal plus buffers for flights and a rest day — not five goals. A and D both earn the Compostela; A adds the ocean finish and has the deepest winter bed network.</p>
+      </div>
+      <ul>
+        <li>Want the Compostela + the Finisterre sunset on a first Camino → <b>A: Sarria → Santiago → Finisterre</b> (day-by-day below).</li>
+        <li>Want the most kilometres in two weeks → <b>B</b> (Porto coastal) or <b>C</b> (SJPP → Burgos).</li>
+        <li>Want the quietest / cheapest Camino → <b>D</b> (Vilalba → Santiago); the Vía de la Plata's last 100 km from Ourense is the same idea inland.</li>
+        <li>February cold is the dealbreaker → <b>E: Madeira</b>.</li>
+      </ul>
+    </div>
+    <div class="table-scroll reveal">
+      <table class="cmp cmp--cut">
+        <thead>
+          <tr><th class="cut-head" colspan="4">A day-by-day · Sarria → Santiago → Finisterre · 22 Feb – 7 Mar</th></tr>
+          <tr><th>Day</th><th>Stage</th><th>Km</th><th>Note</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>22 Feb</td><td>Fly to Santiago (SCQ) → bus to Sarria</td><td>—</td><td>Collect the credencial in Sarria; settle in</td></tr>
+          <tr><td>23 Feb</td><td>Sarria → Portomarín</td><td>22.5</td><td>Sunken green lanes; Portomarín above the reservoir</td></tr>
+          <tr><td>24 Feb</td><td>Portomarín → Palas de Rei</td><td>25.0</td><td>Rolling Galician farmland</td></tr>
+          <tr><td>25 Feb</td><td>Palas de Rei → Arzúa</td><td>28.8</td><td>Pulpo lunch in Melide on the way</td></tr>
+          <tr><td>26 Feb</td><td>Arzúa → O Pedrouzo</td><td>19.3</td><td>Forest; last night before the city</td></tr>
+          <tr><td>27 Feb</td><td>O Pedrouzo → Santiago ✦</td><td>20.0</td><td>Pilgrim's Mass 12:00; Compostela at rúa das Carretas 33</td></tr>
+          <tr><td>28 Feb</td><td>Santiago — rest day</td><td>—</td><td>Cathedral, old town, celebration</td></tr>
+          <tr><td>1 Mar</td><td>Santiago → Negreira</td><td>21.0</td><td>Epilogue day 1</td></tr>
+          <tr><td>2 Mar</td><td>Negreira → Olveiroa</td><td>23.0</td><td>Epilogue day 2</td></tr>
+          <tr><td>3 Mar</td><td>Olveiroa → Finisterre ✦</td><td>19.0</td><td>Sunset at the lighthouse; bus back to Santiago</td></tr>
+          <tr><td>4–7 Mar</td><td>Buffer · fly home from SCQ</td><td>—</td><td>Room for weather or flight slip</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sec sec--tight" id="overview">
+    <div class="sec-head reveal">
+      <div><p class="klabel mono">02 — The full route · ~5 weeks</p><h2>Why this route, <em>why now.</em></h2></div>
+      <span class="idx">Saint-Jean-Pied-de-Port → Santiago → Finisterre</span>
+    </div>
+    <p class="lede sec-lede reveal">The Francés is the classic pilgrimage road: ~780 km from the French Pyrenees to Galicia, crossing five landscapes — mountains, green valleys, wine country, the high meseta, and the Atlantic forests. We start on 22 February on purpose: the trails are empty, the air is cold and clear, and the walk feels like it belongs to you alone. This is the full ~5-week version — with a two-week cap, use option A in the comparison above (Sarria → Santiago → Finisterre).</p>
+    <div class="grid3">
+      <div class="pcard reveal">
+        <svg class="shell-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 22C6.5 22 2.5 17.5 2.5 12 2.5 6.5 6.5 2 12 2s9.5 4.5 9.5 10c0 5.5-4 10-9.5 10Z" stroke="currentColor" stroke-width="1.5"/><path d="M12 21V4M12 21 5.5 7M12 21l6.5-14M12 21 3.5 12M12 21l8.5-9" stroke="currentColor" stroke-width="1.1"/></svg>
+        <h3>Walk far, not fast</h3>
+        <p>20–29 km a day at an easy pace. Thirty-four walking days with two full rest days in Burgos and León. The Camino rewards the unhurried — you are not racing the route, you are reading it.</p>
+      </div>
+      <div class="pcard reveal">
+        <svg class="shell-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 22C6.5 22 2.5 17.5 2.5 12 2.5 6.5 6.5 2 12 2s9.5 4.5 9.5 10c0 5.5-4 10-9.5 10Z" stroke="currentColor" stroke-width="1.5"/><path d="M12 21V4M12 21 5.5 7M12 21l6.5-14M12 21 3.5 12M12 21l8.5-9" stroke="currentColor" stroke-width="1.1"/></svg>
+        <h3>Climb where it counts</h3>
+        <p>The scenic high points are all here: the Pyrenees crossing on day one (Valcarlos route in winter), the Alto del Perdón wind ridge, the Cruz de Ferro at 1,505 m, and a night in O Cebreiro at 1,293 m above Galicia.</p>
+      </div>
+      <div class="pcard reveal">
+        <svg class="shell-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 22C6.5 22 2.5 17.5 2.5 12 2.5 6.5 6.5 2 12 2s9.5 4.5 9.5 10c0 5.5-4 10-9.5 10Z" stroke="currentColor" stroke-width="1.5"/><path d="M12 21V4M12 21 5.5 7M12 21l6.5-14M12 21 3.5 12M12 21l8.5-9" stroke="currentColor" stroke-width="1.1"/></svg>
+        <h3>Arrive slow</h3>
+        <p>Santiago deserves a day of its own — the cathedral, the pilgrim’s mass, the Compostela. Then the epilogue: three more days and 63 km west to Finisterre, where the road ends at the ocean.</p>
+      </div>
+    </div>
+    <div class="stats reveal">
+      <div class="stat"><b class="num">≈780<em> km</em></b><span>Saint-Jean → Santiago</span></div>
+      <div class="stat"><b class="num">34</b><span>walking days</span></div>
+      <div class="stat"><b class="num">2</b><span>rest days · Burgos, León</span></div>
+      <div class="stat"><b class="num">2</b><span>countries</span></div>
+      <div class="stat"><b class="num">1,293<em> m</em></b><span>highest night · O Cebreiro</span></div>
+      <div class="stat"><b class="num">39<em> days</em></b><span>door to door incl. epilogue</span></div>
+    </div>
+    <div class="whybox reveal">
+      <div>
+        <h3>Why 22 February is <em>the right</em> time to start</h3>
+        <p>Winter changes the terms of the walk — and for the right pilgrim, that is the invitation, not the warning. You trade crowds for silence, and summer’s race for beds for a quieter, rawer pilgrimage.</p>
+      </div>
+      <ul>
+        <li>Empty trails — in February the Francés can feel like yours alone.</li>
+        <li>The high Pyrenees route is closed (1 Nov – 31 Mar), so day one takes the beautiful Valcarlos valley route instead — gentler and safer.</li>
+        <li>Beds are scarcer: most albergues close in winter, so we book ahead and lean on private albergues and pensions.</li>
+        <li>Short days (~11 h of light): start at 7:30–8:00, plan water and food gaps, carry microspikes.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec sec--tight" id="route">
+    <div class="sec-head reveal">
+      <div><p class="klabel mono">03 — The route</p><h2>Eight hundred km, <em>drawn.</em></h2></div>
+      <span class="idx">schematic map — not to scale</span>
+    </div>
+    <p class="lede sec-lede reveal">From the Basque foothills over the Pyrenees into Navarra, east to Pamplona, then a long westward line through La Rioja, across the meseta of Castile to León, over the Bierzo mountains into Galicia, down the last 100 km to the cathedral — then on to the sea.</p>
+    <div class="mapcard reveal">
+      <svg id="routeMap" viewBox="0 0 920 380" role="img" aria-label="Schematic map of the Camino Francés from Saint-Jean-Pied-de-Port to Santiago de Compostela and Finisterre">
+        <g class="graticule">
+          <line x1="100" y1="40" x2="100" y2="360"/><line x1="220" y1="40" x2="220" y2="360"/><line x1="340" y1="40" x2="340" y2="360"/><line x1="460" y1="40" x2="460" y2="360"/><line x1="580" y1="40" x2="580" y2="360"/><line x1="700" y1="40" x2="700" y2="360"/><line x1="820" y1="40" x2="820" y2="360"/>
+          <line x1="30" y1="100" x2="890" y2="100"/><line x1="30" y1="160" x2="890" y2="160"/><line x1="30" y1="220" x2="890" y2="220"/><line x1="30" y1="280" x2="890" y2="280"/><line x1="30" y1="340" x2="890" y2="340"/>
+        </g>
+        <g class="geo">
+          <text x="150" y="72">FRANCE</text>
+          <text x="470" y="150">NAVARRA</text>
+          <text x="742" y="238">LA RIOJA</text>
+          <text x="470" y="352">CASTILLA Y LEÓN</text>
+          <text x="268" y="292">EL BIERZO</text>
+          <text x="150" y="112">GALICIA</text>
+          <text x="36" y="330">ATLANTIC OCEAN</text>
+        </g>
+        <path id="epiPath" d="M136,170 L115,160 L89,155 L60,165"/>
+        <path id="routePath" d="M175,105 L167,131 L173,129 L125,155 L861,186 L843,225 L820,246 L795,251 L776,277 L746,290 L732,285 L698,290 L672,290 L645,311 L625,305 L598,324 L570,329 L526,311 L519,311 L490,311 L481,303 L448,264 L448,243 L416,266 L398,279 L374,266 L341,256 L318,240 L294,217 L273,201 L255,222 L229,251 L206,207 L191,162 L176,157 L155,183 L136,170"/>
+        <g id="towns"></g>
+        <g class="labels">
+          <text x="185" y="98">Saint-Jean-Pied-de-Port</text>
+          <text class="sub" x="150" y="152">Roncesvalles</text>
+          <text x="852" y="176">Pamplona</text>
+          <text x="776" y="300" text-anchor="middle">Logroño</text>
+          <text x="645" y="332" text-anchor="middle">Burgos</text>
+          <text x="458" y="238">León</text>
+          <text class="sub" x="341" y="248" text-anchor="middle">Ponferrada</text>
+          <text class="sub" x="294" y="208" text-anchor="middle">O Cebreiro</text>
+          <text class="sub" x="255" y="240" text-anchor="middle">Sarria</text>
+          <text class="big-label" x="136" y="158" text-anchor="middle">Santiago ✦</text>
+          <text class="sub epi-lbl" x="60" y="188" text-anchor="middle">Finisterre</text>
+        </g>
+        <circle class="start-ring" cx="175" cy="105" r="7"/>
+        <circle class="start-dot" cx="175" cy="105" r="3"/>
+        <g class="scale">
+          <text x="872" y="52">N ↑</text>
+          <line x1="40" y1="352" x2="120" y2="352"/>
+          <text x="40" y="346">≈100 km</text>
+        </g>
+      </svg>
+      <div class="legend mono">
+        <span><span class="dot"></span> Camino Francés — main line (34 walking days)</span>
+        <span><span class="dot dot--day"></span> overnight stops</span>
+        <span><span class="dot dot--ep"></span> epilogue to Finisterre (+3 days)</span>
+      </div>
+    </div>
+    <div class="mapcard reveal" id="elevWrap">
+      <svg id="elev" viewBox="0 0 1100 340" role="img" aria-label="Elevation profile of the route from Saint-Jean-Pied-de-Port to Finisterre"></svg>
+    </div>
+    <p class="lede sec-lede sec-lede--end reveal">Two big climbs define the walk: the Pyrenees crossing on day one (the winter Valcarlos route tops out near Roncesvalles at ~950 m — lower than the closed high route, but still mountain weather), and the long pull into Galicia ending at O Cebreiro, 1,293 m, on day 29. Everything between is rolling plateau and valley — the meseta is flat, windy, and beautiful in its emptiness.</p>
+  </section>
+
+  <section class="sec sec--tight" id="days">
+    <div class="sec-head reveal">
+      <div><p class="klabel mono">04 — Day by day</p><h2>Thirty-six days, <em>stage by stage.</em></h2></div>
+      <span class="idx">tap a day for field notes</span>
+    </div>
+    <p class="lede sec-lede reveal">Distances are approximate (the official Saint-Jean–Santiago distance is ~790 km). “↑” is elevation gained that day. Use the filters for long days, scenic high points, food and wine, cities, and rest days.</p>
+    <div class="filters reveal" id="filters" role="group" aria-label="Filter days">
+      <button class="fchip on" data-f="all">All 36 days</button>
+      <button class="fchip" data-f="long">Long days · 25 km+</button>
+      <button class="fchip" data-f="scenic">Scenic</button>
+      <button class="fchip" data-f="food">Food &amp; wine</button>
+      <button class="fchip" data-f="city">Cities</button>
+      <button class="fchip" data-f="rest">Rest days</button>
+    </div>
+    <div id="dayList"></div>
+  </section>
+
+  <section class="sec sec--tight" id="practical">
+    <div class="sec-head reveal">
+      <div><p class="klabel mono">05 — Practical</p><h2>Everything you need <em>before you go.</em></h2></div>
+      <span class="idx">winter edition · Feb–Mar</span>
+    </div>
+    <div class="prac-grid">
+      <div class="prac reveal"><h3><span class="n mono">01</span>Weather &amp; daylight</h3><p class="tag-line">22 Feb – 1 Apr · what winter actually feels like</p>
+        <ul>
+          <li><b>Pyrenees (day 1):</b> 0–8 °C, possible snow or ice — microspikes essential.</li>
+          <li><b>Meseta (days 14–22):</b> −2–12 °C, hard wind, big sun. Layers and a windproof shell.</li>
+          <li><b>Galicia (days 30+):</b> 5–14 °C and rain is likely — waterproof boots and a pack cover.</li>
+          <li><b>Daylight:</b> ~11 h on 22 Feb growing to ~12.5 h by late March. Sunrise ≈ 7:50, sunset ≈ 18:50 (CET). Start walking 7:30–8:00.</li>
+        </ul>
+      </div>
+      <div class="prac reveal"><h3><span class="n mono">02</span>The Pyrenees in winter</h3><p class="tag-line">the one rule you must not break</p>
+        <ul>
+          <li>The <b>Route Napoléon is closed 1 Nov – 31 Mar</b> (fines up to €12,000). The official winter line is the <b>Valcarlos valley route</b> — ~25 km Saint-Jean → Roncesvalles, open year-round.</li>
+          <li>Split it at <b>Valcarlos</b> (~13 km in) if the cold or dark argues for it; there is a winter albergue there.</li>
+          <li>Check the status board at the <b>Pilgrim Office in Saint-Jean</b> (39 rue de la Citadelle) the morning you leave. Never attempt the high route during closure.</li>
+        </ul>
+      </div>
+      <div class="prac reveal"><h3><span class="n mono">03</span>Beds in winter</h3><p class="tag-line">book ahead — this is the one thing winter demands</p>
+        <ul>
+          <li>Many albergues close November–March. Use the <b>APRINCA winter list</b> plus Wise Pilgrim / Buen Camino / Gronze apps; <b>phone the night before</b> to confirm.</li>
+          <li>Private albergues and pensions stay open and <b>take bookings</b> (phone, WhatsApp, website). Public albergues are walk-up only, one night, credencial required.</li>
+          <li>Prices: Xunta (Galicia) €10 · municipal €8–12 · private €15–27 · pilgrim dinner €10–16.</li>
+        </ul>
+      </div>
+      <div class="prac reveal"><h3><span class="n mono">04</span>Money</h3><p class="tag-line">realistic winter budget</p>
+        <table>
+          <tr><td>Bed (private albergue / pension dorm)</td><td>€15–25</td></tr>
+          <tr><td>Lunch menú del día</td><td>€13–16</td></tr>
+          <tr><td>Dinner (pilgrim menú or tapas)</td><td>€10–16</td></tr>
+          <tr><td>Breakfast + coffee</td><td>€3–5</td></tr>
+          <tr><td>Water, snacks, laundry, buffer</td><td>€5–10</td></tr>
+          <tr><td><b>Per day</b></td><td><b>€45–65</b></td></tr>
+          <tr><td><b>36 days + 3-day epilogue</b></td><td><b>≈ €1,800–2,600</b></td></tr>
+          <tr><td>Flights (in/out)</td><td>≈ €150–350</td></tr>
+        </table>
+      </div>
+      <div class="prac reveal"><h3><span class="n mono">05</span>Packing — 6–7 kg</h3><p class="tag-line">carry light, walk far · leave room for the stone at Cruz de Ferro</p>
+        <ul class="cols">
+          <li>35–40 L pack + rain cover</li>
+          <li>Waterproof boots (Feb mud/snow) or grippy trail runners</li>
+          <li>Microspikes (Pyrenees)</li>
+          <li>Rain shell + insulated jacket</li>
+          <li>2× merino base layers, 2× socks</li>
+          <li>Headlamp (early starts)</li>
+          <li>2 L water capacity</li>
+          <li>Blister kit (Compeed), plasters, painkillers</li>
+          <li>Credencial del peregrino + passport</li>
+          <li>Phone, power bank, offline maps</li>
+          <li>Quick-dry towel, soap, sunscreen</li>
+          <li>Earplugs (dorms), light sandals</li>
+        </ul>
+      </div>
+      <div class="prac reveal"><h3><span class="n mono">06</span>Getting there &amp; away</h3><p class="tag-line">logistics</p>
+        <ul>
+          <li><b>In:</b> fly to <b>Biarritz (BIQ)</b> — bus/taxi ~1 h to Saint-Jean-Pied-de-Port — or Pamplona (PNA) / Lourdes, then bus to SJPP.</li>
+          <li><b>Out:</b> Santiago de Compostela airport (SCQ) has direct flights, or ALSA bus / Renfe train to Madrid.</li>
+          <li><b>Epilogue:</b> Tralusa bus Santiago → Negreira / Finisterre (~1 h); return to Santiago the same or next day.</li>
+          <li>Escape hatches: ALSA buses and Renfe trains run along the whole route — a sore knee is not the end of the pilgrimage.</li>
+        </ul>
+      </div>
+      <div class="prac reveal"><h3><span class="n mono">07</span>Paperwork &amp; the Compostela</h3><p class="tag-line">the bureaucracy, simplified</p>
+        <ul>
+          <li>Pick up the <b>credencial</b> (free) at the SJPP Pilgrim Office before you start; stamp it twice a day (café + albergue).</li>
+          <li>The <b>Compostela</b> requires the last <b>100 km on foot</b> — Sarria onward qualifies, and we walk ~130 km from there.</li>
+          <li>Collect it at the Pilgrim’s Reception Office, rúa das Carretas 33, Santiago (10:00–18:00 daily).</li>
+          <li>Pilgrim’s Mass in the cathedral at <b>12:00 daily</b>; the Botafumeiro swings on Fridays and holy days.</li>
+        </ul>
+      </div>
+      <div class="prac reveal"><h3><span class="n mono">08</span>Health &amp; safety</h3><p class="tag-line">boring but read it once</p>
+        <ul>
+          <li><b>112</b> is the EU emergency number everywhere on the route; farmacias show a green cross.</li>
+          <li>Travel insurance with <b>trekking/hiking cover</b> — the Pyrenees and O Cebreiro days are the exposed ones.</li>
+          <li>Day 18 (Carrión → Terradillos) has <b>17 km with no water or shops</b> — carry 2 L and food. Same care on El Burgo → Reliegos.</li>
+          <li>Download offline maps; signal fades on the meseta and in Galician valleys.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec sec--tight" id="epilogue">
+    <div class="sec-head reveal">
+      <div><p class="klabel mono">06 — The epilogue</p><h2>Then walk to <em>the end of the world.</em></h2></div>
+      <span class="idx">optional but recommended</span>
+    </div>
+    <div class="epi-card reveal">
+      <div>
+        <h2>Santiago → Negreira → Olveiroa → <em>Finisterre</em></h2>
+        <p>For nine centuries pilgrims walked past Santiago to the Atlantic and burned their clothes at Cape Finisterre — the Romans called it the end of the world. Three more days (63 km) take you there: forest paths, the last corredoiras, and on the final afternoon the lighthouse above the waves. Watch the sunset, then catch the bus back to Santiago.</p>
+      </div>
+      <div class="epi-stats">
+        <div class="e"><b class="num">+63 km</b><span>3 walking days · 30 Mar – 1 Apr</span></div>
+        <div class="e"><b class="num">0 m</b><span>sea level — where the road ends</span></div>
+        <div class="e"><b class="num">834 km</b><span>total, SJPP to Finisterre</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="cam-foot">
+  <div class="wrap">
+    <p class="big">Buen <em>Camino.</em></p>
+    <div class="foot-row mono">
+      <span class="foot-brand"><img src="mark.svg" alt="" width="18" height="18"> Saint-Jean-Pied-de-Port → Santiago → Finisterre</span>
+      <span>22 Feb – 7 Mar (2-week cut) · full route below · distances approximate · confirm beds on the APRINCA winter list and pass status with the SJPP Pilgrim Office</span>
+      <a class="accent-link" href="https://ethantam.dev/">← Back to ethantam.dev</a>
+    </div>
+  </div>
+</footer>
+<script defer src="camino.js?v=2026.11.24"></script>
+<!-- visit counts: Cloudflare Web Analytics, no cookies (see /privacy) -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "166550e4e2484a1b9849675469b727da"}'></script>
+</body>
+</html>

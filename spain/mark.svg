@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="7" fill="#0c0b0a"/>
+  <!-- a tulip reduced to three strokes: two petals and a stem that doubles as a rising chart -->
+  <path d="M16 6c-3.2 2.4-5 5.4-5 8.6 0 2.8 2.2 5 5 5s5-2.2 5-5c0-3.2-1.8-6.2-5-8.6Z" fill="#f2a93b"/>
+  <path d="M16 19.6V26M16 26l-4.5-3.2M16 26l5.5-4.8" stroke="#f2a93b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
