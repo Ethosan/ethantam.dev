@@ -215,8 +215,10 @@ function tick(t){
 }
 requestAnimationFrame(tick);
 
+const canon = document.querySelector("link[rel=canonical]");
 if (location.hostname === "spain.ethantam.dev") {
-  const c = document.querySelector("link[rel=canonical]");
-  if (c) c.setAttribute("href", "https://spain.ethantam.dev/");
+  if (canon) canon.setAttribute("href", "https://spain.ethantam.dev/");
   document.title = "The long way to Santiago · spain.ethantam.dev";
+} else if (location.hostname.endsWith(".pages.dev") && canon) {
+  canon.setAttribute("href", location.origin + "/");
 }

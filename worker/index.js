@@ -1,6 +1,5 @@
 // Cloudflare Worker for ethantam.dev. Static files are served from the assets binding; this script handles:
 //   GET /              the home page, with "Last updated" stamped from the deploy's date
-//   host spain.ethantam.dev   only the Camino page (camino.html); its assets pass through
 //   GET /api/live      WebSocket that streams every price change as it happens
 //   GET /api/quotes    the same prices as one JSON snapshot (first paint, and the fallback when a socket can't connect)
 //   GET /api/spark     one symbol's path for the ticker popover (edge-cached 60s)
@@ -703,10 +702,6 @@ export default {
       return new Response(null, { status: 302, headers: { location: `${url.origin}/`, "cache-control": "no-store", "x-robots-tag": "noindex" } });
     }
     if (request.method !== "GET") return env.ASSETS.fetch(request);
-    // spain.ethantam.dev serves only the Camino page: any non-asset path on that host gets camino.html
-    if (url.hostname === "spain.ethantam.dev" && !/\.(css|js|png|svg|webp|woff2|json|xml|txt|ico|pdf|map)$/.test(url.pathname)) {
-      return env.ASSETS.fetch(new Request(new URL("/camino.html", url), request));
-    }
     if (url.pathname === "/ethan-tam-cv.pdf") {
       // a PDF viewer can fetch the file in pieces; only the piece from the start is a download
       const range = request.headers.get("range");
