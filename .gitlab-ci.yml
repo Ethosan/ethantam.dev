@@ -18,3 +18,17 @@ deploy:
     - npx wrangler deploy --tag "$CI_COMMIT_SHORT_SHA"
     # ask Bing and the other IndexNow engines to re-crawl the sitemap's pages; never fails the deploy
     - node scripts/indexnow.mjs
+
+# The Camino page as its own Pages project (spain/ is a standalone site, see spain/README.md):
+# live at https://spain-ethantam-dev.pages.dev, then spain.ethantam.dev CNAMEs to it.
+# Needs "Cloudflare Pages: Edit" on the CLOUDFLARE_API_TOKEN (the Workers template alone is not enough).
+pages:
+  stage: deploy
+  image: node:22
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  variables:
+    CLOUDFLARE_ACCOUNT_ID: "f4cf66898198033a983bcbc15b6f3900"
+  script:
+    - npm ci --no-audit --no-fund
+    - npx wrangler pages deploy spain --project-name spain-ethantam-dev
