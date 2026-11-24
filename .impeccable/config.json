@@ -70,9 +70,9 @@
         "rule": "marquee",
         "value": "*",
         "files": [
-          "spain/index.html",
-          "spain/camino.css",
-          "spain/camino.js"
+          "camino.html",
+          "camino.css",
+          "camino.js"
         ],
         "createdAt": "2026-11-24T00:00:00.000Z",
         "reason": "Agent: a town-name strip echoing the ticker; pauses on hover and stops under prefers-reduced-motion"
@@ -81,8 +81,8 @@
         "rule": "italic-serif-display",
         "value": "*",
         "files": [
-          "spain/index.html",
-          "spain/camino.css"
+          "camino.html",
+          "camino.css"
         ],
         "createdAt": "2026-11-24T00:00:00.000Z",
         "reason": "Agent: single italic Instrument Serif accent words inside roman Geist headlines, the brand's own h1 em pattern"
