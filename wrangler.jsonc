@@ -3,12 +3,15 @@
   "name": "ethantam-dev",
   "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
+  // the Camino page's own subdomain; worker/index.js serves camino.html on it and 404s /camino* on the main host.
+  // the deploy creates the DNS record on the ethantam.dev zone (same account) automatically
+  "custom_domains": ["spain.ethantam.dev"],
   "assets": {
     "directory": ".",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     // "/" too, so the Worker can stamp the deploy into the page; the PDF and the QR codes, so it can count them
-    "run_worker_first": ["/api/*", "/", "/ethan-tam-cv.pdf", "/P", "/p", "/Q", "/q", "/stats"]
+    "run_worker_first": ["/api/*", "/", "/ethan-tam-cv.pdf", "/P", "/p", "/Q", "/q", "/stats", "/camino", "/camino.css", "/camino.js"]
   },
   // the deploy's id, time and tag (CI tags it with the commit) for "Last updated"
   "version_metadata": { "binding": "VERSION" },
