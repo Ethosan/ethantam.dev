@@ -427,6 +427,8 @@ html.theme-wipe::view-transition-new(root) {
   transition: color .15s;
 }
 @media (hover: hover) and (pointer: fine) { .card__src:hover { color: var(--fg); } }
+/* a card with a demo link as well as its source: keep the two apart */
+.card__src + .card__src { margin-left: 20px; }
 /* is the app up, and when was it last worked on (main.js fills it from /api/projects) */
 .card__status { position: relative; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 8px; color: var(--muted); font-size: 0.75rem; }
 /* its line is kept from the start and the status fades into it: it arrives a moment after the page (two seconds on a
