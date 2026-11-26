@@ -782,8 +782,10 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
     display: flex; justify-content: space-around;
     padding: 4px max(4px, var(--pad-r)) max(4px, var(--pad-b)) max(4px, var(--pad-l));
-    background: var(--sec-bg);
-    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    /* solid, no backdrop blur, on its own layer: Android browsers (Samsung Internet, Chrome) re-blur a fixed bar every
+       frame while their toolbar slides in and out, and it jittered as you scrolled */
+    background: var(--bg);
+    transform: translateZ(0);
     border-top: 1px solid var(--line);
   }
   .tabbar a {
