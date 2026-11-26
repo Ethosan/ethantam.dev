@@ -164,6 +164,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   flex: 1; min-width: 0;
   display: flex; align-items: center;
   overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 92%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 4%, #000 92%, transparent);
 }
 .ticker__track {
@@ -433,9 +434,9 @@ html.theme-wipe::view-transition-new(root) {
 .card__status { position: relative; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 8px; color: var(--muted); font-size: 0.75rem; }
 /* its line is kept from the start and the status fades into it: it arrives a moment after the page (two seconds on a
    phone) and used to push each card's text down when it did */
-.card__status { min-height: calc(1lh + 2px); transition: opacity .2s ease-out; }
+.card__status { min-height: calc(1.5em + 2px); min-height: calc(1lh + 2px); transition: opacity .2s ease-out; }
 .card__status[hidden] { visibility: hidden; opacity: 0; }
-@container (max-width: 459px) { .card__status { min-height: calc(2lh + 6px); } } /* narrow cards wrap it onto two lines */
+@container (max-width: 459px) { .card__status { min-height: calc(3em + 6px); min-height: calc(2lh + 6px); } } /* narrow cards wrap it onto two lines */
 .card__state, .card__commit { display: inline-flex; align-items: center; gap: 8px; }
 .card__commit { white-space: nowrap; } /* "last commit 28 minutes ago" in one piece, so the status stays within its two reserved lines */
 .card__status .dot { margin-left: 0; width: 6px; height: 6px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--up) 18%, transparent); }
@@ -620,8 +621,12 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
     transition: color .2s;
   }
   .nav__line { width: 32px; height: 1px; background: var(--line-2); transition: width .2s var(--ease), background-color .2s; }
-  .nav a:hover, .nav a:focus-visible, .nav a.is-active { color: var(--fg); }
-  .nav a:hover .nav__line, .nav a:focus-visible .nav__line { width: 64px; background: var(--fg); }
+  .nav a:focus-visible, .nav a.is-active { color: var(--fg); }
+  .nav a:focus-visible .nav__line { width: 64px; background: var(--fg); }
+  @media (hover: hover) and (pointer: fine) {
+    .nav a:hover { color: var(--fg); }
+    .nav a:hover .nav__line { width: 64px; background: var(--fg); }
+  }
   .nav a.is-active .nav__line { width: 64px; background: var(--accent); }
 
   .side__foot { margin-top: 24px; }
@@ -783,6 +788,11 @@ kbd { font-family: var(--mono); padding: 2px 7px; border: 1px solid var(--line-2
   /* terminal: sit at the top so the on-screen keyboard doesn't cover it */
   .term { place-items: start center; padding: max(12px, var(--pad-t)) 12px max(12px, var(--pad-b)); }
   .term__win { height: min(420px, 85vh); height: min(420px, 85dvh); }
+}
+/* iPad and landscape phones: the terminal sits at the top there too, so the on-screen keyboard does not cover it */
+@media (pointer: coarse) and (min-width: 561px) {
+  .term { place-items: start center; padding: max(12px, var(--pad-t)) 12px max(12px, var(--pad-b)); }
+  .term__win { height: min(420px, 85dvh); }
 }
 @media (max-width: 400px) {
   .ticker__label { display: none; }

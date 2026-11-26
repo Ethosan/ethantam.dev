@@ -301,7 +301,7 @@
     placePop();
     const have = sparks.get(s);
     if (have && Date.now() - have.at < 60_000) return;
-    fetch(`/api/spark?s=${s}`)
+    fetch(`/api/spark?s=${s}`, { signal: AbortSignal.timeout?.(8000) })
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.status))))
       .then((data) => data, () => null)
       .then((data) => { sparks.set(s, { at: Date.now(), data }); if (popS === s) drawPop(); });
@@ -327,7 +327,7 @@
   // Binance for the crypto to every visitor. Until it connects, or while it's down, poll /api/quotes every 5s;
   // on a plain static preview with no Worker, CoinGecko for the crypto only.
   const fromApi = async () => {
-    const r = await fetch("/api/quotes", { cache: "no-store" });
+    const r = await fetch("/api/quotes", { cache: "no-store", signal: AbortSignal.timeout?.(8000) });
     if (!r.ok) throw new Error(r.status);
     const { quotes: q } = await r.json();
     if (!q?.some((x) => typeof x.p === "number")) throw new Error("empty");
@@ -335,7 +335,7 @@
   };
   const fromCoinGecko = async () => {
     const ids = Object.values(COINS).join(",");
-    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true&include_last_updated_at=true`);
+    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true&include_last_updated_at=true`, { signal: AbortSignal.timeout?.(8000) });
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
     return Object.entries(COINS).filter(([, id]) => d[id]).map(([s, id]) => ({ s, p: d[id].usd, c: d[id].usd_24h_change, t: d[id].last_updated_at * 1000 }));
@@ -408,7 +408,7 @@
       return unit ? rel.format(Math.round(sec / n), unit) : "just now";
     };
     const span = (cls, text) => Object.assign(document.createElement("span"), { className: cls, textContent: text });
-    fetch("/api/projects")
+    fetch("/api/projects", { signal: AbortSignal.timeout?.(8000) })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
       .then(({ t, projects }) => {
         const checked = new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -613,7 +613,12 @@
       setTimeout(() => window.print(), 50);
       return `opening the print dialog: my CV, one A4 page. to read it or get the PDF: ${a("/resume", "ethantam.dev/resume")}`;
     },
-    qr: () => { closeTerm(); document.querySelector("[data-show-qr]")?.click(); return null; },
+    qr: () => {
+      // Back first (it drops the terminal's history entry), then the QR screen adds its own
+      const go = () => document.querySelector("[data-show-qr]")?.click();
+      if (termPushed) { addEventListener("popstate", go, { once: true }); closeTerm(); } else { closeTerm(); go(); }
+      return null;
+    },
     tulip: () => "Feb 1637: a single Semper Augustus bulb was quoted at more than a house on an\nAmsterdam canal. A few weeks later, buyers stopped showing up.\nThe painting on the front page is from about 20 years before the peak.",
     ls: () => "about  now  projects  record  watchlist  contact  tulip",
     whoami: () => "guest. but you could be a friend: try `contact`",
@@ -649,10 +654,23 @@
   const background = [...document.body.children].filter((el) => el !== term && el.tagName !== "SCRIPT");
   const setInert = (on) => background.forEach((el) => { el.inert = on; });
 
+  // Android's Back closes the terminal instead of leaving the page: it adds a history entry while it's open (as share.js does for the QR code)
+  let termPushed = false;
+  // iOS doesn't shrink the page for the keyboard: fit the terminal to the part of the screen that's showing
+  const vv = window.visualViewport;
+  const fitTerm = () => {
+    if (!vv || term.hidden) return;
+    term.style.height = vv.height + "px";
+    term.style.transform = "translateY(" + vv.offsetTop + "px)";
+  };
   const openTerm = () => {
     if (!term.hidden) return;
     opener = document.activeElement;
     term.hidden = false;
+    try { history.pushState({ term: 1 }, "", "#term"); termPushed = true; } catch {}
+    vv?.addEventListener("resize", fitTerm);
+    vv?.addEventListener("scroll", fitTerm);
+    fitTerm();
     setInert(true);
     document.body.style.overflow = "hidden";
     if (!out.childElementCount) {
@@ -663,7 +681,12 @@
     input.focus();
   };
   const closeTerm = () => {
+    if (term.hidden) return;
     term.hidden = true;
+    vv?.removeEventListener("resize", fitTerm);
+    vv?.removeEventListener("scroll", fitTerm);
+    term.style.height = term.style.transform = "";
+    if (termPushed) { termPushed = false; history.back(); }
     setInert(false);
     document.body.style.overflow = "";
     opener?.focus?.();
@@ -690,6 +713,7 @@
     }
     if (e.key === "ArrowDown") { hIdx = Math.min(history.length, hIdx + 1); input.value = history[hIdx] ?? ""; e.preventDefault(); }
   });
+  addEventListener("popstate", () => { if (!term.hidden) { termPushed = false; closeTerm(); } });
   document.querySelectorAll("[data-open-term]").forEach((b) => b.addEventListener("click", openTerm));
   document.querySelectorAll("[data-close-term]").forEach((b) => b.addEventListener("click", closeTerm));
   term.addEventListener("click", (e) => { if (e.target === term) closeTerm(); });

@@ -1,5 +1,5 @@
 // Service worker for ethantam.dev: offline-first, cache static assets.
-const CACHE = "ethantam-v8";
+const CACHE = "ethantam-v9";
 const PRECACHE = [
   "/",
   "/index.html",
@@ -20,6 +20,7 @@ const PRECACHE = [
   "/assets/fonts/instrument-serif-italic-latin.woff2",
   "/manifest.json",
   "/404.html",
+  "/offline.html",
 ];
 
 self.addEventListener("install", (e) => {
@@ -50,11 +51,14 @@ self.addEventListener("fetch", (e) => {
     e.respondWith(
       fetch(request)
         .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copy));
+          // an error page during an outage must not replace the good copy
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then((cache) => cache.put(request, copy));
+          }
           return res;
         })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match("/404.html")))
+        .catch(() => caches.match(request).then((cached) => cached || (request.mode === "navigate" ? caches.match("/offline.html") : Response.error())))
     );
   } else {
     e.respondWith(

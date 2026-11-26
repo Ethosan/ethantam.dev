@@ -1,7 +1,14 @@
 // The resume page: the Print button (hidden without JavaScript), a file name for "Save as PDF", and the theme toggle.
 const printBtn = document.querySelector("[data-print]");
 printBtn.hidden = false;
-printBtn.addEventListener("click", () => window.print());
+// the in-app browsers of LinkedIn and Instagram ignore print(): if no print dialog starts, open the PDF instead
+let printing = false;
+addEventListener("beforeprint", () => { printing = true; });
+printBtn.addEventListener("click", () => {
+  printing = false;
+  window.print();
+  setTimeout(() => { if (!printing) location.href = "/ethan-tam-cv.pdf"; }, 800);
+});
 
 const pageTitle = document.title;
 addEventListener("beforeprint", () => { document.title = "Ethan Tam CV"; });

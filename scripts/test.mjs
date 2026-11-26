@@ -32,7 +32,7 @@ for (const f of [".gitignore", ".assetsignore"]) {
   check(`${f} lists secret files`, [".env*", ".dev.vars*", ".zizidesk-session"].every((l) => read(f).split(/\r?\n/).includes(l)));
 }
 
-for (const f of readdirSync(new URL("../", import.meta.url)).filter((n) => n.endsWith(".html") && n !== "404.html")) {
+for (const f of readdirSync(new URL("../", import.meta.url)).filter((n) => n.endsWith(".html") && !["404.html", "offline.html"].includes(n))) {
   const html = read(f);
   check(`${f} has og:title, og:image and twitter:card`, ["og:title", "og:image", "twitter:card"].every((p) => html.includes(`"${p}"`)));
 }
