@@ -14,6 +14,7 @@ deploy:
     CLOUDFLARE_ACCOUNT_ID: "f4cf66898198033a983bcbc15b6f3900"
   script:
     - npm ci --no-audit --no-fund
+    - npm test
     # tag the version with its commit, so the Cloudflare dashboard shows which build is which
     - npx wrangler deploy --tag "$CI_COMMIT_SHORT_SHA"
     # safety net: make sure the ethantam.dev/* route and its DNS record exist after every deploy

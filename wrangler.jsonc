@@ -1,6 +1,9 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "ethantam-dev",
+  // only ethantam.dev answers: no *.workers.dev copy of /stats, no preview URLs
+  "workers_dev": false,
+  "preview_urls": false,
   "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
   "assets": {
@@ -19,6 +22,13 @@
     "bindings": [{ "name": "TICKER", "class_name": "Ticker" }, { "name": "STATS", "class_name": "Stats" }]
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Ticker"] }, { "tag": "v2", "new_sqlite_classes": ["Stats"] }],
+  // per-IP limits, counted per Cloudflare location (the same pattern as the other workers). RL_API: the /api/* routes; RL_COUNT:
+  // the CV and QR counters (the file and the redirect are always served, only the count is skipped); RL_AUTH: tries at /stats
+  "ratelimits": [
+    { "name": "RL_API", "namespace_id": "2001", "simple": { "limit": 60, "period": 60 } },
+    { "name": "RL_COUNT", "namespace_id": "2002", "simple": { "limit": 10, "period": 60 } },
+    { "name": "RL_AUTH", "namespace_id": "2003", "simple": { "limit": 5, "period": 60 } }
+  ],
   // PR builds run `wrangler preview`, which needs this block (it can stay empty)
   "previews": {}
 }

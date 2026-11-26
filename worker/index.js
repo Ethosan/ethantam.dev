@@ -34,10 +34,18 @@ const IDLE_MS = 60_000;      // close the upstreams this long after the last vis
 
 const text = new TextDecoder();
 const round = (n, d) => Math.round(n * 10 ** d) / 10 ** d;
+// _headers only reaches static files, so what the Worker builds itself carries these too
+const SEC = {
+  "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "strict-origin-when-cross-origin",
+};
 const json = (body, status = 200) => new Response(JSON.stringify(body), {
   status,
-  headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+  headers: { ...SEC, "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
 });
+// the ticker's sockets are capped; a visitor needs one
+const MAX_SOCKETS = 500;
 
 // Yahoo's streamer sends base64 protobuf (PricingData). Only a few fields matter:
 // 1 id, 2 price (float), 3 time (sint64 ms), 7 market hours (0 pre, 1 regular, 2 post, 3 extended), 8 change % (float)
@@ -142,6 +150,7 @@ export class Ticker extends DurableObject {
 
   async fetch(request) {
     if (request.headers.get("upgrade")?.toLowerCase() === "websocket") {
+      if (this.ctx.getWebSockets().length >= MAX_SOCKETS) return new Response("busy", { status: 503, headers: { ...SEC, "retry-after": "30" } });
       const [client, server] = Object.values(new WebSocketPair());
       this.ctx.acceptWebSocket(server);
       this.lastVisitor = Date.now();
@@ -386,7 +395,7 @@ export class Stats extends DurableObject {
 
   async record(row, who) {
     const now = Date.now();
-    const visitor = row.bot ? null : await this.visitor(who, now);
+    const visitor = await this.visitor(who, now); // bots too, so a bot hammering the paths counts once
     const seen = visitor && this.sql.exec(
       "SELECT 1 FROM events WHERE kind = ? AND visitor = ? AND ts > ? LIMIT 1", row.kind, visitor, now - REPEAT_MS,
     ).toArray().length;
@@ -439,7 +448,7 @@ const botName = (ua) => (ua.match(/[\w-]*(?:bot|crawler|spider|preview)[\w-]*/i)
 function linkedFrom(request, url) {
   try {
     const ref = new URL(request.headers.get("referer"));
-    return ref.host === url.host ? ref.pathname : ref.hostname.replace(/^www\./, "");
+    return ref.host === url.host ? ref.pathname.slice(0, 120) : ref.hostname.replace(/^www\./, "").slice(0, 80);
   } catch {
     return null;
   }
@@ -462,6 +471,12 @@ function count(kind, request, url, env, ctx) {
   ctx.waitUntil((async () => {
     try { await env.STATS.get(env.STATS.idFromName("ethantam.dev")).record(row, who); } catch {}
   })());
+}
+
+// a rate limit from wrangler.jsonc's "ratelimits"; with no binding (a plain dev run) everything is allowed
+async function allow(limiter, key) {
+  if (!limiter) return true;
+  try { return (await limiter.limit({ key: key || "anon" })).success; } catch { return true; }
 }
 
 // Basic auth: any user name, STATS_KEY as the password, compared in constant time
@@ -551,7 +566,7 @@ function statsPage({ totals, since, bots, recent }) {
 }
 
 async function stats(request, env) {
-  const headers = { "cache-control": "no-store", "x-robots-tag": "noindex, nofollow", "referrer-policy": "no-referrer" };
+  const headers = { ...SEC, "cache-control": "no-store", "x-robots-tag": "noindex, nofollow", "referrer-policy": "no-referrer" };
   const plain = (status, body, more = {}) =>
     new Response(body, { status, headers: { ...headers, "content-type": "text/plain; charset=utf-8", ...more } });
   if (!env.STATS_KEY) return plain(503, "Stats aren't set up: the Worker needs a STATS_KEY secret.");
@@ -564,7 +579,6 @@ async function stats(request, env) {
       ...headers,
       "content-type": "text/html; charset=utf-8",
       "content-security-policy": "default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
-      "x-content-type-options": "nosniff",
     },
   });
 }
@@ -634,7 +648,7 @@ async function cached(request, ctx, ttl, build) {
   const body = await build().catch((err) => { why = String(err); return null; });
   if (!body) return (await cache.match(staleKey)) ?? json({ error: "unavailable", why }, 503);
   const res = (age) => new Response(JSON.stringify(body), {
-    headers: { "content-type": "application/json; charset=utf-8", "cache-control": `public, max-age=${age}` },
+    headers: { ...SEC, "content-type": "application/json; charset=utf-8", "cache-control": `public, max-age=${age}` },
   });
   ctx.waitUntil(Promise.all([cache.put(key, res(ttl)), cache.put(staleKey, res(86_400))]));
   return res(ttl);
@@ -672,7 +686,7 @@ async function home(request, env, ctx) {
   const v = env.VERSION ?? {};
   // the page changes with every deploy even when index.html doesn't, so the deploy's id is the ETag
   const etag = v.id ? `"${v.id}"` : null;
-  if (etag && request.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers: { etag } });
+  if (etag && request.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers: { ...SEC, etag } });
   const [res, cv] = await Promise.all([
     env.ASSETS.fetch(new Request(request.url, { headers: { accept: "text/html" } })),
     cvArticle(request, env),
@@ -695,25 +709,35 @@ async function home(request, env, ctx) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const ip = request.headers.get("cf-connecting-ip") ?? "";
     // a QR code: count the scan, then on to the home page (a 302 that isn't cached, so every scan comes through here)
     const scan = QR[url.pathname];
     if (scan) {
-      if (request.method === "GET") count(scan, request, url, env, ctx);
-      return new Response(null, { status: 302, headers: { location: `${url.origin}/`, "cache-control": "no-store", "x-robots-tag": "noindex" } });
+      if (request.method === "GET" && (await allow(env.RL_COUNT, ip))) count(scan, request, url, env, ctx);
+      return new Response(null, { status: 302, headers: { ...SEC, location: `${url.origin}/`, "cache-control": "no-store", "x-robots-tag": "noindex" } });
     }
     if (request.method !== "GET") return env.ASSETS.fetch(request);
     if (url.pathname === "/ethan-tam-cv.pdf") {
       // a PDF viewer can fetch the file in pieces; only the piece from the start is a download
       const range = request.headers.get("range");
-      if (!range || /^bytes=0-/.test(range)) count("cv", request, url, env, ctx);
+      if ((!range || /^bytes=0-/.test(range)) && (await allow(env.RL_COUNT, ip))) count("cv", request, url, env, ctx);
       return env.ASSETS.fetch(request);
     }
-    if (url.pathname === "/stats") return stats(request, env);
+    if (url.pathname === "/stats") {
+      if (!(await allow(env.RL_AUTH, ip))) return new Response("Too many tries. Wait a minute.", { status: 429, headers: { ...SEC, "retry-after": "60", "cache-control": "no-store" } });
+      return stats(request, env);
+    }
+    if (url.pathname.startsWith("/api/") && !(await allow(env.RL_API, ip))) return json({ error: "slow down" }, 429);
     if (url.pathname === "/api/live" || url.pathname === "/api/quotes") {
       // the socket is for this site's own page
       const origin = request.headers.get("origin");
       const host = (() => { try { return new URL(origin).host; } catch { return null; } })();
-      if (url.pathname === "/api/live" && origin && host !== url.host) return new Response("forbidden", { status: 403 });
+      if (url.pathname === "/api/live" && host !== url.host) return new Response("forbidden", { status: 403, headers: SEC }); // a browser always sends Origin
+      // ?debug shows upstream errors and the visitor count: only with the stats password
+      if (url.searchParams.has("debug") && !(env.STATS_KEY && (await allowed(request, env.STATS_KEY)))) {
+        url.searchParams.delete("debug");
+        request = new Request(url, request);
+      }
       try {
         return await env.TICKER.get(env.TICKER.idFromName("watchlist")).fetch(request);
       } catch {
@@ -721,7 +745,7 @@ export default {
       }
     }
     if (url.pathname === "/api/projects") {
-      return cached(request, ctx, 120, async () => ({
+      return cached(new Request(`${url.origin}/api/projects`), ctx, 120, async () => ({
         t: Date.now(),
         projects: Object.fromEntries(await Promise.all(Object.entries(PROJECTS).map(project))),
       }));

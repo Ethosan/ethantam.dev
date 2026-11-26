@@ -15,3 +15,6 @@ TERMS.md
 LICENSE
 .gitlab-ci.yml
 scripts
+.env*
+.dev.vars*
+.zizidesk-session
