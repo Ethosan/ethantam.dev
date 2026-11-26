@@ -7,7 +7,7 @@ let failed = 0;
 const check = (name, ok) => { console.log(`${ok ? "ok  " : "FAIL"} ${name}`); if (!ok) failed++; };
 const read = (f) => readFileSync(new URL(`../${f}`, import.meta.url), "utf8");
 
-for (const f of ["worker/index.js", "main.js", "share.js", "resume.js", "sw.js", "scripts/bump-version.mjs", "scripts/indexnow.mjs"]) {
+for (const f of ["worker/index.js", "worker/stats-auth.js", "main.js", "share.js", "resume.js", "sw.js", "scripts/bump-version.mjs", "scripts/indexnow.mjs"]) {
   const r = spawnSync(process.execPath, ["--check", new URL(`../${f}`, import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")], { encoding: "utf8" });
   check(`${f} parses`, r.status === 0);
 }

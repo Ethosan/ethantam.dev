@@ -8,6 +8,7 @@
 //   GET /ethan-tam-cv.pdf  the CV's PDF, counted as a download
 //   GET /P, /Q         what the QR codes open (P the one printed on the CV, Q the one shown full screen), counted, then /
 //   GET /stats         those counts, and the latest downloads and scans, behind a password (the STATS_KEY secret)
+//   POST /stats        that page's password form (worker/stats-auth.js), which signs you in with a cookie
 // The ticker:
 // Both come from one Durable Object, so every visitor sees the same numbers. While anyone is watching it holds two upstream
 // sockets, Yahoo's streamer for the stocks and Binance's market-data stream for the crypto (one tick a second each), and
@@ -16,6 +17,7 @@
 // most likely because it sits behind Cloudflare too; Binance and Yahoo don't.)
 
 import { DurableObject } from "cloudflare:workers";
+import { statsRoute } from "./stats-auth.js";
 
 const COINS = { BTC: "BTCUSDT", ETH: "ETHUSDT", SOL: "SOLUSDT" }; // Binance symbols
 const COINBASE = { BTC: "BTC-USD", ETH: "ETH-USD", SOL: "SOL-USD" }; // REST for the coins (see coinsRest)
@@ -479,7 +481,8 @@ async function allow(limiter, key) {
   try { return (await limiter.limit({ key: key || "anon" })).success; } catch { return true; }
 }
 
-// Basic auth: any user name, STATS_KEY as the password, compared in constant time
+// Basic auth: any user name, STATS_KEY as the password, compared in constant time. Only ?debug on /api uses it now:
+// /stats signs in with its own form (worker/stats-auth.js)
 async function allowed(request, key) {
   const [scheme, b64] = (request.headers.get("authorization") ?? "").split(" ");
   if (scheme?.toLowerCase() !== "basic" || !b64) return false;
@@ -546,6 +549,8 @@ function statsPage({ totals, since, bots, recent }) {
   .meta { font-size: .875rem; overflow-wrap: anywhere; }
   .bot { opacity: .55; }
   .note { font-size: .8rem; margin-top: 28px; max-width: 62ch; }
+  .out button { margin-top: 16px; font: inherit; font-size: .8rem; padding: 6px 12px; color: var(--muted); background: none;
+    border: 1px solid var(--line); border-radius: 6px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -560,26 +565,17 @@ function statsPage({ totals, since, bots, recent }) {
   so on), and the city can be a nearby one. The same person again within 30 minutes counts once. Your own downloads and
   scans count too. Faded rows are crawlers and link previews (Google, Bing, LinkedIn, WhatsApp...), left out of the totals:
   ${bots ?? 0} so far. Rows are kept for a year.</p>
+  <form class="out" method="post" action="/stats"><input type="hidden" name="out" value="1"><button type="submit">Sign out</button></form>
 </main>
 </body>
 </html>`;
 }
 
-async function stats(request, env) {
-  const headers = { ...SEC, "cache-control": "no-store", "x-robots-tag": "noindex, nofollow", "referrer-policy": "no-referrer" };
-  const plain = (status, body, more = {}) =>
-    new Response(body, { status, headers: { ...headers, "content-type": "text/plain; charset=utf-8", ...more } });
-  if (!env.STATS_KEY) return plain(503, "Stats aren't set up: the Worker needs a STATS_KEY secret.");
-  if (!(await allowed(request, env.STATS_KEY))) {
-    return plain(401, "This page needs the password.", { "www-authenticate": 'Basic realm="ethantam.dev stats", charset="UTF-8"' });
-  }
-  const report = await env.STATS.get(env.STATS.idFromName("ethantam.dev")).report();
-  return new Response(statsPage(report), {
-    headers: {
-      ...headers,
-      "content-type": "text/html; charset=utf-8",
-      "content-security-policy": "default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
-    },
+function stats(request, env) {
+  return statsRoute(request, env, {
+    sec: SEC,
+    allow: () => allow(env.RL_AUTH, request.headers.get("cf-connecting-ip") ?? ""), // 5 password tries a minute
+    page: async () => statsPage(await env.STATS.get(env.STATS.idFromName("ethantam.dev")).report()),
   });
 }
 
@@ -716,16 +712,13 @@ export default {
       if (request.method === "GET" && (await allow(env.RL_COUNT, ip))) count(scan, request, url, env, ctx);
       return new Response(null, { status: 302, headers: { ...SEC, location: `${url.origin}/`, "cache-control": "no-store", "x-robots-tag": "noindex" } });
     }
+    if (url.pathname === "/stats") return stats(request, env); // GET: the stats or the sign-in form; POST: signs in or out
     if (request.method !== "GET") return env.ASSETS.fetch(request);
     if (url.pathname === "/ethan-tam-cv.pdf") {
       // a PDF viewer can fetch the file in pieces; only the piece from the start is a download
       const range = request.headers.get("range");
       if ((!range || /^bytes=0-/.test(range)) && (await allow(env.RL_COUNT, ip))) count("cv", request, url, env, ctx);
       return env.ASSETS.fetch(request);
-    }
-    if (url.pathname === "/stats") {
-      if (!(await allow(env.RL_AUTH, ip))) return new Response("Too many tries. Wait a minute.", { status: 429, headers: { ...SEC, "retry-after": "60", "cache-control": "no-store" } });
-      return stats(request, env);
     }
     if (url.pathname.startsWith("/api/") && !(await allow(env.RL_API, ip))) return json({ error: "slow down" }, 429);
     if (url.pathname === "/api/live" || url.pathname === "/api/quotes") {
