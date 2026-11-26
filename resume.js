@@ -10,6 +10,26 @@ printBtn.addEventListener("click", () => {
   setTimeout(() => { if (!printing) location.href = "/ethan-tam-cv.pdf"; }, 800);
 });
 
+// any CSS colour (the tokens are oklch) as [r, g, b, a], read back from a 1px canvas
+const cssRgb = (color) => {
+  const px = Object.assign(document.createElement("canvas"), { width: 1, height: 1 }).getContext("2d", { willReadFrequently: true });
+  px.fillStyle = color; px.fillRect(0, 0, 1, 1);
+  return px.getImageData(0, 0, 1, 1).data;
+};
+const cssHex = (color) => "#" + [...cssRgb(color)].slice(0, 3).map((n) => n.toString(16).padStart(2, "0")).join("");
+
+// an opt-in reading view: the same CV as a plain column at a normal text size, instead of the scaled A4 page
+// (print and the PDF stay the A4 sheet)
+const reflowBtn = document.querySelector("[data-reflow]");
+if (reflowBtn) {
+  reflowBtn.hidden = false;
+  reflowBtn.addEventListener("click", () => {
+    const on = document.querySelector(".resume").classList.toggle("is-reflow");
+    reflowBtn.setAttribute("aria-pressed", String(on));
+    reflowBtn.textContent = on ? "Show the A4 page" : "Reflow to read";
+  });
+}
+
 const pageTitle = document.title;
 addEventListener("beforeprint", () => { document.title = "Ethan Tam CV"; });
 addEventListener("afterprint", () => { document.title = pageTitle; });
@@ -24,7 +44,7 @@ const themeColors = document.querySelectorAll('meta[name="theme-color"]');
 const updateThemeBtn = () => {
   themeBtn.setAttribute("aria-pressed", String(isLight()));
   const bg = getComputedStyle(root).getPropertyValue("--bg").trim();
-  if (bg) themeColors.forEach((m) => m.setAttribute("content", bg));
+  if (bg) themeColors.forEach((m) => m.setAttribute("content", cssHex(bg)));
 };
 themeBtn.addEventListener("click", () => {
   const next = isLight() ? "dark" : "light";

@@ -1,4 +1,11 @@
 (() => {
+  // any CSS colour (the tokens are oklch) as [r, g, b, a], read back from a 1px canvas
+  const cssRgb = (color) => {
+    const px = Object.assign(document.createElement("canvas"), { width: 1, height: 1 }).getContext("2d", { willReadFrequently: true });
+    px.fillStyle = color; px.fillRect(0, 0, 1, 1);
+    return px.getImageData(0, 0, 1, 1).data;
+  };
+  const cssHex = (color) => "#" + [...cssRgb(color)].slice(0, 3).map((n) => n.toString(16).padStart(2, "0")).join("");
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (s, el = document) => el.querySelector(s);
   // Feedback that can't be missed, kept for the rare moments: a mistake shakes (±7px, 280ms), a success overshoots and
@@ -139,6 +146,11 @@
   const SESSIONS = { pre: "pre-market", ah: "after hours" };
   const PX_PER_SEC = 45;
   const POLL_MS = 5_000;
+  const STALE_MS = 3 * 60_000; // older than this, a quote shows its time
+  const stamp = (ms) => {
+    const d = new Date(ms), hm = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return d.toDateString() === new Date().toDateString() ? hm : `${d.toLocaleDateString([], { weekday: "short" })} ${hm}`;
+  };
   const quotes = new Map(WATCHLIST.map((s) => [s, { s }]));
 
   const fmtPx = (n) => n >= 1000
@@ -178,8 +190,10 @@
     paintRaf = 0;
     let css;
     for (const s of dirty) {
-      const { p, c, x } = quotes.get(s);
+      const { p, c, x, t } = quotes.get(s);
       const px = typeof p === "number" ? fmtQ(s, p) : "…";
+      // a price that is not from a pre-market or after-hours session and is minutes old says when it is from
+      const asOf = !x && typeof p === "number" && typeof t === "number" && Date.now() - t > STALE_MS ? `as of ${stamp(t)}` : "";
       const was = painted.get(s);
       const tone = typeof was === "number" && fmtQ(s, was) !== px ? (p > was ? "--up" : "--down") : null;
       painted.set(s, p);
@@ -188,14 +202,14 @@
         pEl.textContent = px;
         cEl.className = typeof c === "number" ? (c >= 0 ? "up" : "dn") : "";
         cEl.textContent = typeof c === "number" ? fmtMove(s, p, c) : "";
-        xEl.textContent = x ?? "";
+        xEl.textContent = x || asOf;
         if (tone) {
           css ??= getComputedStyle(document.documentElement);
           pEl.animate?.([{ color: css.getPropertyValue(tone).trim(), offset: 0 }], { duration: 1200, easing: "ease-out" });
         }
       }
       const chg = typeof c === "number" ? `, ${sayMove(s, p, c)}` : "";
-      cells.get(s)[0].setAttribute("aria-label", `${WATCH[s][0]}: ${px}${chg}${x ? `, ${SESSIONS[x]}` : ""}`);
+      cells.get(s)[0].setAttribute("aria-label", `${WATCH[s][0]}: ${px}${chg}${x ? `, ${SESSIONS[x]}` : asOf ? `, ${asOf}` : ""}`);
       if (s === popS) drawPop();
     }
     dirty.clear();
@@ -395,6 +409,8 @@
   addEventListener("pageshow", (e) => { if (e.persisted) resume(); });
   poll();
   connect();
+  // a quote that stops moving goes stale without a new tick to say so: look again every 30 s
+  setInterval(() => { if (document.hidden) return; for (const [s, q] of quotes) if (typeof q.p === "number") dirty.add(s); if (dirty.size && !paintRaf) paintRaf = requestAnimationFrame(paint); }, 30_000);
 
   /* ---------- projects: is each app up, and when was it last worked on ---------- */
   // from /api/projects (worker/index.js): the Worker loads each app and reads its last commit on GitLab, every 2 minutes
@@ -480,11 +496,8 @@
       const out = ctx.createImageData(W, H);
       // read theme-aware colors from CSS custom properties
       const cs = getComputedStyle(root);
-      const accentHex = cs.getPropertyValue("--accent").trim() || "#f2a93b";
-      const bgHex = cs.getPropertyValue("--bg").trim() || "#0c0b0a";
-      const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
-      const [ar, ag, ab] = hex(accentHex);
-      const [br, bg, bb] = hex(bgHex);
+      const [ar, ag, ab] = cssRgb(cs.getPropertyValue("--accent").trim() || "#f2a93b");
+      const [br, bg, bb] = cssRgb(cs.getPropertyValue("--bg").trim() || "#0c0b0a");
       for (let i = 0; i < W * H; i++) {
         const p = i * 4, on = lum[i] > 0.5;
         out.data[p] = on ? ar : br;
@@ -735,7 +748,7 @@
     const light = isLight();
     themeBtns.forEach((b) => b.setAttribute("aria-pressed", String(light)));
     const bg = getComputedStyle(root).getPropertyValue("--bg").trim();
-    if (bg) themeColors.forEach((m) => m.setAttribute("content", bg));
+    if (bg) themeColors.forEach((m) => m.setAttribute("content", cssHex(bg)));
   };
   const toggleTheme = (e) => {
     const light = isLight();
