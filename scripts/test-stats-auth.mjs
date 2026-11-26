@@ -79,6 +79,14 @@ let session;
   const cross = await route(post({ password: KEY }, "https://evil.example"));
   check("a sign-in posted from another site is refused (403)", cross.status === 403 && !cross.headers.get("set-cookie"));
   check("a POST with no Origin is refused", (await route(post({ password: KEY }, null))).status === 403);
+  // Firefox: Origin "null" on the form's own POST (seen live 27 Nov), with Sec-Fetch-Site saying it's this site
+  const ff = (site) => { const r = post({ password: KEY }, "null"); r.headers.set("sec-fetch-site", site); return r; };
+  reset();
+  check("Firefox-style 'Origin: null' from this site signs in", (await route(ff("same-origin"))).status === 303);
+  check("'Origin: null' from another site is refused", (await route(ff("cross-site"))).status === 403);
+  check("'Origin: null' with no Sec-Fetch-Site is refused", (await route(post({ password: KEY }, "null"))).status === 403);
+  const rp = (await route(get())).headers.get("referrer-policy");
+  check("the pages keep Origin on their own posts (referrer-policy same-origin, not no-referrer)", rp === "same-origin");
   const out = await route(post({ out: "1" }));
   check("sign out clears the cookie", out.status === 303 && /^__Host-stats=;.*Max-Age=0/.test(out.headers.get("set-cookie") ?? ""));
   const none = await route(get(), {});

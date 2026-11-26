@@ -85,7 +85,9 @@ export function signInPage(message = "") {
 
 // deps: allow() -> is this try within the rate limit; page() -> the stats page's HTML; sec -> headers for every response
 export async function statsRoute(request, env, { allow, page, sec = {} }) {
-  const base = { ...sec, "cache-control": "no-store", "x-robots-tag": "noindex, nofollow", "referrer-policy": "no-referrer" };
+  // same-origin, not no-referrer: under no-referrer Firefox sends "Origin: null" on the form's own POST, and the
+  // check below refused every sign-in. same-origin still sends nothing to other sites.
+  const base = { ...sec, "cache-control": "no-store", "x-robots-tag": "noindex, nofollow", "referrer-policy": "same-origin" };
   const html = (status, body, more = {}) => new Response(body, {
     status,
     headers: {
@@ -100,8 +102,11 @@ export async function statsRoute(request, env, { allow, page, sec = {} }) {
   const url = new URL(request.url);
 
   if (request.method === "POST") {
-    // a form posted from another site is refused (a browser always sends Origin on a POST)
-    if (request.headers.get("origin") !== url.origin) return html(403, signInPage("That sign-in came from another site. Open this page and try again."));
+    // a form posted from another site is refused. Origin is the check; when a browser blanks it to "null" (a page with
+    // a strict referrer policy, a privacy setting), its Sec-Fetch-Site still says whether the post came from this site
+    const origin = request.headers.get("origin");
+    const sameSite = origin === url.origin || ((!origin || origin === "null") && request.headers.get("sec-fetch-site") === "same-origin");
+    if (!sameSite) return html(403, signInPage("That sign-in came from another site. Open this page and try again."));
     const form = await request.formData().catch(() => null);
     if (form?.get("out")) return new Response(null, { status: 303, headers: { ...base, location: "/stats", "set-cookie": `${COOKIE}=; Max-Age=0; Path=/; Secure; HttpOnly; SameSite=Strict` } });
     if (!(await allow())) return html(429, signInPage("Too many tries. Wait a minute, then try again."), { "retry-after": "60" });
